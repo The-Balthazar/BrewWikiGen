@@ -64,6 +64,7 @@ end
 
 for i, file in ipairs({
     'Environment.lua',
+    'Generators.lua',
     'Utils.lua',
     'Components/Infobox.lua',
     'Components/Bodytext.lua',
@@ -72,7 +73,6 @@ for i, file in ipairs({
 end
 
 safecall(dofile, ModDirectories[1]..'documentation/Wiki Data.lua')
-safecall(dofile, WikiGeneratorDirectory..'Generators.lua')
 
 for i, dir in ipairs(ModDirectories) do
     safecall(LoadModFilesMakeUnitPagesGatherData, dir, i)
