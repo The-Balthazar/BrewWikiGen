@@ -4,10 +4,13 @@
 --------------------------------------------------------------------------------
 
 GetUnitBodytextLeadText = function(ModInfo, bp)
-    local bodytext = (bp.General.UnitName and '"'..LOC(bp.General.UnitName)..'" is a'
-    or 'This unamed unit is a')..(bp.General and bp.General.FactionName == 'Aeon' and 'n ' or ' ') -- a UEF, an Aeon ect.
-    ..(bp.General and bp.General.FactionName..' ')..(bp.Physics.MotionType and motionTypes[bp.Physics.MotionType][1] or 'structure')..' unit included in *'..ModInfo.name.."*.\n"
-    ..(bp.unitTdesc and 'It is classified as a '..string.lower(bp.unitTdesc) or 'It is an unclassified'..(bp.unitTlevel and ' '..string.lower(bp.unitTlevel) ) )..' unit'..(not bp.unitTlevel and ' with no defined tech level' or '')..'.'
+
+    local bodytext = (bp.General.UnitName and '"'..LOC(bp.General.UnitName)..'" is a' or 'This unamed unit is a')
+    ..(bp.General and bp.General.FactionName and string.upper(string.sub(bp.General.FactionName, 1, 1)) == 'A' and 'n ' or ' ')
+    ..(bp.General and bp.General.FactionName and bp.General.FactionName..' ' or 'factionless ')
+    ..(bp.Physics.MotionType and motionTypes[bp.Physics.MotionType][1] or 'structure')..' unit included in *'..ModInfo.name.."*.\n"
+    ..(bp.unitTdesc and 'It is classified as a '..string.lower(bp.unitTdesc) or 'It is an unclassified'..(bp.unitTlevel and ' '..string.lower(bp.unitTlevel) or '' ) )
+    ..' unit'..((not bp.unitTlevel) and ' with no defined tech level' or '')..'.'
 
     local BuildIntroTexts = {
         [0] = " It has no defined build description, and no categories to define common builders.\n",

@@ -31,7 +31,10 @@ function LoadModFilesMakeUnitPagesGatherData(ModDirectory, modsidebarindex)
             Data = GetUnitInfoboxData(ModInfo, bp),
         })
 
-        local headerstring = (bp.General.UnitName and '"'..LOC(bp.General.UnitName)..'": ' or '')..bp.unitTdesc.."\n----\n"
+        local headerstring = bp.General.UnitName and bp.unitTdesc and string.format("\"%s\": %s\n----\n", LOC(bp.General.UnitName), bp.unitTdesc)
+        or bp.General.UnitName and string.format("\"%s\"\n----\n", LOC(bp.General.UnitName) )
+        or bp.unitTdesc and string.format("%s\n----\n", bp.unitTdesc)
+        or ''
 
         local BodyTextSections = GetUnitBodytextSectionData(ModInfo, bp)
 
@@ -218,7 +221,10 @@ function GenerateCategoryPages()
     for cat, datum in pairs(categoryData) do
         table.sort(datum, function(a,b)
             g = { ['Tech 1'] = 1, ['Tech 2'] = 2, ['Tech 3'] = 3, ['Experi'] = 4 }
-            return (g[string.sub(a.UnitInfo.desc, 1, 6)] or 5)..a.UnitInfo.bpid < (g[string.sub(b.UnitInfo.desc, 1, 6)] or 5)..b.UnitInfo.bpid
+            return
+            (g[a.UnitInfo.desc and string.sub(a.UnitInfo.desc, 1, 6)] or 5)..a.UnitInfo.bpid
+            <
+            (g[b.UnitInfo.desc and string.sub(b.UnitInfo.desc, 1, 6)] or 5)..b.UnitInfo.bpid
         end)
 
         local catstring = 'Units with the <code>'..cat.."</code> category.\n<table>\n"
