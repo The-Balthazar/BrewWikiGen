@@ -160,8 +160,8 @@ function GenerateModPages()
 
     for modindex, moddata in ipairs(sidebarData) do
 
-        local InfoboxString = tostring(Infobox{
-            Style = 'mod-right',
+        local ModInfobox = Infobox{
+            Style = 'main-right',
             Header = {
                 moddata.ModInfo.name,
                 '<img src="'..ImageRepo..'mods/'..(moddata.ModInfo.icon and stringSanitiseFile(moddata.ModInfo.name, true, true) or 'mod')..'.png" width="256px" />'
@@ -169,8 +169,10 @@ function GenerateModPages()
             Data = {
                 { 'Author:', moddata.ModInfo.author },
                 { 'Version:', moddata.ModInfo.version },
+                {''},
+                {'', "<strong>Units:</strong>" }
             }
-        })
+        }
 
         local mulString = '***'..moddata.ModInfo.name..'*** is a mod by '..(moddata.ModInfo.author or 'an unknown author')
         ..". Its mod menu description is:\n"
@@ -181,6 +183,9 @@ function GenerateModPages()
             local faction = FactionsByIndex[i]
             local unitarray = moddata.Factions[i]
             if unitarray then
+
+                table.insert(ModInfobox.Data, { faction..':', #moddata.Factions[i] })
+
                 local curtechi = 0
                 local thash = {
                     ['Tech 1'] = {1, 'Tech 1'},
@@ -204,8 +209,10 @@ function GenerateModPages()
             end
         end
 
+        table.insert(ModInfobox.Data, { 'Total:', tableSubcount(moddata.Factions) })
+
         md = io.open(OutputDirectory..stringSanitiseFile(moddata.ModInfo.name)..'.md', "w")
-        md:write(InfoboxString..mulString)
+        md:write(tostring(ModInfobox)..mulString)
         md:close()
 
     end

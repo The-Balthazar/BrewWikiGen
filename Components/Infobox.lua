@@ -101,10 +101,9 @@ GetUnitInfoboxData = function(ModInfo, bp)
     }
 end
 
-local InfoboxHeader = function(style, ...)
-    --local arg = {...}
+local InfoboxHeader = function(style, data)
     local styles = {
-        ['main-right'] = [[
+        ['main-right1'] = [[
 <table align=right>
     <thead>
         <tr>
@@ -115,7 +114,7 @@ local InfoboxHeader = function(style, ...)
     </thead>
     <tbody>
 ]],
-        ['mod-right'] = [[
+        ['main-right2'] = [[
 <table align=right>
     <thead>
         <tr>
@@ -131,9 +130,9 @@ local InfoboxHeader = function(style, ...)
     </thead>
     <tbody>
 ]],
-        ['detail-left'] = "<details>\n<summary>%s</summary>\n<p>\n    <table>\n",
+        ['detail-left1'] = "<details>\n<summary>%s</summary>\n<p>\n    <table>\n",
     }
-    return string.format(styles[style], table.unpack{...})
+    return string.format(styles[style..#data], table.unpack(data))
 end
 
 local InfoboxRow = function(th, td, tip)
@@ -150,7 +149,7 @@ end
 local InfoboxEnd = function(style)
     local styles = {
         ['main-right'] = "    </tbody>\n</table>\n\n",
-        ['mod-right'] = "    </tbody>\n</table>\n\n",
+        --['mod-right'] = "    </tbody>\n</table>\n\n",
         ['detail-left'] = "    </table>\n</p>\n</details>\n",
     }
     return styles[style]
@@ -160,12 +159,12 @@ Infobox = function(spec)
     return setmetatable(spec, {
 
         __tostring = function(self)
-            local infoboxstring = InfoboxHeader(self.Style, table.unpack(self.Header) )
+            local infoboxstring = InfoboxHeader(self.Style, self.Header )
             if type(self.Data) == 'string' then
                 infoboxstring = infoboxstring .. self.Data
             else
                 for i, field in ipairs(self.Data) do
-                    infoboxstring = infoboxstring .. InfoboxRow(field[1], field[2], field[3])
+                    infoboxstring = infoboxstring .. InfoboxRow( table.unpack(field) )
                 end
             end
             return infoboxstring .. InfoboxEnd(self.Style)

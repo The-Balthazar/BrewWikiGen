@@ -61,6 +61,21 @@ tableOverwrites = function(t1, t2)
     return new
 end
 
+tableSubcount = function(t)
+    local num = 0
+    for i, v in pairs(t) do
+        num = num + #v
+    end
+    return num
+end
+
+tableSubcounts = function(t)
+    local nums = {}
+    for i, v in pairs(t) do
+        nums[i] = #v
+    end
+    return nums
+end
 --------------------------------------------------------------------------------
 -- Generic string functions
 --------------------------------------------------------------------------------
