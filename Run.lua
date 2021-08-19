@@ -68,6 +68,7 @@ for i, file in ipairs({
     'Utils.lua',
     'Components/Infobox.lua',
     'Components/Bodytext.lua',
+    'Components/Weapon.lua',
 }) do
     safecall(dofile, WikiGeneratorDirectory..file)
 end
