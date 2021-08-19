@@ -51,8 +51,6 @@ function LoadModFilesMakeUnitPagesGatherData(ModDirectory, modsidebarindex)
         local cattext = ''
 
         if _G.FooterCategories and _G.FooterCategories[1] then
-            bodytext = bodytext.."\n<table align=center>\n<td>Categories : "
-
             for i, cat in ipairs(FooterCategories) do
                 if arrayfind(bp.Categories, cat) then
 
@@ -71,6 +69,9 @@ function LoadModFilesMakeUnitPagesGatherData(ModDirectory, modsidebarindex)
 
                     cattext = cattext..'<a href="_categories.'..cat..'">'..cat..'</a>'
                 end
+            end
+            if cattext ~= '' then
+                cattext = "\n<table align=center>\n<td>Categories : "..cattext
             end
         end
         ------------------------------------------------------------------------
@@ -94,7 +95,7 @@ function LoadModFilesMakeUnitPagesGatherData(ModDirectory, modsidebarindex)
         table.insert(sidebarData[modsidebarindex].Factions[factioni], UnitInfo)
     end
 
-    print( #BlueprintPathsArray..' unit wiki page'..(#BlueprintPathsArray > 1 and 's' or '')..' created' )
+    print( #BlueprintPathsArray..' unit wiki page'..(#BlueprintPathsArray ~= 1 and 's' or '')..' created' )
 end
 
 local sortData = function(sorttable, sort)
@@ -170,7 +171,7 @@ function GenerateModPages()
                 { 'Author:', moddata.ModInfo.author },
                 { 'Version:', moddata.ModInfo.version },
                 {''},
-                {'', "<strong>Units:</strong>" }
+                {'', "<strong>Unit counts:</strong>" }
             }
         }
 

@@ -138,10 +138,10 @@ end
 local InfoboxRow = function(th, td, tip)
     if th == '' then
         return "        <tr><td colspan='2' align=center>"..(td or '').."</td></tr>\n"
-    elseif td then
+    elseif td and tostring(td) ~= '' then
         return "        <tr>\n            <td align=right><strong>"
         ..(th or '').."</strong></td>\n            <td>"
-        ..td..(tip and ' <span title="'..tip..'">(<u>?</u>)</span>' or '').."</td>\n        </tr>\n"
+        ..tostring(td)..(tip and ' <span title="'..tip..'">(<u>?</u>)</span>' or '').."</td>\n        </tr>\n"
     end
     return ''
 end
@@ -171,4 +171,13 @@ Infobox = function(spec)
         end,
 
     })
+end
+
+DoToInfoboxDataCell = function(fun, infodata, key, value)
+    for i, v in ipairs(infodata) do
+        if v[1] == key then
+            fun(v[2], value)
+            break
+        end
+    end
 end
