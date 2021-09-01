@@ -44,6 +44,7 @@ function LoadModFilesMakeUnitPagesGatherData(ModDirectory, modsidebarindex)
             bpid = bp.ID,
             name = LOC(bp.General.UnitName),
             desc = bp.unitTdesc,
+            tech = bp.unitTlevel,
         }
 
         ------------------------------------------------------------------------
@@ -108,14 +109,15 @@ local sortData = function(sorttable, sort)
                 table.sort(unitarray, function(a,b)
                     --return a[3] < b[3]
                     local g
+                    local desc = a.desc or 'z error'
 
                     if sort == 'TechDescending-DescriptionAscending' then
-                        g = { ['Experi'] = 1, ['Tech 3'] = 2, ['Tech 2'] = 3, ['Tech 1'] = 4 }
-                        return (g[string.sub(a.desc, 1, 6)] or 5)..a.desc < (g[string.sub(b.desc, 1, 6)] or 5)..b.desc
+                        g = { ['Experimental'] = 1, ['Tech 3'] = 2, ['Tech 2'] = 3, ['Tech 1'] = 4 }
+                        return (g[a.tech] or 5)..desc < (g[a.tech] or 5)..desc
 
                     elseif sort == 'TechAscending-IDAscending' then
-                        g = { ['Tech 1'] = 1, ['Tech 2'] = 2, ['Tech 3'] = 3, ['Experi'] = 4 }
-                        return (g[string.sub(a.desc, 1, 6)] or 5)..a.bpid < (g[string.sub(b.desc, 1, 6)] or 5)..b.bpid
+                        g = { ['Tech 1'] = 1, ['Tech 2'] = 2, ['Tech 3'] = 3, ['Experimental'] = 4 }
+                        return (g[a.tech] or 5)..a.bpid < (g[a.tech] or 5)..b.bpid
 
                     end
                 end)

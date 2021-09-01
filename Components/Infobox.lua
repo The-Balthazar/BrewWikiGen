@@ -15,33 +15,29 @@ GetUnitInfoboxData = function(ModInfo, bp)
                 not arrayfind(bp.Categories, 'INVULNERABLE')
                 and iconText(
                     'Health',
-                    bp.Defense.MaxHealth,
-                    (bp.Defense.RegenRate and ' (+'..bp.Defense.RegenRate ..'/s)')
+                    bp.Defense and bp.Defense.MaxHealth,
+                    (bp.Defense and bp.Defense.RegenRate and ' (+'..bp.Defense.RegenRate ..'/s)')
                 )
                 or 'Invulnerable'
             )
         },
-        {'Armour:', (not arrayfind(bp.Categories, 'INVULNERABLE') and bp.Defense.ArmorType and '<code>'..bp.Defense.ArmorType..'</code>')},
+        {'Armour:', (bp.Defense and not arrayfind(bp.Categories, 'INVULNERABLE') and bp.Defense.ArmorType and '<code>'..bp.Defense.ArmorType..'</code>')},
         {'Shield health:',
             iconText(
                 'Shield',
-                bp.Defense.Shield and bp.Defense.Shield.ShieldMaxHealth,
-                (bp.Defense.Shield and bp.Defense.Shield.ShieldRegenRate and ' (+'..bp.Defense.Shield.ShieldRegenRate..'/s)')
+                tableSafe(bp.Defense, 'Shield', 'ShieldMaxHealth'),
+                (tableSafe(bp.Defense, 'Shield', 'ShieldRegenRate') and ' (+'..bp.Defense.Shield.ShieldRegenRate..'/s)')
             )
         },
-        {'Shield radius:', (bp.Defense.Shield and bp.Defense.Shield.ShieldSize and numberFormatNoTrailingZeros(bp.Defense.Shield.ShieldSize / 2))}, --Shield size is a scale multiplier, and so is effectively diameter
+        {'Shield radius:', (tableSafe(bp.Defense, 'Shield', 'ShieldSize') and numberFormatNoTrailingZeros(bp.Defense.Shield.ShieldSize / 2))}, --Shield size is a scale multiplier, and so is effectively diameter
         {'Flags:',
-            (
-                arrayfind(bp.Categories, 'UNTARGETABLE') or
-                (arrayfind(bp.Categories, 'UNSELECTABLE') or not arrayfind(bp.Categories, 'SELECTABLE') ) or
-                (bp.Display and bp.Display.HideLifebars or bp.LifeBarRender == false) or
-                (bp.Defense and bp.Defense.Shield and (bp.Defense.Shield.AntiArtilleryShield or bp.Defense.Shield.PersonalShield))
-            ) and
-            (arrayfind(bp.Categories, 'UNTARGETABLE') and 'Untargetable<br />' or '')..
-            ( (arrayfind(bp.Categories, 'UNSELECTABLE') or not arrayfind(bp.Categories, 'SELECTABLE') ) and 'Unselectable<br />' or '')..
-            ((bp.Display and bp.Display.HideLifebars or bp.LifeBarRender == false) and 'Lifebars hidden<br />' or '' )..
-            (bp.Defense and bp.Defense.Shield and bp.Defense.Shield.AntiArtilleryShield and 'Artillery shield<br />' or '')..
-            (bp.Defense and bp.Defense.Shield and bp.Defense.Shield.PersonalShield and 'Personal shield<br />' or '')
+            InfoboxFlagsList{
+                arrayfind(bp.Categories, 'UNTARGETABLE') and 'Untargetable' or '',
+                (arrayfind(bp.Categories, 'UNSELECTABLE') or not arrayfind(bp.Categories, 'SELECTABLE')) and 'Unselectable' or '',
+                (bp.Display and bp.Display.HideLifebars or bp.LifeBarRender == false) and 'Lifebars hidden' or '',
+                tableSafe(bp.Defense,'Shield','AntiArtilleryShield') and 'Artillery shield' or '',
+                tableSafe(bp.Defense,'Shield','PersonalShield') and 'Personal shield' or '',
+            }
         },
         {''},
         {'Energy cost:', iconText('Energy', bp.Economy and bp.Economy.BuildCostEnergy)},
@@ -71,11 +67,11 @@ GetUnitInfoboxData = function(ModInfo, bp)
         {'Radar stealth radius:', (bp.Intel and bp.Intel.RadarStealthFieldRadius)},
         {'Sonar stealth radius:', (bp.Intel and bp.Intel.SonarStealthFieldRadius)},
         {'Flags:',
-            (bp.Intel and (bp.Intel.Cloak or bp.Intel.RadarStealth or bp.Intel.SonarStealth))
-            and
-            (bp.Intel.Cloak and 'Cloak<br />' or '')..
-            (bp.Intel.RadarStealth and 'Radar stealth<br />' or '')..
-            (bp.Intel.SonarStealth and 'Sonar stealth<br />' or '')
+            bp.Intel and InfoboxFlagsList{
+                (bp.Intel.Cloak and 'Cloak' or ''),
+                (bp.Intel.RadarStealth and 'Radar stealth' or ''),
+                (bp.Intel.SonarStealth and 'Sonar stealth' or ''),
+            }
         },
         {''},
         {'Motion type:', bp.Physics.MotionType and ('<code>'..bp.Physics.MotionType..'</code>')},
@@ -99,6 +95,29 @@ GetUnitInfoboxData = function(ModInfo, bp)
         {'Misc radius:', arrayfind(bp.Categories, 'OVERLAYMISC') and bp.AI and bp.AI.StagingPlatformScanRadius, 'Defined by the air staging radius value. Often used to indicate things without a dedicated range ring.' },
         {'Weapons:', bp.Weapon and #bp.Weapon..' (<a href="#weapons">Details</a>)'},
     }
+end
+
+InfoboxFlagsList = function(spec)
+    return setmetatable(spec, {
+
+        __tostring = function(self)
+            local s = ''
+            for i, v in ipairs(self) do
+                if v and tostring(v) ~= '' then
+                    if s ~= '' then
+                        s = s..'<br />'
+                    end
+                    s = s..tostring(v)
+                end
+            end
+            return s
+        end,
+
+        __eq = function(t1, t2)
+            return tostring(t1) == tostring(t2)
+        end,
+
+    })
 end
 
 local InfoboxHeader = function(style, data)
@@ -141,7 +160,7 @@ local InfoboxRow = function(th, td, tip)
     elseif td and tostring(td) ~= '' then
         return "        <tr>\n            <td align=right><strong>"
         ..(th or '').."</strong></td>\n            <td>"
-        ..tostring(td)..(tip and ' <span title="'..tip..'">(<u>?</u>)</span>' or '').."</td>\n        </tr>\n"
+        ..tostring(td)..hoverTip(tip).."</td>\n        </tr>\n"
     end
     return ''
 end

@@ -3,126 +3,11 @@
 -- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
 --------------------------------------------------------------------------------
 
-GetWeaponSectionString = function(bp)
-    local compiledWeaponsTable = {}
-
-    for i, wep in ipairs(bp.Weapon) do
-        weapontable = {}
-        table.insert(weapontable, {'Target type:', WepTarget(wep, bp)})
-        table.insert(weapontable, {'DPS estimate:', DPSEstimate(wep), "Note: This only counts listed stats."})
-        table.insert(weapontable, {
-            'Damage:',
-            (wep.NukeInnerRingDamage or wep.Damage),
-            ( not (IsDeathWeapon(wep) and not wep.FireOnDeath) and "Note: This doesn't count additional scripted effects, such as splintering projectiles, and variable scripted damage.")
-        })
-        table.insert(weapontable, {'Damage to shields:', (wep.DamageToShields or wep.ShieldDamage)})
-        table.insert(weapontable, {'Damage radius:', (wep.NukeInnerRingRadius or wep.DamageRadius)})
-        table.insert(weapontable, {'Outer damage:', wep.NukeOuterRingDamage})
-        table.insert(weapontable, {'Outer radius:', wep.NukeOuterRingRadius})
-        do
-            local s = WepProjectiles(wep)
-            if s and s > 1 then
-                if wep.BeamCollisionDelay then
-                    s = tostring(s)..' beams'
-                else
-                    s = tostring(s)..' projectiles'
-                end
-            else
-                s = ''
-            end
-            local dot = wep.DoTPulses
-            if dot and dot > 1 then
-                if s ~= '' then
-                    s = s..'<br />'
-                end
-                s = s..dot.. ' DoT pulses'
-            end
-            if (wep.BeamLifetime and wep.BeamLifetime > 0) and wep.BeamCollisionDelay then
-                if s ~= '' then
-                    s = s..'<br />'
-                end
-                s = math.ceil( (wep.BeamLifetime or 1) / (wep.BeamCollisionDelay + 0.1) )..' beam collisions'
-            end
-            if s == '' then s = nil end
-            table.insert(weapontable, {'Damage instances:', s})
-        end
-        table.insert(weapontable, {'Damage type:', wep.DamageType and '<code>'..wep.DamageType..'</code>'})
-        table.insert(weapontable, {'Max range:', not IsDeathWeapon(wep) and wep.MaxRadius})
-        table.insert(weapontable, {'Min range:', wep.MinRadius})
-        table.insert(weapontable, {'Firing arc:', ArcTable{wep.Turreted and wep.TurretYawRange} })
-        if not IsDeathWeapon(wep) and wep.RateOfFire and not (wep.BeamLifetime == 0 and wep.BeamCollisionDelay) then
-            table.insert(weapontable, {
-                'Firing cycle:',
-                ('Once every '..tostring(math.floor(10 / wep.RateOfFire + 0.5)/10)..'s' ),
-                "Note: This doesn't count additional delays such as charging, reloading, and others."
-            })
-        elseif not IsDeathWeapon(wep) and (wep.BeamLifetime == 0 and wep.BeamCollisionDelay) then
-            table.insert(weapontable, {
-                'Firing cycle:',
-                'Continuous beam<br />Once every '..((wep.BeamCollisionDelay or 0) + 0.1)..'s',
-                'How often damage instances occur.'
-            })
-        end
-        table.insert(weapontable, {'Firing cost:',
-            iconText(
-                'Energy',
-                wep.EnergyRequired and wep.EnergyRequired ~= 0 and
-                (
-                    wep.EnergyRequired ..
-                        (wep.EnergyDrainPerSecond and ' ('..wep.EnergyDrainPerSecond..'/s for '..(math.ceil((wep.EnergyRequired/wep.EnergyDrainPerSecond)*10)/10)..'s)' or '')
-                    )
-                )
-            }
-        )
-        table.insert(weapontable, {'Flags:', (wep.ArtilleryShieldBlocks and 'Artillery <span title="Blocked by artillery shield">(<u>?</u>)</span>' or nil)})
-        table.insert(weapontable, {'Projectile storage:', (wep.MaxProjectileStorage and (wep.InitialProjectileStorage or 0)..'/'..(wep.MaxProjectileStorage) )})
-        if wep.Buffs then
-            local buffs = ''
-            for i, buff in ipairs(wep.Buffs) do
-                if buff.BuffType then
-                    if buffs ~= '' then
-                        buffs = buffs..'<br />'
-                    end
-                    buffs = buffs..'<code>'..buff.BuffType..'</code>'
-                end
-            end
-            if buffs == '' then
-                buffs = nil
-            end
-            table.insert(weapontable, {'Buffs:', buffs})
-        end
-
-        local CWTn = #compiledWeaponsTable
-        if compiledWeaponsTable[1] and arrayEqual(compiledWeaponsTable[CWTn][3], weapontable) then
-            compiledWeaponsTable[CWTn][2] = compiledWeaponsTable[CWTn][2] + 1
-            DoToInfoboxDataCell(table.insert, compiledWeaponsTable[CWTn][3], 'Firing arc:', wep.Turreted and wep.TurretYawRange)
-        else
-            table.insert(compiledWeaponsTable, {(wep.DisplayName or wep.Label or '<i>Dummy Weapon</i>'), 1, weapontable})
-        end
-    end
-
-    local text = ''
-    for i, wepdata in ipairs(compiledWeaponsTable) do
-        local weapontable = wepdata[3]
-
-        if wepdata[2] ~= 1 then
-            table.insert(weapontable, 1, {'', 'Note: Stats are per instance of the weapon.'} )
-        end
-
-        text = text .. tostring(Infobox{
-            Style = 'detail-left',
-            Header = { wepdata[1]..(wepdata[2] == 1 and '' or ' (×'..tostring(wepdata[2])..')') },
-            Data = weapontable
-        })
-    end
-    return text
-end
-
 IsDeathWeapon = function(wep)
     return (wep.Label == 'DeathWeapon' or wep.Label == 'DeathImpact' or wep.WeaponCategory == 'Death')
 end
 
-GetTargetLayers = function(weapon, unit)
+local GetWeaponTargetLayers = function(weapon, unit)
     local fromLayers = motionTypes[unit.Physics.MotionType][2]
     local targetLayers = {}
     if weapon.FireTargetLayerCapsTable then
@@ -144,13 +29,13 @@ GetTargetLayers = function(weapon, unit)
     return targetLayers, tableSum(targetLayers)
 end
 
-WepTarget = function(weapon, unit)
+local GetWeaponTargets = function(weapon, unit)
     if IsDeathWeapon(weapon) then
         return nil
     end
 
     if weapon.TargetType == 'RULEWTT_Projectile' then
-        local s = '<code>'..weapon.TargetType..'</code>'
+        local s = '<code>RULEWTT_Projectile</code>'
         local mapping = {
             {'STRATEGIC', '(Anti-strategic)'},
             { 'TACTICAL', '(Anti-tactical)'},
@@ -165,7 +50,7 @@ WepTarget = function(weapon, unit)
         return s
 
     elseif weapon.TargetType == 'RULEWTT_Prop' then
-        return '<code>'..weapon.TargetType..'</code><error:prop weapon;its a real thing but why>'
+        return '<code>RULEWTT_Prop</code><error:prop weapon;its a real thing but why>'
 
     else --'RULEWTT_Unit' is the default and generally not written
         local s = '<code>RULEWTT_Unit</code>'
@@ -174,7 +59,7 @@ WepTarget = function(weapon, unit)
             return s .. '<br />(Anti-Air)'
         end
 
-        local targetLayers, bitwiselayers = GetTargetLayers(weapon, unit)
+        local targetLayers, bitwiselayers = GetWeaponTargetLayers(weapon, unit)
 
         if bitwiselayers == 0 then
             return 'Untargeted'
@@ -217,7 +102,7 @@ WepTarget = function(weapon, unit)
     end
 end
 
-WepProjectiles = function(weapon)
+local WepProjectiles = function(weapon)
     if not weapon.RackBones then return end
     local ProjectileCount
     if weapon.MuzzleSalvoDelay == 0 then
@@ -231,13 +116,68 @@ WepProjectiles = function(weapon)
     return ProjectileCount
 end
 
-DPSEstimate = function(weapon)
-    -- Dont do death weapons, or weapons without RoF
-    if IsDeathWeapon(weapon) or not weapon.RateOfFire then
+local GetDamageInstances = function(wep)
+    local s = WepProjectiles(wep)
+    if s and s > 1 then
+        if wep.BeamCollisionDelay then
+            s = tostring(s)..' beams'
+        else
+            s = tostring(s)..' projectiles'
+        end
+    else
+        s = ''
+    end
+    local dot = wep.DoTPulses
+    if dot and dot > 1 then
+        if s ~= '' then
+            s = s..'<br />'
+        end
+        s = s..dot.. ' DoT pulses'
+    end
+    if (wep.BeamLifetime and wep.BeamLifetime > 0) and wep.BeamCollisionDelay then
+        if s ~= '' then
+            s = s..'<br />'
+        end
+        s = math.ceil( (wep.BeamLifetime or 1) / (wep.BeamCollisionDelay + 0.1) )..' beam collisions'
+    end
+    if s == '' then s = nil end
+    return s
+end
+
+local GetFiringCycle = function(wep)
+    if IsDeathWeapon(wep) then
         return
     end
-    -- Only do unit weapons, not projectile or the technically real but not really 'prop' weapons
-    if not (weapon.TargetType == 'RULEWTT_Unit' or not weapon.TargetType) then
+    if wep.RateOfFire and not (wep.BeamLifetime == 0 and wep.BeamCollisionDelay) then
+        return ('Once every '..tostring(math.floor(10 / wep.RateOfFire + 0.5)/10)..'s' ), "Note: This doesn't count additional delays such as charging, reloading, and others."
+    elseif (wep.BeamLifetime == 0 and wep.BeamCollisionDelay) then
+        return ('Continuous beam<br />Once every '..((wep.BeamCollisionDelay or 0) + 0.1)..'s'), 'How often damage instances occur.'
+    end
+end
+
+local GetWeaponBuffs = function(wep)
+    if wep.Buffs then
+        local buffs = ''
+        for i, buff in ipairs(wep.Buffs) do
+            if buff.BuffType then
+                if buffs ~= '' then
+                    buffs = buffs..'<br />'
+                end
+                buffs = buffs..'<code>'..buff.BuffType..'</code>'
+            end
+        end
+        if buffs == '' then
+            buffs = nil
+        end
+        return buffs
+    end
+end
+
+local DPSEstimate = function(weapon)
+    -- Dont do death weapons, or weapons without RoF
+    if IsDeathWeapon(weapon)
+    or not weapon.RateOfFire
+    or not (weapon.TargetType == 'RULEWTT_Unit' or not weapon.TargetType) then -- Undefined is 'Unit'
         return
     end
 
@@ -270,7 +210,7 @@ DPSEstimate = function(weapon)
     return math.floor(damage * rof + 0.5)
 end
 
-ArcTable = function(spec)
+local ArcTable = function(spec)
     return setmetatable(spec, {
 
         __tostring = function(self)
@@ -286,7 +226,11 @@ ArcTable = function(spec)
                 if s ~= '' then
                     s = s..', '
                 end
-                s = s..v+v..'°'
+                if type(v) == 'number' then
+                    s = s..v+v..'°'
+                else
+                    s = s..'false <error:unturreted weapon or non-number yaw>'
+                end
             end
             return s
         end,
@@ -296,4 +240,81 @@ ArcTable = function(spec)
         end,
 
     })
+end
+
+--------------------------------------------------------------------------------
+
+GetWeaponInfoboxData = function(wep, bp)
+    return {
+        {'Target type:', GetWeaponTargets(wep, bp)},
+        {'DPS estimate:', DPSEstimate(wep), "Note: This only counts listed stats."},
+        {
+            'Damage:',
+            (wep.NukeInnerRingDamage or wep.Damage),
+            ( not (IsDeathWeapon(wep) and not wep.FireOnDeath) and "Note: This doesn't count additional scripted effects, such as splintering projectiles, and variable scripted damage.")
+        },
+        {'Damage to shields:', (wep.DamageToShields or wep.ShieldDamage)},
+        {'Damage radius:', (wep.NukeInnerRingRadius or wep.DamageRadius)},
+        {'Outer damage:', wep.NukeOuterRingDamage},
+        {'Outer radius:', wep.NukeOuterRingRadius},
+        {'Damage instances:', GetDamageInstances(wep)},
+        {'Damage type:', wep.DamageType and '<code>'..wep.DamageType..'</code>'},
+        {'Max range:', not IsDeathWeapon(wep) and wep.MaxRadius},
+        {'Min range:', wep.MinRadius},
+        {'Firing arc:', ArcTable{wep.Turreted and wep.TurretYawRange}},
+        {'Firing cycle:', GetFiringCycle(wep)},
+        {'Firing cost:',
+            iconText(
+                'Energy',
+                wep.EnergyRequired and wep.EnergyRequired ~= 0 and
+                (
+                    wep.EnergyRequired ..
+                    (wep.EnergyDrainPerSecond and ' ('..wep.EnergyDrainPerSecond..'/s for '..(math.ceil((wep.EnergyRequired/wep.EnergyDrainPerSecond)*10)/10)..'s)' or '')
+                )
+            )
+        },
+        {'Flags:',
+            InfoboxFlagsList{
+                (wep.ArtilleryShieldBlocks and 'Artillery shield blocks' or ''),
+                --(wep.PrefersPrimaryWeaponTarget and 'Prefers primary target' or ''),
+                --(wep.NotExclusive and 'Not exclusive' or ''),
+                (wep.CollideFriendly and 'Collide friendly' or ''),
+                (wep.DamageFriendly and 'Damage friendly' or ''),
+            }
+        },
+        {'Projectile storage:', (wep.MaxProjectileStorage and (wep.InitialProjectileStorage or 0)..'/'..(wep.MaxProjectileStorage) )},
+        {'Buffs:', GetWeaponBuffs(wep)},
+    }
+end
+
+GetWeaponBodytextSectionString = function(bp)
+    local compiledWeaponsTable = {}
+
+    for i, wep in ipairs(bp.Weapon) do
+        weapontable = GetWeaponInfoboxData(wep, bp)
+
+        local CWTn = #compiledWeaponsTable
+        if compiledWeaponsTable[1] and arrayEqual(compiledWeaponsTable[CWTn][3], weapontable) then
+            compiledWeaponsTable[CWTn][2] = compiledWeaponsTable[CWTn][2] + 1
+            DoToInfoboxDataCell(table.insert, compiledWeaponsTable[CWTn][3], 'Firing arc:', wep.Turreted and wep.TurretYawRange)
+        else
+            table.insert(compiledWeaponsTable, {(wep.DisplayName or wep.Label or '<i>Dummy Weapon</i>'), 1, weapontable})
+        end
+    end
+
+    local text = ''
+    for i, wepdata in ipairs(compiledWeaponsTable) do
+        local weapontable = wepdata[3]
+
+        if wepdata[2] ~= 1 then
+            table.insert(weapontable, 1, {'', 'Note: Stats are per instance of the weapon.'} )
+        end
+
+        text = text .. tostring(Infobox{
+            Style = 'detail-left',
+            Header = { wepdata[1]..(wepdata[2] == 1 and '' or ' (×'..tostring(wepdata[2])..')') },
+            Data = weapontable
+        })
+    end
+    return text
 end

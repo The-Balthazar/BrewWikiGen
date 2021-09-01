@@ -79,7 +79,7 @@ only and the check should at most need to be performed in game at most once.
 Mod files that must meet this criteria are `_unit.bp` files, and:
 
 *    `/mod_info.lua`
-*    `/hook/lua/ui/help/tooltips.lua'`
+*    `/hook/lua/ui/help/tooltips.lua`
 *    `/hook/lua/ui/help/unitdescription.lua`
 *    `/hook/loc/US/strings_db.lua`
 

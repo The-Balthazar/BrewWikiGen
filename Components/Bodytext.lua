@@ -30,7 +30,7 @@ GetUnitBodytextSectionData = function(ModInfo, bp)
             Data = function(bp)
                 local text = "Hover over abilities to see effect descriptions.\n"
                 for i, ability in ipairs(bp.Display.Abilities) do
-                    text = text.."\n* "..abilityTitle(LOC(ability))
+                    text = text.."\n*"..abilityTitle(LOC(ability))
                 end
                 return text
             end
@@ -207,7 +207,7 @@ GetUnitBodytextSectionData = function(ModInfo, bp)
         {
             'Weapons',
             check = bp.Weapon,
-            Data = GetWeaponSectionString
+            Data = GetWeaponBodytextSectionString
         },
         {
             'Veteran levels',
@@ -223,13 +223,15 @@ GetUnitBodytextSectionData = function(ModInfo, bp)
                 for i = 1, 5 do
                     local lev = 'Level'..i
                     if bp.Veteran[lev] then
-                        text = text .. "\n"..i..'. '..bp.Veteran[lev]..' kills gives: '..iconText('Health', bp.Defense and bp.Defense.MaxHealth and '+'..numberFormatNoTrailingZeros(bp.Defense.MaxHealth / 10 * i) )
-                        for buffname, buffD in pairs(bp.Buffs) do
-                            if buffD[lev] then
-                                if buffname == 'Regen' then
-                                    text = text..' (+'..buffD[lev]..'/s)'
-                                else
-                                    text = text..' '..buffname..': '..buffD[lev]
+                        text = text .. "\n"..i..'. '..bp.Veteran[lev]..' kills gives: '..(bp.Defense and bp.Defense.MaxHealth and iconText('Health', '+'..numberFormatNoTrailingZeros(bp.Defense.MaxHealth / 10 * i) ) or 'error:vet defined and no defense defined' )
+                        if bp.Buffs then
+                            for buffname, buffD in pairs(bp.Buffs) do
+                                if buffD[lev] then
+                                    if buffname == 'Regen' then
+                                        text = text..' (+'..buffD[lev]..'/s)'
+                                    else
+                                        text = text..' '..buffname..': '..buffD[lev]
+                                    end
                                 end
                             end
                         end

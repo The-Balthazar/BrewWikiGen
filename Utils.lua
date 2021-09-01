@@ -97,6 +97,20 @@ tableSum = function(t)
     return total
 end
 
+tableSafe = function(target, ...)
+    if not target then
+        return false
+    end
+    for i, t in ipairs{...} do
+        if target[t] then
+            target = target[t]
+        else
+            return false
+        end
+    end
+    return target
+end
+
 --------------------------------------------------------------------------------
 -- Generic string functions
 --------------------------------------------------------------------------------
@@ -137,10 +151,17 @@ numberFormatNoTrailingZeros = function(n)
     return n
 end
 
+hoverTip = function(s1, s2)
+    return s1 and ' '..'<span title="'..s1..'" >'..(s2 and s2 or "(<u>?</u>)")..'</span>' or ''
+end
+
 --------------------------------------------------------------------------------
 
 iconText = function(icon, text, text2)
-    --icon = string.lower(icon)
+
+    text = numberFormatNoTrailingZeros(text)
+    text2 = numberFormatNoTrailingZeros(text2)
+
     local icons = {
         Health = IconRepo..'health.png',
         Regen = IconRepo..'health.png',
@@ -219,7 +240,7 @@ abilityDesc = {
 }
 
 abilityTitle = function(ability)
-    return '<span title="'..(abilityDesc[ability] or 'error:description')..'" >'..ability..'</span>'
+    return hoverTip( abilityDesc[ability] or 'error:description', ability)
 end
 
 BuildableLayer = function(phys)
