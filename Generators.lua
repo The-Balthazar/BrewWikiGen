@@ -44,7 +44,7 @@ function LoadModFilesMakeUnitPagesGatherData(ModDirectory, modsidebarindex)
             bpid = bp.ID,
             name = LOC(bp.General.UnitName),
             desc = bp.unitTdesc,
-            tech = bp.unitTlevel,
+            tech = bp.unitTIndex,
         }
 
         ------------------------------------------------------------------------
@@ -107,17 +107,14 @@ local sortData = function(sorttable, sort)
             local unitarray = moddata.Factions[i]
             if unitarray then
                 table.sort(unitarray, function(a,b)
-                    --return a[3] < b[3]
-                    local g
-                    local desc = a.desc or 'z error'
 
                     if sort == 'TechDescending-DescriptionAscending' then
-                        g = { ['Experimental'] = 1, ['Tech 3'] = 2, ['Tech 2'] = 3, ['Tech 1'] = 4 }
-                        return (g[a.tech] or 5)..desc < (g[a.tech] or 5)..desc
+                        local function sortkey(c) return (5-(c.tech or 0))..(c.desc or 'z error')..c.bpid end
+                        return sortkey(a) < sortkey(b)
 
                     elseif sort == 'TechAscending-IDAscending' then
-                        g = { ['Tech 1'] = 1, ['Tech 2'] = 2, ['Tech 3'] = 3, ['Experimental'] = 4 }
-                        return (g[a.tech] or 5)..a.bpid < (g[a.tech] or 5)..b.bpid
+                        local function sortkey(c) return (c.tech or 5)..c.bpid end
+                        return sortkey(a) < sortkey(b)
 
                     end
                 end)
@@ -190,21 +187,22 @@ function GenerateModPages()
                 table.insert(ModInfobox.Data, { faction..':', #moddata.Factions[i] })
 
                 local curtechi = 0
-                local thash = {
-                    ['Tech 1'] = {1, 'Tech 1'},
-                    ['Tech 2'] = {2, 'Tech 2'},
-                    ['Tech 3'] = {3, 'Tech 3'},
-                    ['Experi'] = {4, 'Experimental'},
-                    ['Other']  = {5, 'Other'},
+
+                local TechNames = {
+                    'Tech 1',
+                    'Tech 2',
+                    'Tech 3',
+                    'Experimental',
+                    'Other',
                 }
 
                 mulString = mulString .. MDHead(faction,2)
 
                 for unitI, unitData in ipairs(unitarray) do
-                    local tech = unitData.desc and thash[string.sub(unitData.desc, 1, 6)] or thash['Other']
-                    if tech[1] > curtechi then
-                        curtechi = tech[1]
-                        mulString = mulString ..MDHead(tech[2])
+                    local tech = unitData.tech or 5
+                    if tech > curtechi then
+                        curtechi = tech
+                        mulString = mulString ..MDHead(TechNames[tech])
                     end
 
                     mulString = mulString .. [[<a title="]]..(unitData.name or unitData.bpid)..[[" href="]]..unitData.bpid..[["><img src="]]..unitIconRepo..unitData.bpid.."_icon.png\" /></a>\n"

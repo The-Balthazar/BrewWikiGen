@@ -312,7 +312,7 @@ BuilderList = function(bp)
             local secs = bp.Economy.BuildTime / buildercats[cat][2]
             bilst = bilst .. "\n* "..iconText('Time', string.format('%02d:%02d', math.floor(secs/60), math.floor(secs % 60) ) )..' ‒ '..iconText('Energy', math.floor(bp.Economy.BuildCostEnergy / secs + 0.5), '/s')..' ‒ '..iconText('Mass', math.floor(bp.Economy.BuildCostMass / secs + 0.5), '/s')..' — Built by '..buildercats[cat][1]
         elseif string.find(cat, 'BUILTBY') then
-            bilst = bilst.."\n* <error:category />Unknown build category <code>]]..cat..[[</code>"
+            bilst = bilst.."\n* <error:category />Unknown build category <code>"..cat.."</code>"
         end
     end
 
@@ -457,7 +457,7 @@ GetBlueprint = function(dir, file)
     bp.ID = string.sub(file,1,-9)
     bp.id = string.lower(bp.ID)
 
-    bp.unitTlevel, bp.unitTdesc = GetUnitTechAndDescStrings(bp)
+    bp.unitTIndex, bp.unitTlevel, bp.unitTdesc = GetUnitTechAndDescStrings(bp)
 
     return bp
 end
@@ -467,11 +467,11 @@ GetUnitTechAndDescStrings = function(bp)
     -- Experimental do. This unified it so we don't have to check again.
     for i = 1, 3 do
         if arrayfind(bp.Categories, 'TECH'..i) then
-            return 'Tech '..i, 'Tech '..i..' '..LOC(bp.Description)
+            return i, 'Tech '..i, bp.Description and 'Tech '..i..' '..LOC(bp.Description)
         end
     end
     if arrayfind(bp.Categories, 'EXPERIMENTAL') then
-        return 'Experimental', LOC(bp.Description)
+        return 4, 'Experimental', LOC(bp.Description)
     end
-    return nil, LOC(bp.Description)
+    return nil, nil, LOC(bp.Description)
 end
