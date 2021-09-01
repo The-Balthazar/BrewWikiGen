@@ -9,6 +9,7 @@ GetUnitInfoboxData = function(ModInfo, bp)
         {'Source:', '<a href="'..stringSanitiseFile(ModInfo.name)..'">'..ModInfo.name..'</a>'},
         {'Unit ID:', '<code>'..bp.id..'</code>',},
         {'Faction:', (bp.General and bp.General.FactionName)},
+        {'Tech level:', bp.unitTIndex and bp.unitTIndex..(bp.unitTIndex == 4 and ' (Experimental)' or '') },
         {''},
         {'Health:',
             (

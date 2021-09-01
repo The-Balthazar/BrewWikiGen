@@ -3,10 +3,6 @@
 -- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
 --------------------------------------------------------------------------------
 
-IsDeathWeapon = function(wep)
-    return (wep.Label == 'DeathWeapon' or wep.Label == 'DeathImpact' or wep.WeaponCategory == 'Death')
-end
-
 local GetWeaponTargetLayers = function(weapon, unit)
     local fromLayers = motionTypes[unit.Physics.MotionType][2]
     local targetLayers = {}
@@ -247,7 +243,7 @@ end
 GetWeaponInfoboxData = function(wep, bp)
     return {
         {'Target type:', GetWeaponTargets(wep, bp)},
-        {'DPS estimate:', DPSEstimate(wep), "Note: This only counts listed stats."},
+        {'DPS estimate:', NewDPSEstimate(wep), "Note: This only counts listed stats."},
         {
             'Damage:',
             (wep.NukeInnerRingDamage or wep.Damage),
@@ -318,3 +314,74 @@ GetWeaponBodytextSectionString = function(bp)
     end
     return text
 end
+
+--------------------------------------------------------------------------------
+-- Weapon validation
+--------------------------------------------------------------------------------
+local function NumMuzzles(weapon)
+        --Calculation only used for error checking
+        local muzzles = 0
+        for rk, rv in ipairs(weapon.RackBones) do
+            muzzles = muzzles + (#rv.MuzzleBones or 0)
+        end
+        return muzzles / #weapon.RackBones
+    end
+local function TotalMuzzleFiringTime(weapon)
+        return (NumMuzzles(weapon) - 1) * weapon.MuzzleSalvoDelay
+    end
+local function TotalFiringTimePossible(weapon)
+        return not (TotalMuzzleFiringTime(weapon) > (1 / weapon.RateOfFire))
+    end
+local function weaponHasBasicValues(weapon)
+        return weapon.RackBones and weapon.MuzzleSalvoSize and weapon.MuzzleSalvoDelay
+    end
+local function recoilAnimatorsPossible(weapon)
+        return not (weapon.RackRecoilDistance ~= 0 and weapon.MuzzleSalvoDelay ~= 0)
+    end
+-- Weapon types ----------------------------------------------------------------
+local function IsDefaultWeapon(weapon)
+        return weaponHasBasicValues(weapon) and TotalFiringTimePossible(weapon) and recoilAnimatorsPossible(weapon)
+    end
+local function IsBeamWeapon(weapon)
+        return weapon.BeamCollisionDelay and weapon.BeamLifetime and IsDefaultWeapon(weapon)
+    end
+local function IsContinuousBeam(weapon)
+        return IsBeamWeapon(weapon) and weapon.BeamLifetime == 0
+    end
+function IsDeathWeapon(weapon)
+        return (weapon.Label == 'DeathWeapon' or weapon.Label == 'DeathImpact' or weapon.WeaponCategory == 'Death')
+    end
+-- Weapon stats ----------------------------------------------------------------
+local function weaponDamage(weapon)
+        return (weapon.NukeInnerRingDamage or weapon.Damage)
+    end
+--[[local function weaponTotalDamage(weapon)
+        return weaponDamage(weapon)
+    end]]
+local function BeamCollisionsPerSecond(weapon)
+        return 1 / (weapon.BeamCollisionDelay + 0.1)
+    end
+local function BeamMaxTheoreticalDPS(weapon)
+        return weaponDamage(weapon) * BeamCollisionsPerSecond(weapon) * #(tableSafe(weapon,1,Rackbones,1,MuzzleBones) or {true})
+    end
+--------------------------------------------------------------------------------
+function NewDPSEstimate(weapon)
+    if IsBeamWeapon(weapon) then
+        local max = BeamMaxTheoreticalDPS(weapon)
+        if IsContinuousBeam(weapon) then
+            if max and max > 1 then
+                return math.floor(max + 0.5)
+            end
+        else
+            local dps = DPSEstimate(weapon)
+            if dps and max and dps > max then
+                return 'error:estimate exceeds max '..max
+            else
+                return dps
+            end
+        end
+    elseif IsDefaultWeapon(weapon) then
+        return DPSEstimate(weapon)
+    end
+end
+
