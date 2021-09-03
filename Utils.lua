@@ -446,25 +446,15 @@ GetModHooks = function(ModDirectory)
     print(log)
 end
 
-GetBlueprint = function(dir, file)
-    local bp
-
-    UnitBlueprint = function(a) bp = a end
-    Sound = function(a) return a end
-
-    assert(pcall(dofile, dir..'/'..file), "⚠️ Failed to load "..file)
-
-    bp.ID = string.sub(file,1,-9)
-    bp.id = string.lower(bp.ID)
-
-    bp.unitTIndex, bp.unitTlevel, bp.unitTdesc = GetUnitTechAndDescStrings(bp)
-
-    return bp
+local function SetShortId(bp, file)
+    local id = bp.BlueprintId or string.gsub(file, "_unit.bp", "")--string.gsub(file, "^.*/([^/]+)_[a-z]+%.bp$", "%1" )
+    bp.id = string.lower(id)
+    bp.ID = id == bp.id and string.upper(id) or id
 end
 
-GetUnitTechAndDescStrings = function(bp)
+local function GetUnitTechAndDescStrings(bp)
     -- Tech 1-3 units don't have the tech level in their desc exclicitly,
-    -- Experimental do. This unified it so we don't have to check again.
+    -- Experimental *generally* do. This unified it so we don't have to check again.
     for i = 1, 3 do
         if arrayfind(bp.Categories, 'TECH'..i) then
             return i, 'Tech '..i, bp.Description and 'Tech '..i..' '..LOC(bp.Description)
@@ -474,4 +464,34 @@ GetUnitTechAndDescStrings = function(bp)
         return 4, 'Experimental', LOC(bp.Description)
     end
     return nil, nil, LOC(bp.Description)
+end
+
+function GetBlueprint(dir, file)
+    local bpfile = io.open(dir..'/'..file, 'r')
+    local bpstring = bpfile:read('a')
+
+    bpfile:close()
+
+    bpstring = string.gsub(bpstring, '#', '--')
+    bpstring = string.gsub(bpstring, '\\', '/')
+    bpstring = string.gsub(bpstring, 'Sound%s*{', '{')
+    bpstring = string.gsub(bpstring, 'UnitBlueprint%s*{', 'return {', 1)
+    bpstring = string.gsub(bpstring, 'UnitBlueprint%s*{', '{')
+    bpstring = string.gsub(bpstring, '}%s*{', '}, {')
+
+    local bps = {load(bpstring)()}
+
+    assert(bps[1], "⚠️ Failed to load "..file)
+    if bps[2] then print("⚠️ "..file.. " contains multiple blueprints") end
+
+    for i, bp in ipairs(bps) do
+        SetShortId(bp, file)
+        bp.unitTIndex, bp.unitTlevel, bp.unitTdesc = GetUnitTechAndDescStrings(bp)
+    end
+
+    return bps
+end
+
+function isValidBlueprint(bp)
+    return bp.Display and bp.Categories and bp.Defense and bp.Physics and bp.General
 end

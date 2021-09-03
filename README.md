@@ -64,9 +64,9 @@ page will be generated. Add or remove as seems appropriate for your mods needs.
 Can be completely removed if you don't need categories.
 
 ## Usage notes:
-Since this generator is real Lua and runs mod files directly for data, any mod
-file loaded must be valid Lua. This notably means **not** using `#` instead of
-`--`, not using `!=` instead of `~=`, and probably several other things.
+Since this generator runs mod files directly for data, any referenced files must
+be valid for Lua 5.4. This notably means **not** using `#` instead of `--`, not
+using `!=` instead of `~=`, and probably several other things.
 
 Code in required files that validates as Lua, but wouldn't run, ie: because it
 runs a loop without defining an iterator like `pairs` or `ipairs`, or wouldn't
@@ -74,16 +74,20 @@ want to be ran for the wiki generation can be selectively ran by changing the
 code to check `_VERSION == "Lua 5.0.1"` first so that it only runs in-game.
 
 I don't anticipate this being a huge issue, since these are generally data files
-only and the check should at most need to be performed in game at most once.
+and any code in them shouldn't need to be performed more than once.
 
-Mod files that must meet this criteria are `_unit.bp` files, and:
+Files this affects are as follows:
 
 *    `/mod_info.lua`
 *    `/hook/lua/ui/help/tooltips.lua`
 *    `/hook/lua/ui/help/unitdescription.lua`
 *    `/hook/loc/US/strings_db.lua`
 
-It will skip any mod that doesn't have a valid `mod_info.lua`, and will stop
-running that mod if it reaches a bp file that doesn't validate. For the other
-files it will continue with a warning, but may have missing data on the pages.
-Only blueprint files that end in `_unit.bp` will be included.
+It will skip any mod that doesn't have a valid `mod_info.lua`, and, while
+blueprint files are sanitised it will stop running that mod if it reaches a `.bp`
+file that still doesn't validate as Lua. For the other files it will continue
+with a warning, but may have missing data on the pages.
+
+Only blueprint files that end in `_unit.bp` will be included, and only
+blueprints in those that contain a `Display`, `Categories`, `Defense`,
+`Physics`, and `General` table defined will be given pages.

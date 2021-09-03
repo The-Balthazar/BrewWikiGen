@@ -12,91 +12,95 @@ function LoadModFilesMakeUnitPagesGatherData(ModDirectory, modsidebarindex)
     print('🔎 Searching for blueprints in '..ModInfo.name)
 
     local BlueprintPathsArray = GetModBlueprintPaths(ModDirectory)
+    local numBlueprintsFiles = #BlueprintPathsArray
+    local numValidBlueprints = 0
 
     GetModHooks(ModDirectory)
 
     for i, fileDir in ipairs(BlueprintPathsArray) do
+        for _, bp in ipairs(GetBlueprint(fileDir[1],fileDir[2])) do
+            if isValidBlueprint(bp) then
 
-        local bp = GetBlueprint(fileDir[1],fileDir[2])
+                numValidBlueprints = numValidBlueprints + 1
 
-        local infoboxstring = tostring(Infobox{
-            Style = 'main-right',
-            Header = {string.format(
-                '<img align="left" title="%s unit icon" src="%s_icon.png" />%s<br />%s',
-                (LOC(bp.General.UnitName) or 'The'),
-                unitIconRepo..bp.ID,
-                (LOC(bp.General.UnitName) or '<i>Unnamed</i>'),
-                (bp.unitTdesc or [[<i>No description</i>]])
-            )},
-            Data = GetUnitInfoboxData(ModInfo, bp),
-        })
+                local infoboxstring = tostring(Infobox{
+                    Style = 'main-right',
+                    Header = {string.format(
+                        '<img align="left" title="%s unit icon" src="%s_icon.png" />%s<br />%s',
+                        (LOC(bp.General.UnitName) or 'The'),
+                        unitIconRepo..bp.ID,
+                        (LOC(bp.General.UnitName) or '<i>Unnamed</i>'),
+                        (bp.unitTdesc or [[<i>No description</i>]])
+                    )},
+                    Data = GetUnitInfoboxData(ModInfo, bp),
+                })
 
-        local headerstring = bp.General.UnitName and bp.unitTdesc and string.format("\"%s\": %s\n----\n", LOC(bp.General.UnitName), bp.unitTdesc)
-        or bp.General.UnitName and string.format("\"%s\"\n----\n", LOC(bp.General.UnitName) )
-        or bp.unitTdesc and string.format("%s\n----\n", bp.unitTdesc)
-        or ''
+                local headerstring = bp.General.UnitName and bp.unitTdesc and string.format("\"%s\": %s\n----\n", LOC(bp.General.UnitName), bp.unitTdesc)
+                or bp.General.UnitName and string.format("\"%s\"\n----\n", LOC(bp.General.UnitName) )
+                or bp.unitTdesc and string.format("%s\n----\n", bp.unitTdesc)
+                or ''
 
-        local BodyTextSections = GetUnitBodytextSectionData(ModInfo, bp)
+                local BodyTextSections = GetUnitBodytextSectionData(ModInfo, bp)
 
-        local bodytext = GetUnitBodytextLeadText(ModInfo, bp) .. TableOfContents(BodyTextSections) .. tostring( BodyTextSections )
+                local bodytext = GetUnitBodytextLeadText(ModInfo, bp) .. TableOfContents(BodyTextSections) .. tostring( BodyTextSections )
 
-        local UnitInfo = {
-            bpid = bp.ID,
-            name = LOC(bp.General.UnitName),
-            desc = bp.unitTdesc,
-            tech = bp.unitTIndex,
-        }
+                local UnitInfo = {
+                    bpid = bp.ID,
+                    name = LOC(bp.General.UnitName),
+                    desc = bp.unitTdesc,
+                    tech = bp.unitTIndex,
+                }
 
-        ------------------------------------------------------------------------
+                ----------------------------------------------------------------
 
-        local cattext = ''
+                local cattext = ''
 
-        if _G.FooterCategories and _G.FooterCategories[1] then
-            for i, cat in ipairs(FooterCategories) do
-                if arrayfind(bp.Categories, cat) then
+                if _G.FooterCategories and _G.FooterCategories[1] then
+                    for i, cat in ipairs(FooterCategories) do
+                        if arrayfind(bp.Categories, cat) then
 
-                    if not categoryData[cat] then
-                        categoryData[cat] = {}
+                            if not categoryData[cat] then
+                                categoryData[cat] = {}
+                            end
+
+                            table.insert(categoryData[cat], {
+                                UnitInfo = UnitInfo,
+                                ModInfo = ModInfo
+                            })
+
+                            if cattext ~= '' then
+                                cattext = cattext..' · '
+                            end
+
+                            cattext = cattext..'<a href="_categories.'..cat..'">'..cat..'</a>'
+                        end
                     end
-
-                    table.insert(categoryData[cat], {
-                        UnitInfo = UnitInfo,
-                        ModInfo = ModInfo
-                    })
-
                     if cattext ~= '' then
-                        cattext = cattext..' · '
+                        cattext = "\n<table align=center>\n<td>Categories : "..cattext
                     end
-
-                    cattext = cattext..'<a href="_categories.'..cat..'">'..cat..'</a>'
                 end
+                ----------------------------------------------------------------
+
+                local md = io.open(OutputDirectory..bp.ID..'.md', "w"):write(headerstring..infoboxstring..bodytext..cattext.."\n"):close()
+
+                ----------------------------------------------------------------
+
+                if not sidebarData[modsidebarindex] then
+                    sidebarData[modsidebarindex] = {ModInfo = ModInfo, Factions = {} }
+                end
+
+                local factioni = FactionIndexes[bp.General and bp.General.FactionName] or #FactionsByIndex
+
+                if not sidebarData[modsidebarindex].Factions[factioni] then
+                    sidebarData[modsidebarindex].Factions[factioni] = {}
+                end
+
+                table.insert(sidebarData[modsidebarindex].Factions[factioni], UnitInfo)
             end
-            if cattext ~= '' then
-                cattext = "\n<table align=center>\n<td>Categories : "..cattext
-            end
         end
-        ------------------------------------------------------------------------
-
-        local md = io.open(OutputDirectory..bp.ID..'.md', "w")
-        md:write(headerstring..infoboxstring..bodytext..cattext.."\n")
-        md:close()
-
-        ------------------------------------------------------------------------
-
-        if not sidebarData[modsidebarindex] then
-            sidebarData[modsidebarindex] = {ModInfo = ModInfo, Factions = {} }
-        end
-
-        local factioni = FactionIndexes[bp.General and bp.General.FactionName] or #FactionsByIndex
-
-        if not sidebarData[modsidebarindex].Factions[factioni] then
-            sidebarData[modsidebarindex].Factions[factioni] = {}
-        end
-
-        table.insert(sidebarData[modsidebarindex].Factions[factioni], UnitInfo)
     end
 
-    print( #BlueprintPathsArray..' unit wiki page'..(#BlueprintPathsArray ~= 1 and 's' or '')..' created' )
+    print( numValidBlueprints..' unit wiki page'..(numValidBlueprints ~= 1 and 's' or '')..' created from '..numBlueprintsFiles..' file'..(numValidBlueprints ~= 1 and 's' or '') )
 end
 
 local sortData = function(sorttable, sort)
@@ -148,9 +152,7 @@ function GenerateSidebar()
         sidebarstring = sidebarstring .. "\n</td>\n</tr>\n</table>\n</p>\n</details>\n"
     end
 
-    local md = io.open(OutputDirectory..'_Sidebar.md', "w")
-    md:write(sidebarstring)
-    md:close()
+    local md = io.open(OutputDirectory..'_Sidebar.md', "w"):write(sidebarstring):close()
 
     print("Generated navigation sidebar")
 end
@@ -212,9 +214,7 @@ function GenerateModPages()
 
         table.insert(ModInfobox.Data, { 'Total:', tableSubcount(moddata.Factions) })
 
-        md = io.open(OutputDirectory..stringSanitiseFile(moddata.ModInfo.name)..'.md', "w")
-        md:write(tostring(ModInfobox)..mulString)
-        md:close()
+        md = io.open(OutputDirectory..stringSanitiseFile(moddata.ModInfo.name)..'.md', "w"):write(tostring(ModInfobox)..mulString):close()
 
     end
 
@@ -252,9 +252,7 @@ function GenerateCategoryPages()
             catstring = catstring..switch[BinaryCounter(data.UnitInfo.name, data.UnitInfo.desc)].."</a>\n"
         end
 
-        md = io.open(OutputDirectory..'_categories.'..cat..'.md', "w")
-        md:write(catstring)
-        md:close()
+        md = io.open(OutputDirectory..'_categories.'..cat..'.md', "w"):write(catstring):close()
         num = num+1
     end
 
