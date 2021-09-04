@@ -155,6 +155,8 @@ hoverTip = function(s1, s2)
     return s1 and ' '..'<span title="'..s1..'" >'..(s2 and s2 or "(<u>?</u>)")..'</span>' or ''
 end
 
+pluralS = function(n) return n ~= 1 and 's' or '' end
+
 --------------------------------------------------------------------------------
 
 iconText = function(icon, text, text2)
@@ -466,7 +468,7 @@ local function GetUnitTechAndDescStrings(bp)
     return nil, nil, LOC(bp.Description)
 end
 
-function GetBlueprint(dir, file)
+function GetBlueprintsFromFile(dir, file)
     local bpfile = io.open(dir..'/'..file, 'r')
     local bpstring = bpfile:read('a')
 

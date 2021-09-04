@@ -14,13 +14,18 @@ function LoadModFilesMakeUnitPagesGatherData(ModDirectory, modsidebarindex)
     local BlueprintPathsArray = GetModBlueprintPaths(ModDirectory)
     local numBlueprintsFiles = #BlueprintPathsArray
     local numValidBlueprints = 0
+    local numInvalidBlueprints = 0
+
+    collectgarbage() -- Potentially a lot of garbage at this point.
 
     GetModHooks(ModDirectory)
 
     for i, fileDir in ipairs(BlueprintPathsArray) do
-        for _, bp in ipairs(GetBlueprint(fileDir[1],fileDir[2])) do
-            if isValidBlueprint(bp) then
-
+        for _, bp in ipairs(GetBlueprintsFromFile(fileDir[1],fileDir[2])) do
+            if not isValidBlueprint(bp) then
+                numInvalidBlueprints = numInvalidBlueprints + 1
+                print("⚠️ "..bp.id.." is missing parts")
+            else
                 numValidBlueprints = numValidBlueprints + 1
 
                 local infoboxstring = tostring(Infobox{
@@ -100,7 +105,9 @@ function LoadModFilesMakeUnitPagesGatherData(ModDirectory, modsidebarindex)
         end
     end
 
-    print( numValidBlueprints..' unit wiki page'..(numValidBlueprints ~= 1 and 's' or '')..' created from '..numBlueprintsFiles..' file'..(numValidBlueprints ~= 1 and 's' or '') )
+    print( numValidBlueprints..' unit wiki page'..pluralS(numValidBlueprints)
+    ..' created from '..numBlueprintsFiles..' file'..pluralS(numValidBlueprints)..'. '
+    ..(numInvalidBlueprints ~= 0 and numInvalidBlueprints..' blueprints skipped.' or '') )
 end
 
 local sortData = function(sorttable, sort)
@@ -227,13 +234,7 @@ function GenerateCategoryPages()
     end
     local num = 0
     for cat, datum in pairs(categoryData) do
-        table.sort(datum, function(a,b)
-            g = { ['Tech 1'] = 1, ['Tech 2'] = 2, ['Tech 3'] = 3, ['Experi'] = 4 }
-            return
-            (g[a.UnitInfo.desc and string.sub(a.UnitInfo.desc, 1, 6)] or 5)..a.UnitInfo.bpid
-            <
-            (g[b.UnitInfo.desc and string.sub(b.UnitInfo.desc, 1, 6)] or 5)..b.UnitInfo.bpid
-        end)
+        table.sort(datum, function(a,b) return (a.UnitInfo.tech or 5)..a.UnitInfo.bpid < (b.UnitInfo.tech or 5)..b.UnitInfo.bpid end)
 
         local catstring = 'Units with the <code>'..cat.."</code> category.\n<table>\n"
         for i, data in ipairs(datum) do
