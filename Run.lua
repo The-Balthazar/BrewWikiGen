@@ -53,6 +53,9 @@ FooterCategories = { -- In order
     'STRUCTURE',
 }
 
+DoBlueprintSanityChecks = true
+DoBlueprintSanityChecksPedantic = false
+
 --[[ ---------------------------------------------------------------------- ]]--
 --[[ Run                                                                    ]]--
 --[[ ---------------------------------------------------------------------- ]]--
@@ -69,6 +72,7 @@ for i, file in ipairs({
     'Components/Infobox.lua',
     'Components/Bodytext.lua',
     'Components/Weapon.lua',
+    'Sanity.lua',
 }) do
     safecall(dofile, WikiGeneratorDirectory..file)
 end
