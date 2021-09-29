@@ -88,9 +88,9 @@ GetUnitInfoboxData = function(ModInfo, bp)
                     )
                 )
             ) and iconText('Attached',
-                bp.Transport and bp.Transport.TransportClass or 1
+                transportClassHookType(bp.Transport and bp.Transport.TransportClass or 1)
             )
-        ), 'The space this occupies on transports or on air staging. No units can accommodate greater than class 3.'},
+        )},
         {'Class 1 capacity:', iconText('Attached', bp.Transport and bp.Transport.Class1Capacity), 'The number of class 1 units this can carry. For class 2 and 3 estimates, half or quarter this number; actual numbers will vary on how the attach points are arranged.'},
         {''},
         {'Misc radius:', arrayfind(bp.Categories, 'OVERLAYMISC') and bp.AI and bp.AI.StagingPlatformScanRadius, 'Defined by the air staging radius value. Often used to indicate things without a dedicated range ring.' },

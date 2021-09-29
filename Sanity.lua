@@ -20,7 +20,7 @@ function BlueprintSanityChecks(bp)
     do
         local t1, t2, t3, t4 = arrayfind(bp.Categories, 'TECH1'), arrayfind(bp.Categories, 'TECH2'), arrayfind(bp.Categories, 'TECH3'), arrayfind(bp.Categories, 'EXPERIMENTAL')
         if BinaryCounter(t1, t2, t3, t4) > 1 then
-            table.insert(issues, 'Multiple tech levels.')
+            table.insert(issues, 'Multiple tech level categories')
         elseif t4 and bp.StrategicIconName ~= 'icon_experimental_generic' then
             table.insert(issues, 'Experimental without \'icon_experimental_generic\'')
         else
@@ -37,25 +37,35 @@ function BlueprintSanityChecks(bp)
         end
     end
 
-    do
-        local fac = arrayfind(bp.Categories, 'FACTORY')
-        if bp.Physics.MotionType ~= 'RULEUMT_None' or (not fac and not bp.Physics.BuildOnLayerCaps) then
-            if IconMotionTypes[bp.Physics.MotionType].Icon ~= (bp.General.Icon or 'land') then
-                table.insert(issues, 'Icon background is '..(bp.General.Icon or 'undefined (default is land)')..' instead of '..IconMotionTypes[bp.Physics.MotionType].Icon)
-            end
-        elseif not fac and bp.Physics.BuildOnLayerCaps then
+    do -- bp.General.Icon sanitisation
+        local currenticon = (bp.General.Icon or 'land')
+        local factoryicon
+        local physicaicon
+
+        if bp.Physics.MotionType == 'RULEUMT_None' then
             local blc = bp.Physics.BuildOnLayerCaps
-            local water = blc.LAYER_Water or blc.LAYER_Sub or blc.LAYER_Seabed
-            local land = blc.LAYER_Land
-            if water and land and (bp.General.Icon or 'land') ~= 'amph' then
-                table.insert(issues, 'Icon background is '..(bp.General.Icon or 'undefined (default is land)')..' instead of amph')
-            elseif water and not land and (bp.General.Icon or 'land') ~= 'sea' then
-                table.insert(issues, 'Icon background is '..(bp.General.Icon or 'undefined (default is land)')..' instead of sea')
-            elseif not water and land and (bp.General.Icon or 'land') ~= 'land' then
-                table.insert(issues, 'Icon background is '..bp.General.Icon..' instead of land')
-            end
+            local BLwater = blc and (blc.LAYER_Water or blc.LAYER_Sub or blc.LAYER_Seabed) and 'sea'
+            local BLland = (blc and blc.LAYER_Land or not blc) and 'land'
+
+            local BLbin = BinaryCounter(BLland, BLwater)
+
+            physicaicon = (BLbin == 1) and (BLland or BLwater) or 'amph'
         else
-            --Factory stuff
+            physicaicon = IconMotionTypes[bp.Physics.MotionType].Icon
+        end
+
+        if arrayfind(bp.Categories, 'FACTORY') then
+            local Cair = arrayfind(bp.Categories, 'AIR') and 'air'
+            local Cland = arrayfind(bp.Categories, 'LAND') and 'land'
+            local Cnaval = arrayfind(bp.Categories, 'NAVAL') and 'sea'
+
+            local Cbin = BinaryCounter(Cair, Cland, Cnaval)
+
+            factoryicon = (Cbin == 1) and (Cair or Cnaval or (Cland and physicaicon) ) or (Cbin ~= 0) and 'amph'
+        end
+
+        if currenticon ~= (factoryicon or physicaicon) then
+            table.insert(issues, 'Icon background is '..currenticon..', should be '..(factoryicon or physicaicon))
         end
     end
 

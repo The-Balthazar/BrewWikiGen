@@ -185,61 +185,16 @@ iconText = function(icon, text, text2)
     end
 end
 
---------------------------------------------------------------------------------
-
-abilityDesc = {
-    ['Anti-Air']                        = 'Can shoot aircraft, including high-altitude air',
-    ['Air Staging']                     = 'Aircraft can land on it for refuel and/or repair',
-    ['Artillery Defense']               = 'Protects against artillery projectile weapons',
-    ['Amphibious']                      = 'Can pass land and water',
-    ['Aquatic']                         = 'Buildable on land and on or in water',
-    ['Carrier']                         = 'Can build and/or store aircraft',
-    ['Cloaking']                        = 'Can become hidden to visual sensors',
-    ['Customizable']                    = 'Has optional enhancements to improve performance or unlock new featuers',
-    ['Directional Sensor']              = 'Has non-standard intel that is off-centre', -- BrewLAN
-    ['Volatile']                        = 'Has a death weapon',
-    ['Deploys']                         = 'Needs to be stationary for one or more effects',
-    ['Depth Charges']                   = 'Can attack water with projectiles immune to anti-torpedo',
-    ['Engineering Suite']               = 'Has complete engineering features',
-    ['Factory']                         = 'Can build units without entering command mode',
-    ['Hover']                           = 'Can pass water and is immune to torpedoes',
-    ['Jamming']                         = 'Creates false radar signals',
-    ['Manual Launch']                   = 'Has a counted projectile weapon that needs manually controlling',
-    ['Massive']                         = 'Damages things by treading on them',
-    ['Missile Defense']                 = 'Has countermeasures for missiles that don\'t count as \'tactical\' or \'strategic\'', -- BrewLAN
-    ['Not Capturable']                  = 'Is either unable to be, or never in a position to be, captured',
-    ['Omni Sensor']                     = 'Has advanced intel that can see through counterintel',
-    ['Personal Shield']                 = 'Has a shield that only effectively protects itself',
-    ['Personal Stealth']                = 'Hidden to radar and/or sonar',
-    ['Personal Teleporter']             = 'Has the ability to teleport without requiring an enhancement', -- BrewLAN
-    ['Radar']                           = 'Can see blips of units not seen by vision that are on or above water',
-    ['Reclaims']                        = 'Can harvest entities for resources; this damages them if they have health',
-    ['Repairs']                         = 'Can fix damage on other units at the cost of resources',
-    ['Sacrifice']                       = 'Can destroy itself to contribute to a build',
-    ['Satellite Uplink']                = 'Prevents satellites from receiving damage from flying unguided',  -- BrewLAN
-    ['Satellite Capacity: +0']          = 'Doesn\'t contribute towards satellite population capacity',-- BrewLAN
-    ['Satellite Capacity: +1']          = 'Contributes 1 towards the maximum deployable satellites',  -- BrewLAN
-    ['Satellite Capacity: +2']          = 'Contributes 2 towards the maximum deployable satellites',  -- BrewLAN
-    ['Satellite Capacity: +3']          = 'Contributes 3 towards the maximum deployable satellites',  -- BrewLAN
-    ['Satellite Capacity: +4']          = 'Contributes 4 towards the maximum deployable satellites',  -- BrewLAN
-    ['Satellite Capacity: +5']          = 'Contributes 5 towards the maximum deployable satellites',  -- BrewLAN
-    ['Satellite Capacity Unrestricted'] = 'Effectively removes satellite deployment limits', -- BrewLAN
-    ['Shield Dome']                     = 'Has a bubble shield that can protect others',
-    ['Sonar']                           = 'Can see blips of units not seen by vision that are on or below water',
-    ['Stealth Field']                   = 'Hides itself and nearby others from radar and/or sonar',
-    ['Strategic Missile Defense']       = 'Can target strategic missile projectiles',
-    ['EMP Weapon']                      = "Can inflict 'stun'",
-    ['Submersible']                     = 'Is a naval unit that can surface and dive',
-    ['Suicide Weapon']                  = 'Has a single-use self-damaging weapon',
-    ['Tactical Missiles']               = 'Has a weapon with projectiles that identify as tactical missiles', -- BrewLAN
-    ['Tactical Missile Defense']        = 'Can target tactical missile projectiles',
-    ['Tactical Missile Deflection']     = 'Can target and redirect tactical missile projectiles',
-    ['Teleporter']                      = 'Can teleport itself and others', -- BrewLAN
-    ['Torpedoes']                       = 'Has a weapon that can target things immersed in water',
-    ['Torpedo Defense']                 = 'Can target torpedo projectiles',
-    ['Transport']                       = 'Can carry other units',
-    ['Upgradeable']                     = 'Can build a unit to replace itself',
-}
+transportClassHookType = function(transport)
+    local hooks = {
+        'Small',
+        'Medium',
+        'Large',
+        nil,
+        'Drone',
+    }
+    return hooks[transport]
+end
 
 abilityTitle = function(ability)
     return hoverTip( abilityDesc[ability] or 'error:description', ability)
@@ -268,34 +223,6 @@ BuildableLayer = function(phys)
         return str
     end
 end
-
-buildercats = {
-    BUILTBYTIER1FIELD            = {'Tech 1 Field Engineer',           5},  -- BrewLAN
-    BUILTBYTIER2FIELD            = {'Tech 2 Field Engineer',           10}, -- BrewLAN
-    BUILTBYTIER3FIELD            = {'Tech 3 Field Engineer',           15}, -- BrewLAN
-    BUILTBYENGINEER              = {'Tech 1 Engineer',                 5},  -- R&D
-    BUILTBYTIER1ENGINEER         = {'Tech 1 Engineer',                 5},
-    BUILTBYTIER2ENGINEER         = {'Tech 2 Engineer',                 10},
-    BUILTBYTIER3ENGINEER         = {'Tech 3 Engineer',                 15},
-    BUILTBYCOMMANDER             = {'Armoured Command Unit',           10},
-    BUILTBYTIER2COMMANDER        = {'Tech 2 Armoured Command Unit',    30},
-    BUILTBYTIER3COMMANDER        = {'Tech 3 Armoured Command Unit',    90},
-    BUILTBYTIER1FACTORY          = {'Tech 1 Factory',                  20},
-    BUILTBYTIER2FACTORY          = {'Tech 2 Factory',                  40},
-    BUILTBYTIER3FACTORY          = {'Tech 3 Factory',                  60},
-    BUILTBYLANDTIER1FACTORY      = {'Tech 1 Land Factory',             20}, -- BrewLAN
-    BUILTBYLANDTIER2FACTORY      = {'Tech 2 Land Factory',             40},
-    BUILTBYLANDTIER3FACTORY      = {'Tech 3 Land Factory',             60}, -- BrewLAN
-    BUILTBYTIER1SURFACEFACTORY   = {'Tech 1 Amphibious Factory',       20}, -- R&D
-    BUILTBYTIER2SURFACEFACTORY   = {'Tech 2 Amphibious Factory',       40}, -- R&D
-    BUILTBYTIER3SURFACEFACTORY   = {'Tech 3 Amphibious Factory',       60}, -- R&D
-    BUILTBYQUANTUMGATE           = {'Tech 3 Quantum Gateway',          120},
-    TRANSPORTBUILTBYTIER3FACTORY = {'Tech 3 Air Factory',              60},
-    BUILTBYTIER3SPACEPORT        = {'Tech 3 Satellite Launch Complex', 100}, -- BrewLAN
-    BUILTBYHEAVYWALL             = {'Tech 3 Armored Wall Segment',     1},   --BrewLAN
-    BUILTBYGANTRY                = {'Experimental Factory',            240}, -- BrewLAN
-    BUILTBYEXPERIMENTALSUB       = nil, -- Referenced in vanilla, but nothing uses this
-}
 
 BuilderList = function(bp)
     --local builders = {}
@@ -355,22 +282,6 @@ orderButtonImage = function(orderName, bp)
     return returnstring or orderName, Order
 end
 
-FactionIndexes = {
-    UEF = 1,
-    Aeon = 2,
-    Cybran = 3,
-    Seraphim = 4,
-    Other = 5,
-}
-
-FactionsByIndex = {
-    'UEF',
-    'Aeon',
-    'Cybran',
-    'Seraphim',
-    'Other',
-}
-
 BinaryCounter = function(...)
     local n = 0
     local arg = {...}
@@ -427,11 +338,7 @@ GetModBlueprintPaths = function(dir)
         end
     end
 
-    --local time = os.clock()
-
     dirsearch(dir..(_G.UnitBlueprintsFolder or ''), '/ad')
-
-    --print(os.clock() - time)
 
     return BlueprintPathsArray
 end
@@ -484,7 +391,6 @@ function GetBlueprintsFromFile(dir, file)
     local bps = {load(bpstring)()}
 
     assert(bps[1], "⚠️ Failed to load "..file)
-    if bps[2] then print("⚠️ "..file.. " contains multiple blueprints") end
 
     for i, bp in ipairs(bps) do
         SetShortId(bp, file)
