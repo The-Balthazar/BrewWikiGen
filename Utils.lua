@@ -25,6 +25,15 @@ arraySubfind = function(array, str)
     end
 end
 
+arrayfindSub = function(array, n, m, str)
+    if not array then return end
+    for i, v in ipairs(array) do
+        if string.sub(v, n, m) == str then
+            return v
+        end
+    end
+end
+
 arraySubset = function(t1, t2)
     for k, v in ipairs(t1) do
         if type(v) == 'table' then
