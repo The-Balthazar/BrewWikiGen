@@ -1,3 +1,8 @@
+--------------------------------------------------------------------------------
+-- Supreme Commander mod automatic unit wiki generation script for Github wikis
+-- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+--------------------------------------------------------------------------------
+
 local IconMotionTypes = {
     RULEUMT_Air                = { Icon = 'air', },
     RULEUMT_Amphibious         = { Icon = 'amph', },
@@ -117,35 +122,28 @@ function BlueprintSanityChecks(bp)
     end
 
     if DoBlueprintSanityChecksPedantic then
-        if bp.Interface then
-            table.insert(issues, 'Redundant bp.Interface table')
-        end
-        if bp.Physics.MotionType ~= 'RULEUMT_None' and bp.Physics.BuildOnLayerCaps then
-            table.insert(issues, 'Redundant bp.Physics.BuildOnLayerCaps table')
-        end
-        if bp.Display.SpawnRandomRotation then
-            table.insert(issues, 'Redundant bp.Display.SpawnRandomRotation value')
-        end
-        if bp.Display.PlaceholderMeshName then
-            table.insert(issues, 'Redundant bp.Display.PlaceholderMeshName value')
-        end
-        if arrayfind(bp.Categories, 'OVERLAYANTIAIR') then
-            table.insert(issues, 'Redundant cat OVERLAYANTIAIR')
-        end
-        if arrayfind(bp.Categories, 'OVERLAYANTINAVY') then
-            table.insert(issues, 'Redundant cat OVERLAYANTINAVY')
-        end
-        if arrayfind(bp.Categories, 'OVERLAYDEFENSE') then
-            table.insert(issues, 'Redundant cat OVERLAYDEFENSE')
-        end
-        if arrayfind(bp.Categories, 'OVERLAYDIRECTFIRE') then
-            table.insert(issues, 'Redundant cat OVERLAYDIRECTFIRE')
-        end
-        if arrayfind(bp.Categories, 'OVERLAYINDIRECTFIRE') then
-            table.insert(issues, 'Redundant cat OVERLAYINDIRECTFIRE')
-        end
-        if arrayfindSub(bp.Categories, 1, 7, 'PRODUCT') then
-            table.insert(issues, 'Probably redundant PRODUCT cat')
+        local pedantry = {
+            { bp.Interface,                                     'Redundant bp.Interface table' },
+            { bp.Physics.MotionType ~= 'RULEUMT_None' and bp.Physics.BuildOnLayerCaps, 'Redundant bp.Physics.BuildOnLayerCaps table' },
+            { bp.Display.SpawnRandomRotation,                   'Redundant bp.Display.SpawnRandomRotation value' },
+            { bp.Display.PlaceholderMeshName,                   'Redundant bp.Display.PlaceholderMeshName value' },
+            { arrayfind(bp.Categories, 'OVERLAYANTIAIR'),       'Redundant cat OVERLAYANTIAIR' },
+            { arrayfind(bp.Categories, 'OVERLAYANTINAVY'),      'Redundant cat OVERLAYANTINAVY' },
+            { arrayfind(bp.Categories, 'OVERLAYDEFENSE'),       'Redundant cat OVERLAYDEFENSE' },
+            { arrayfind(bp.Categories, 'OVERLAYDIRECTFIRE'),    'Redundant cat OVERLAYDIRECTFIRE' },
+            { arrayfind(bp.Categories, 'OVERLAYINDIRECTFIRE'),  'Redundant cat OVERLAYINDIRECTFIRE' },
+            { arrayfindSub(bp.Categories, 1, 7, 'PRODUCT'),     'Probably redundant PRODUCT cat' },
+            { bp.UseOOBTestZoom,                                'Redundant UseOOBTestZoom value' },
+            { bp.General.Category,                              'Redundant bp.General.Category value' },
+            { bp.General.Classification,                        'Redundant bp.General.Classification value' },
+            { bp.General.TechLevel,                             'Redundant bp.General.TechLevel value' },
+            { bp.General.UnitWeight,                            'Redundant bp.General.UnitWeight value' },
+        }
+
+        for i, check in ipairs(pedantry) do
+            if check[1] then
+                table.insert(issues, check[2])
+            end
         end
     end
 
