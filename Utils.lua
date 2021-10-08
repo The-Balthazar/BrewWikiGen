@@ -404,6 +404,8 @@ function GetBlueprintsFromFile(dir, file)
     for i, bp in ipairs(bps) do
         SetShortId(bp, file)
         bp.unitTIndex, bp.unitTlevel, bp.unitTdesc = GetUnitTechAndDescStrings(bp)
+        bp.SourceFolder = dir
+        BlueprintMeshBones(bp)
         BlueprintSanityChecks(bp)
     end
 

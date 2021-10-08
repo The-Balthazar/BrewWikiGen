@@ -3,31 +3,66 @@
 -- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
 --------------------------------------------------------------------------------
 
-function GetSCMBoneNames(filename)
-    local file = io.open(filename)
-    local filestring = file:read('a')
+local function GetSCMFileString(filename)
+    local file = assert(io.open(filename), "Cant find mesh: "..filename)
+    local filestring = assert(file:read('a'), "Cant read mesh: "..filename)
     file:close()
-    filestring = string.sub(
-        filestring,
-        string.find(filestring, 'NAME') + 4,
-        string.find(filestring, string.char(197)..'SKEL')  -- 197 = 0xc5
-    )
-
-    local boneIndex = 1
-    local bones = {}
-    for i = 1, string.len(filestring) do
-        local char = string.sub(filestring, i, i)
-        local byte = string.byte(char)
-
-        if byte == 0 then
-            boneIndex = boneIndex + 1
-        elseif byte ~= 197 then
-            if not bones[boneIndex] then
-                bones[boneIndex] = ''
-            end
-            bones[boneIndex] = bones[boneIndex]..char
-        end
-    end
-    return bones
+    assert(string.len(filestring)>64, "Mesh load error; sring too short: "..filestring)
+    return filestring
 end
 
+local function FindSCMBoneArrayStartTagOffset(filestring)
+    return string.find(filestring, 'NAME') or 61
+end
+
+local function FindSCMBoneArrayEndTagOffset(filestring, startoffset)
+    return string.find(filestring, 'SKEL\x00\x00\x80\x3f', startoffset+16) --Catches ~99%
+    or string.find(filestring, '\xc5SKEL', startoffset+15) --Catches 15/16. Technically has overlap but xC5 is padding.
+    or string.find(filestring, '\x00SKEL', startoffset+15) + 1 --Catches the remaining 1/16, but has overlap.
+end
+
+local function GetArrayFrom0x00DelimitedString(str)
+    local things = {}
+    string.gsub(str, '([^\x00]+)\x00', function(thing)
+        table.insert(things, thing)
+    end)
+    return things
+end
+
+local function GetSCMBoneNames(filename)
+    local filestring = GetSCMFileString( filename )
+    local opentag = FindSCMBoneArrayStartTagOffset( filestring )
+    local closetag = FindSCMBoneArrayEndTagOffset( filestring, opentag )
+    return GetArrayFrom0x00DelimitedString(string.sub( filestring, opentag + 4, closetag - 1 ))
+end
+
+local function GetLOD0SCMFilename(bp)
+    if tableSafe(bp,'Display','MeshBlueprint') then
+        error("Mesh defined as blueprint that I've not implemented parsing of yet")
+
+    elseif tableSafe(bp,'Display','Mesh','LODs',1) then
+        local path = string.lower(bp.Display.Mesh.LODs[1].MeshName or (bp.ID..'_lod0.scm'))
+
+        if string.sub(path,1,1) == '/' then
+            if string.sub(path,1,6) == '/mods/' then
+                local sourceRoot = assert(string.find(bp.SourceFolder, '/mods/'), "Can't parse root folder to find absolute mod path: "..path)
+                return string.sub(bp.SourceFolder, 1, sourceRoot -1)
+            else
+                error("Vanilla mesh: "..path)--return path
+            end
+        end
+
+        return bp.SourceFolder..'/'..path
+    end
+    error("No mesh found")
+end
+
+function BlueprintMeshBones(bp)
+    local ok, msg = pcall(
+        function(bp)
+            bp.Bones = GetSCMBoneNames(GetLOD0SCMFilename(bp))
+        end,
+        bp
+    )
+    if DoLogMeshIssues and not ok then print(bp.ID, msg) end
+end

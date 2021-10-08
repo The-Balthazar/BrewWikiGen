@@ -55,6 +55,7 @@ FooterCategories = { -- In order
 
 DoBlueprintSanityChecks = true
 DoBlueprintSanityChecksPedantic = false
+DoLogMeshIssues = false
 
 --[[ ---------------------------------------------------------------------- ]]--
 --[[ Run                                                                    ]]--
@@ -73,6 +74,7 @@ for i, file in ipairs({
     'Components/Bodytext.lua',
     'Components/Weapon.lua',
     'Sanity.lua',
+    'MeshUtils.lua',
 }) do
     safecall(dofile, WikiGeneratorDirectory..file)
 end

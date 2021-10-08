@@ -121,6 +121,18 @@ function BlueprintSanityChecks(bp)
         end
     end
 
+    do -- mesh stuff
+        if bp.Bones then
+            if bp.General and bp.General.CommandCaps
+            and bp.General.CommandCaps.RULEUCC_CallTransport
+            and bp.Physics.MotionType ~= 'RULEUMT_Air'
+            and not arrayfind(bp.Bones, 'AttachPoint')
+            then
+                table.insert(issues, "Mesh has no valid transport attach bone.")
+            end
+        end
+    end
+
     if DoBlueprintSanityChecksPedantic then
         local pedantry = {
             { bp.Interface,                                     'Redundant bp.Interface table' },
