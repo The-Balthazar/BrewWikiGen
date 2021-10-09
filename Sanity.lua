@@ -16,7 +16,7 @@ local IconMotionTypes = {
 }
 
 function BlueprintSanityChecks(bp)
-    if not DoBlueprintSanityChecks or not isValidBlueprint(bp) then
+    if not Sanity.BlueprintChecks or not isValidBlueprint(bp) then
         return
     end
 
@@ -133,7 +133,7 @@ function BlueprintSanityChecks(bp)
         end
     end
 
-    if DoBlueprintSanityChecksPedantic then
+    if Sanity.BlueprintPedanticChecks then
         local pedantry = {
             { bp.Interface,                                     'Redundant bp.Interface table' },
             { bp.Physics.MotionType ~= 'RULEUMT_None' and bp.Physics.BuildOnLayerCaps, 'Redundant bp.Physics.BuildOnLayerCaps table' },

@@ -53,9 +53,13 @@ FooterCategories = { -- In order
     'STRUCTURE',
 }
 
-DoBlueprintSanityChecks = true
-DoBlueprintSanityChecksPedantic = false
-DoLogMeshIssues = false
+Logging = {
+    SCMLoadIssues = true,
+}
+Sanity = {
+    BlueprintChecks = true,
+    BlueprintPedanticChecks = false,
+}
 
 --[[ ---------------------------------------------------------------------- ]]--
 --[[ Run                                                                    ]]--

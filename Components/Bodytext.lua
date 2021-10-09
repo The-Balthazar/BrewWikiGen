@@ -205,6 +205,71 @@ GetUnitBodytextSectionData = function(ModInfo, bp)
             end
         },
         {
+            'Transport capacity',
+            check = bp.General and bp.General.CommandCaps and bp.General.CommandCaps.RULEUCC_Transport and bp.Transport,
+            Data = function(bp)
+                if bp.Bones then
+                    local data = {
+                        [1] = { Count = 0, Bone = 'Attachpoint',--[[Class = 1,]]Name = 'small' },
+                        [2] = { Count = 0, Bone = 'Attachpoint_Med', Class = 2, Name = 'medium' },
+                        [3] = { Count = 0, Bone = 'Attachpoint_Lrg', Class = 3, Name = 'large' },
+                        [4] = { Count = 0, Bone = 'Attachpoint_Spr', Class = 4, Name = 'super size' },
+                        [5] = { Count = 0, Bone = 'AttachSpecial', Class = 'S', Name = 'drone' },
+                    }
+                    for i, bone in pairs(bp.Bones) do
+                        for i = 0, 4 do
+                            if string.find(bone, data[5-i].Bone) then -- Work backwards because small matches 2-4
+                                data[5-i].Count = data[5-i].Count + 1
+                                break
+                            end
+                        end
+                    end
+
+                    local Smalls
+                    local total = 0
+                    local limitLower = false
+                    for i, datum in ipairs(data) do
+                        if not datum.Class then Smalls = datum.Count end
+                        if datum.Class and bp.Transport['Class'..datum.Class..'AttachSize'] then
+                            datum.Limit = Smalls/bp.Transport['Class'..datum.Class..'AttachSize']
+                            if datum.Limit < datum.Count then limitLower = true end
+                        end
+                        total = total + datum.Count
+                    end
+
+                    if total > 0 then
+                        local text = 'This unit has '
+                        local sects = {}
+                        if (bp.Transport.DockingSlots and bp.Transport.DockingSlots > 0) then
+                        --or (bp.Transport.StorageSlots and bp.Transport.StorageSlots > 0) then
+                            text = text..bp.Transport.DockingSlots..' docking slot'..pluralS(bp.Transport.DockingSlots)..' consisting of '
+                        end
+                        for i, datum in ipairs(data) do
+                            if datum.Count > 0 then
+                                table.insert(sects, datum.Count..' '..datum.Name..' attach point'..pluralS(datum.Count))
+                            end
+                        end
+
+                        for i, sect in ipairs(sects) do
+                            if i > 1 then text = text..', ' end
+                            if i == #sects and i > 1 then text = text..'and ' end
+                            text = text..sect
+                            if i == #sects then text = text..'. ' end
+                        end
+                        if limitLower then
+                            text = text..'Not all bones of a given size are usable concurrently. '
+                        end
+                        return text
+                    elseif --(bp.Transport.DockingSlots and bp.Transport.DockingSlots > 0) or
+                    (bp.Transport.StorageSlots and bp.Transport.StorageSlots > 0) then
+                        return 'This unit has '..bp.Transport.StorageSlots..' storage slots.'
+                    end
+                else
+                    return "<error: cant load mesh>"
+                end
+            end
+        },
+        {
             'Weapons',
             check = bp.Weapon,
             Data = GetWeaponBodytextSectionString

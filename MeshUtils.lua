@@ -4,10 +4,9 @@
 --------------------------------------------------------------------------------
 
 local function GetSCMFileString(filename)
-    local file = assert(io.open(filename), "Cant find mesh: "..filename)
-    local filestring = assert(file:read('a'), "Cant read mesh: "..filename)
+    local file = assert(io.open(filename, 'rb'), "Cant find mesh: "..filename)
+    local filestring = assert(file:read('*all'), "Cant read mesh: "..filename)
     file:close()
-    assert(string.len(filestring)>64, "Mesh load error; sring too short: "..filestring)
     return filestring
 end
 
@@ -17,7 +16,7 @@ end
 
 local function FindSCMBoneArrayEndTagOffset(filestring, startoffset)
     return string.find(filestring, 'SKEL\x00\x00\x80\x3f', startoffset+16) --Catches ~99%
-    or string.find(filestring, '\xc5SKEL', startoffset+15) --Catches 15/16. Technically has overlap but xC5 is padding.
+    or string.find(filestring, '\xc5SKEL', startoffset+15) --Catches 15/16, but only vanilla or 3dsmax exported. Blender uses the print-able character X as padding instead.
     or string.find(filestring, '\x00SKEL', startoffset+15) + 1 --Catches the remaining 1/16, but has overlap.
 end
 
@@ -64,5 +63,5 @@ function BlueprintMeshBones(bp)
         end,
         bp
     )
-    if DoLogMeshIssues and not ok then print(bp.ID, msg) end
+    if Logging.SCMLoadIssues and not ok then print(bp.ID, msg) end
 end
