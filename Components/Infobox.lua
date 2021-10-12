@@ -91,7 +91,18 @@ GetUnitInfoboxData = function(ModInfo, bp)
                 transportClassHookType(bp.Transport and bp.Transport.TransportClass or 1)
             )
         )},
-        {'Class 1 capacity:', iconText('Attached', bp.Transport and bp.Transport.Class1Capacity), 'The number of class 1 units this can carry. For class 2 and 3 estimates, half or quarter this number; actual numbers will vary on how the attach points are arranged.'},
+        {'Transport capacity:', iconText('Attached',
+            (
+                bp.General and
+                bp.General.CommandCaps and
+                bp.General.CommandCaps.RULEUCC_Transport
+                and bp.Transport
+            ) and (
+                bp.Transport.Class1Capacity and
+                bp.Transport.Class1Capacity..' (<a href="#transport-capacity">Details</a>)'
+                --or '<a href="#transport-capacity">Details</a>'
+            )
+        )},
         {''},
         {'Misc radius:', arrayfind(bp.Categories, 'OVERLAYMISC') and bp.AI and bp.AI.StagingPlatformScanRadius, 'Defined by the air staging radius value. Often used to indicate things without a dedicated range ring.' },
         {'Weapons:', bp.Weapon and #bp.Weapon..' (<a href="#weapons">Details</a>)'},

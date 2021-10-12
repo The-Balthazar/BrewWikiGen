@@ -225,19 +225,29 @@ GetUnitBodytextSectionData = function(ModInfo, bp)
                         end
                     end
 
-                    local Smalls
-                    local total = 0
-                    local limitLower = false
+                    local numSmallBones
+                    local totalAttachBones = 0
+                    local numGroupsClassLimited = 0
+                    local numGroupsBoneLimited = 0
+                    local numGroups = 0
+                    local usedClasses = {}
                     for i, datum in ipairs(data) do
-                        if not datum.Class then Smalls = datum.Count end
-                        if datum.Class and bp.Transport['Class'..datum.Class..'AttachSize'] then
-                            datum.Limit = Smalls/bp.Transport['Class'..datum.Class..'AttachSize']
-                            if datum.Limit < datum.Count then limitLower = true end
+                        if not datum.Class then numSmallBones = datum.Count end
+                        local LongClass = 'Class'..(datum.Class or 1)..'AttachSize'
+
+                        if datum.Class and bp.Transport[LongClass] then
+                            datum.Limit = numSmallBones/bp.Transport[LongClass]
+                            if datum.Limit < datum.Count and datum.Count > 1 then numGroupsClassLimited = numGroupsClassLimited + 1 end
+                            if datum.Limit > datum.Count and datum.Count > 1 then numGroupsBoneLimited = numGroupsBoneLimited + 1 end
+                            if datum.Count ~= 0 then table.insert(usedClasses, { Class = LongClass, Name = datum.Name }) end
                         end
-                        total = total + datum.Count
+
+                        if datum.Count ~= 0 then numGroups = numGroups + 1 end
+
+                        totalAttachBones = totalAttachBones + datum.Count
                     end
 
-                    if total > 0 then
+                    if totalAttachBones > 0 then
                         local text = 'This unit has '
                         local sects = {}
                         if (bp.Transport.DockingSlots and bp.Transport.DockingSlots > 0) then
@@ -256,8 +266,69 @@ GetUnitBodytextSectionData = function(ModInfo, bp)
                             text = text..sect
                             if i == #sects then text = text..'. ' end
                         end
-                        if limitLower then
-                            text = text..'Not all bones of a given size are usable concurrently. '
+
+                        if numSmallBones
+                        and numSmallBones > 1
+                        and totalAttachBones > 1
+                        and numGroups > 1 then
+                            text = text.."Using an attach point that isn't small costs a number of small attach points. Specifically "
+                            for i, datum in ipairs(usedClasses) do
+                                if i > 1 then text = text..', ' end
+                                if i == #usedClasses and i > 1 then text = text..'and ' end
+                                text = text..bp.Transport[datum.Class]..' for '..datum.Name
+                                if i == #usedClasses then text = text..'. ' end
+                            end
+                        end
+
+                        if numGroupsClassLimited > 0 then
+                            if numGroupsClassLimited == 1 then
+                                for i, datum in ipairs(data) do
+                                    if datum.Count > 1 and datum.Limit and datum.Limit < datum.Count then
+                                        text = text..'Due to these costs, not all '..datum.Name..' attach points can be used concurrently; at most '..math.floor(datum.Limit)..' of them could be used at a given time, and the physical layout of them may reduce that number further.'
+                                        break
+                                    end
+                                end
+                            else--if numGroupsClassLimited > 1 then
+                                text = text..'Due to these costs; at most '
+                                local done = 0
+                                for i, datum in ipairs(data) do
+                                    if datum.Count > 1 and datum.Limit and datum.Limit < datum.Count then
+                                        done = done + 1
+                                        text = text..math.floor(datum.Limit)..' '..datum.Name
+
+                                        if done < numGroupsClassLimited then text = text..', ' end
+                                        if done + 1 == numGroupsClassLimited then text = text..'or ' end
+                                    end
+                                end
+                                text = text..'attach points can be used concurrently, and this may be further reduced by the physical layout of said bones. '
+                            end
+                        end
+                        if numGroupsBoneLimited > 0 then
+                            if numGroupsBoneLimited == 1 then
+                                for i, datum in ipairs(data) do
+                                    if datum.Count > 1 and datum.Limit and datum.Limit > datum.Count then
+                                        local freeSmalls = numSmallBones-(math.floor(datum.Count)*bp.Transport['Class'..datum.Class..'AttachSize'])
+
+                                        text = text..'With all '..datum.Name..' bones occupied '..freeSmalls..' small attach point'..pluralS(freeSmalls)..' would be free still.'
+                                        break
+                                    end
+                                end
+                            else--if numGroupsBoneLimited > 1 then
+                                text = text..'With all attach points of a given size occupied, there would still be a number of small points free. Specifically '
+                                local done = 0
+                                for i, datum in ipairs(data) do
+                                    if datum.Count > 1 and datum.Limit and datum.Limit > datum.Count then
+                                        done = done + 1
+                                        local freeSmalls = numSmallBones-(math.floor(datum.Count)*bp.Transport['Class'..datum.Class..'AttachSize'])
+
+                                        text = text..freeSmalls..' with '..datum.Name
+
+                                        if done < numGroupsBoneLimited then text = text..', ' end
+                                        if done + 1 == numGroupsBoneLimited then text = text..'or ' end
+                                    end
+                                end
+                                text = text..'. '
+                            end
                         end
                         return text
                     elseif --(bp.Transport.DockingSlots and bp.Transport.DockingSlots > 0) or
