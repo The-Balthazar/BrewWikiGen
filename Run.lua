@@ -47,6 +47,7 @@ FooterCategories = { -- In order
     'BOMBER',       'TORPEDOBOMBER',
     'MINE',
     'COMMAND',      'SUBCOMMANDER', 'ENGINEER',     'FIELDENGINEER',
+    'TRANSPORTATION',               'AIRSTAGINGPLATFORM',
     'SILO',
     'FACTORY',
     'ARTILLERY',
@@ -54,7 +55,7 @@ FooterCategories = { -- In order
 }
 
 Logging = {
-    SCMLoadIssues = true,
+    SCMLoadIssues = false,
 }
 Sanity = {
     BlueprintChecks = true,

@@ -39,29 +39,34 @@ GetUnitBodytextSectionData = function(ModInfo, bp)
             'Adjacency',
             check = arraySubfind(bp.Categories, 'SIZE') or bp.Adjacency,
             Data = function(bp)
-                local sizecat = arraySubfind(bp.Categories, 'SIZE')
-                local sizecatno = sizecat and tonumber(string.sub(sizecat,5))
+                local CategorySizeString = arraySubfind(bp.Categories, 'SIZE')
+                local CategorySizeNumber = CategorySizeString and tonumber(string.sub(CategorySizeString,5))
 
-                local sizeX = math.max(bp.Footprint and bp.Footprint.SizeX or bp.SizeX or 1, bp.Physics.SkirtSizeX or 0)
-                if math.floor(bp.Physics.SkirtOffsetX or 0) ~= (bp.Physics.SkirtOffsetX or 0) - 0.5 then sizeX = sizeX - 1 end
-                sizeX = math.floor(sizeX / 2) * 2
+                local function GetEffectiveSkirtSize(bp, axe)
+                    local sizeA = 'Size'..axe
+                    local offsetA = 'SkirtOffset'..axe
+                    local sizevalue = math.max(
+                        bp.Footprint and bp.Footprint[sizeA] or bp[sizeA] or 1,
+                        bp.Physics['Skirt'..sizeA] or 0
+                    )
+                    if math.floor(bp.Physics[offsetA] or 0) ~= (bp.Physics[offsetA] or 0) - 0.5 then
+                        sizevalue = sizevalue - 1
+                    end
+                    return math.floor(sizevalue / 2) * 2
+                end
 
-                local sizeZ = math.max(bp.Footprint and bp.Footprint.SizeZ or bp.SizeZ or 1, bp.Physics.SkirtSizeZ or 0)
-                if math.floor(bp.Physics.SkirtOffsetZ or 0) ~= (bp.Physics.SkirtOffsetZ or 0) - 0.5 then sizeZ = sizeZ - 1 end
-                sizeZ = math.floor(sizeZ / 2) * 2
+                local EffectiveSize = math.max(2, GetEffectiveSkirtSize(bp,'X') ) + math.max(2, GetEffectiveSkirtSize(bp, 'Z'))
 
-                local actualsize = math.max(2, sizeX) + math.max(2, sizeZ)
-
-                local text = (sizecat and "This unit counts as `"..
-                sizecat.."` for adjacency effects from other structures. This theoretically means that it can be surrounded by exactly "..
-                string.sub(sizecat,5).." structures the size of a standard tech 1 power generator"..(
-                actualsize and (
-                    actualsize == sizecatno
+                local text = (CategorySizeString and "This unit counts as `"..
+                CategorySizeString.."` for adjacency effects from other structures. This theoretically means that it can be surrounded by exactly "..
+                string.sub(CategorySizeString,5).." structures the size of a standard tech 1 power generator"..(
+                EffectiveSize and (
+                    EffectiveSize == CategorySizeNumber
                     and ', which is accurate; meaning it can get the maximum intended buff effects'
-                    or actualsize > sizecatno
-                    and ', however it is actually larger; meaning it receives '..string.format('%.1f', (actualsize / sizecatno - 1) * 100)..'% better buffs than would normally be afforded it'
-                    or actualsize < sizecatno
-                    and ', however it is actually smaller; meaning it receives '..string.format('%.1f', (1 - actualsize / sizecatno) * 100)..'% weaker buffs than a standard structure of the same skirt size'
+                    or EffectiveSize > CategorySizeNumber
+                    and ', however it is actually larger; meaning it receives '..string.format('%.1f', (EffectiveSize / CategorySizeNumber - 1) * 100)..'% better buffs than would normally be afforded it'
+                    or EffectiveSize < CategorySizeNumber
+                    and ', however it is actually smaller; meaning it receives '..string.format('%.1f', (1 - EffectiveSize / CategorySizeNumber) * 100)..'% weaker buffs than a standard structure of the same skirt size'
                 ) or '')..'. ' or '')
 
                 if bp.Adjacency then
@@ -74,7 +79,7 @@ GetUnitBodytextSectionData = function(ModInfo, bp)
             'Construction',
             check = arraySubfind(bp.Categories, 'BUILTBY'),
             Data = function(bp)
-                return "The estimated build times for this unit on the Steam/retail version of the game are as follows; Note: This only includes hard-coded builders; some build categories are generated on game launch."..BuilderList(bp)
+                return "Build times from hard coded builders on the Steam/retail version of the game:"..BuilderList(bp)
             end
         },
         {

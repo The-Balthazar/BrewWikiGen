@@ -62,7 +62,7 @@ function LoadModFilesMakeUnitPagesGatherData(ModDirectory, modsidebarindex)
 
                 if _G.FooterCategories and _G.FooterCategories[1] then
                     for i, cat in ipairs(FooterCategories) do
-                        if arrayfind(bp.Categories, cat) then
+                        if bp.CategoriesHash[cat] then
 
                             if not categoryData[cat] then
                                 categoryData[cat] = {}

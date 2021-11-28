@@ -13,7 +13,7 @@ GetUnitInfoboxData = function(ModInfo, bp)
         {''},
         {'Health:',
             (
-                not arrayfind(bp.Categories, 'INVULNERABLE')
+                not bp.CategoriesHash.INVULNERABLE
                 and iconText(
                     'Health',
                     bp.Defense and bp.Defense.MaxHealth,
@@ -22,7 +22,7 @@ GetUnitInfoboxData = function(ModInfo, bp)
                 or 'Invulnerable'
             )
         },
-        {'Armour:', (bp.Defense and not arrayfind(bp.Categories, 'INVULNERABLE') and bp.Defense.ArmorType and '<code>'..bp.Defense.ArmorType..'</code>')},
+        {'Armour:', (bp.Defense and not bp.CategoriesHash.INVULNERABLE and bp.Defense.ArmorType and '<code>'..bp.Defense.ArmorType..'</code>')},
         {'Shield health:',
             iconText(
                 'Shield',
@@ -33,8 +33,8 @@ GetUnitInfoboxData = function(ModInfo, bp)
         {'Shield radius:', (tableSafe(bp.Defense, 'Shield', 'ShieldSize') and numberFormatNoTrailingZeros(bp.Defense.Shield.ShieldSize / 2))}, --Shield size is a scale multiplier, and so is effectively diameter
         {'Flags:',
             InfoboxFlagsList{
-                arrayfind(bp.Categories, 'UNTARGETABLE') and 'Untargetable' or '',
-                (arrayfind(bp.Categories, 'UNSELECTABLE') or not arrayfind(bp.Categories, 'SELECTABLE')) and 'Unselectable' or '',
+                bp.CategoriesHash.UNTARGETABLE and 'Untargetable' or '',
+                (bp.CategoriesHash.UNSELECTABLE or not bp.CategoriesHash.SELECTABLE) and 'Unselectable' or '',
                 (bp.Display and bp.Display.HideLifebars or bp.LifeBarRender == false) and 'Lifebars hidden' or '',
                 tableSafe(bp.Defense,'Shield','AntiArtilleryShield') and 'Artillery shield' or '',
                 tableSafe(bp.Defense,'Shield','PersonalShield') and 'Personal shield' or '',
@@ -104,7 +104,7 @@ GetUnitInfoboxData = function(ModInfo, bp)
             )
         )},
         {''},
-        {'Misc radius:', arrayfind(bp.Categories, 'OVERLAYMISC') and bp.AI and bp.AI.StagingPlatformScanRadius, 'Defined by the air staging radius value. Often used to indicate things without a dedicated range ring.' },
+        {'Misc radius:', bp.CategoriesHash.OVERLAYMISC and bp.AI and bp.AI.StagingPlatformScanRadius, 'Defined by the air staging radius value. Often used to indicate things without a dedicated range ring.' },
         {'Weapons:', bp.Weapon and #bp.Weapon..' (<a href="#weapons">Details</a>)'},
     }
 end

@@ -140,7 +140,8 @@ stringSanitiseFile = function(s, lower, nospace)
 end
 
 LOC = function(s)
-    if type(s) == 'string' and string.sub(s, 1, 4)=='<LOC' then
+    --Lua regex could allow for '%b<>'
+    if type(s) == 'string' and string.sub(s, 1, 4) == '<LOC' then
         local i = string.find(s,">")
         local locK = string.sub(s, 6, i-1)
         if _G[locK] then
@@ -364,21 +365,44 @@ GetModHooks = function(ModDirectory)
     print(log)
 end
 
-local function SetShortId(bp, file)
+local function BlueprintSetShortId(bp, file)
     local id = bp.BlueprintId or string.gsub(file, "_unit.bp", "")--string.gsub(file, "^.*/([^/]+)_[a-z]+%.bp$", "%1" )
     bp.id = string.lower(id)
     bp.ID = id == bp.id and string.upper(id) or id
+end
+
+local function BlueprintHashCategories(bp)
+    bp.CategoriesHash = {}
+    bp.FactionCategoryHash = {}
+    if not bp.Categories then return end
+    for i, cat in ipairs(bp.Categories) do
+        cat = string.upper(cat)
+        bp.CategoriesHash[cat] = cat
+
+        if FactionCategoryIndexes[cat] then
+            bp.FactionCategoryHash[cat] = cat
+            if bp.FactionCategory == nil then
+                bp.FactionCategory = cat
+            else
+                bp.FactionCategory = false -- has multiple faction categories
+            end
+        end
+    end
+
+    if bp.FactionCategory == nil then
+        print(bp.ID..' has no identifiable faction categories')
+    end
 end
 
 local function GetUnitTechAndDescStrings(bp)
     -- Tech 1-3 units don't have the tech level in their desc exclicitly,
     -- Experimental *generally* do. This unified it so we don't have to check again.
     for i = 1, 3 do
-        if arrayfind(bp.Categories, 'TECH'..i) then
+        if bp.CategoriesHash['TECH'..i] then
             return i, 'Tech '..i, bp.Description and 'Tech '..i..' '..LOC(bp.Description)
         end
     end
-    if arrayfind(bp.Categories, 'EXPERIMENTAL') then
+    if bp.CategoriesHash.EXPERIMENTAL then
         return 4, 'Experimental', LOC(bp.Description)
     end
     return nil, nil, LOC(bp.Description)
@@ -390,19 +414,26 @@ function GetBlueprintsFromFile(dir, file)
 
     bpfile:close()
 
-    bpstring = string.gsub(bpstring, '#', '--')
-    bpstring = string.gsub(bpstring, '\\', '/')
-    bpstring = string.gsub(bpstring, 'Sound%s*{', '{')
-    bpstring = string.gsub(bpstring, 'UnitBlueprint%s*{', 'return {', 1)
-    bpstring = string.gsub(bpstring, 'UnitBlueprint%s*{', '{')
-    bpstring = string.gsub(bpstring, '}%s*{', '}, {')
+    local sanitiseSteps = {
+        {'#',                 '--',         },
+        {'\\',                '/',          },
+        {'Sound%s*{',         '{',          },
+        {'UnitBlueprint%s*{', 'return {', 1 },
+        {'UnitBlueprint%s*{', '{',          },
+        {'}%s*{',             '}, {',       },
+    }
+
+    for i, v in ipairs(sanitiseSteps) do
+        bpstring = string.gsub(bpstring, v[1], v[2], v[3])
+    end
 
     local bps = {load(bpstring)()}
 
     assert(bps[1], "⚠️ Failed to load "..file)
 
     for i, bp in ipairs(bps) do
-        SetShortId(bp, file)
+        BlueprintSetShortId(bp, file)
+        BlueprintHashCategories(bp)
         bp.unitTIndex, bp.unitTlevel, bp.unitTdesc = GetUnitTechAndDescStrings(bp)
         bp.SourceFolder = dir
         BlueprintMeshBones(bp)

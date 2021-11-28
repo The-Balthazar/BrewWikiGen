@@ -19,6 +19,14 @@ FactionsByIndex = {
     'Other',
 }
 
+FactionCategoryIndexes = {
+    UEF = 1,
+    AEON = 2,
+    CYBRAN = 3,
+    SERAPHIM = 4,
+    OTHER = 5,
+}
+
 Layers = {
     Land   = 1,
     Seabed = 2,
@@ -157,7 +165,7 @@ buildercats = {
     BUILTBYQUANTUMGATE           = {'Tech 3 Quantum Gateway',          120},
     TRANSPORTBUILTBYTIER3FACTORY = {'Tech 3 Air Factory',              60},
     BUILTBYTIER3SPACEPORT        = {'Tech 3 Satellite Launch Complex', 100}, -- BrewLAN
-    BUILTBYHEAVYWALL             = {'Tech 3 Armored Wall Segment',     1},   --BrewLAN
+    BUILTBYTIER3WALL             = {'Tech 3 Armored Wall Segment',     1},   --BrewLAN
     BUILTBYGANTRY                = {'Experimental Factory',            240}, -- BrewLAN
     BUILTBYEXPERIMENTALSUB       = nil, -- Referenced in vanilla, but nothing uses this
 }

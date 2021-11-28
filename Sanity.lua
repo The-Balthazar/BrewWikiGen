@@ -23,7 +23,7 @@ function BlueprintSanityChecks(bp)
     local issues = {}
 
     do -- Tech category, strategic icon tech level, transport class
-        local t1, t2, t3, t4 = arrayfind(bp.Categories, 'TECH1'), arrayfind(bp.Categories, 'TECH2'), arrayfind(bp.Categories, 'TECH3'), arrayfind(bp.Categories, 'EXPERIMENTAL')
+        local t1, t2, t3, t4 = bp.CategoriesHash.TECH1, bp.CategoriesHash.TECH2, bp.CategoriesHash.TECH3, bp.CategoriesHash.EXPERIMENTAL
         if BinaryCounter(t1, t2, t3, t4) > 1 then
             table.insert(issues, 'Multiple tech level categories')
         elseif t4 then -- Experimental things
@@ -41,7 +41,7 @@ function BlueprintSanityChecks(bp)
 
             if t and bp.Physics.MotionType ~= 'RULEUMT_None'
             and (bp.General.CommandCaps and bp.General.CommandCaps.RULEUCC_CallTransport)
-            and not arrayfind(bp.Categories, 'CANNOTUSEAIRSTAGING')
+            and not bp.CategoriesHash.CANNOTUSEAIRSTAGING
             and (bp.Transport and bp.Transport.TransportClass or 1) ~= t then
                 table.insert(issues, 'Tech '..t..' with transport class '..(bp.Transport and bp.Transport.TransportClass or 1))
             end
@@ -51,7 +51,7 @@ function BlueprintSanityChecks(bp)
 
                 for i = 1, 3 do
                     local builtI = string.gsub(builtby, '%d', i)
-                    if arrayfind(bp.Categories, builtI) then
+                    if bp.CategoriesHash[builtI] then
                         if i < t then
                             table.insert(issues, 'Tech '..t..' unit appears to have tier '..i..' built by cat.')
                         end
@@ -83,10 +83,10 @@ function BlueprintSanityChecks(bp)
             physicaicon = IconMotionTypes[bp.Physics.MotionType].Icon
         end
 
-        if arrayfind(bp.Categories, 'FACTORY') then
-            local Cair = arrayfind(bp.Categories, 'AIR') and 'air'
-            local Cland = arrayfind(bp.Categories, 'LAND') and 'land'
-            local Cnaval = arrayfind(bp.Categories, 'NAVAL') and 'sea'
+        if bp.CategoriesHash.FACTORY then
+            local Cair = bp.CategoriesHash.AIR and 'air'
+            local Cland = bp.CategoriesHash.LAND and 'land'
+            local Cnaval = bp.CategoriesHash.NAVAL and 'sea'
 
             local Cbin = BinaryCounter(Cair, Cland, Cnaval)
 
@@ -139,11 +139,11 @@ function BlueprintSanityChecks(bp)
             { bp.Physics.MotionType ~= 'RULEUMT_None' and bp.Physics.BuildOnLayerCaps, 'Redundant bp.Physics.BuildOnLayerCaps table' },
             { bp.Display.SpawnRandomRotation,                   'Redundant bp.Display.SpawnRandomRotation value' },
             { bp.Display.PlaceholderMeshName,                   'Redundant bp.Display.PlaceholderMeshName value' },
-            { arrayfind(bp.Categories, 'OVERLAYANTIAIR'),       'Redundant cat OVERLAYANTIAIR' },
-            { arrayfind(bp.Categories, 'OVERLAYANTINAVY'),      'Redundant cat OVERLAYANTINAVY' },
-            { arrayfind(bp.Categories, 'OVERLAYDEFENSE'),       'Redundant cat OVERLAYDEFENSE' },
-            { arrayfind(bp.Categories, 'OVERLAYDIRECTFIRE'),    'Redundant cat OVERLAYDIRECTFIRE' },
-            { arrayfind(bp.Categories, 'OVERLAYINDIRECTFIRE'),  'Redundant cat OVERLAYINDIRECTFIRE' },
+            { bp.CategoriesHash.OVERLAYANTIAIR,                 'Redundant cat OVERLAYANTIAIR' },
+            { bp.CategoriesHash.OVERLAYANTINAVY,                'Redundant cat OVERLAYANTINAVY' },
+            { bp.CategoriesHash.OVERLAYDEFENSE,                 'Redundant cat OVERLAYDEFENSE' },
+            { bp.CategoriesHash.OVERLAYDIRECTFIRE,              'Redundant cat OVERLAYDIRECTFIRE' },
+            { bp.CategoriesHash.OVERLAYINDIRECTFIRE,            'Redundant cat OVERLAYINDIRECTFIRE' },
             { arrayfindSub(bp.Categories, 1, 7, 'PRODUCT'),     'Probably redundant PRODUCT cat' },
             { bp.UseOOBTestZoom,                                'Redundant UseOOBTestZoom value' },
             { bp.General.Category,                              'Redundant bp.General.Category value' },
