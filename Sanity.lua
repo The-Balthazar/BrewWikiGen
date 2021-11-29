@@ -16,7 +16,7 @@ local IconMotionTypes = {
 }
 
 function BlueprintSanityChecks(bp)
-    if not Sanity.BlueprintChecks or not isValidBlueprint(bp) then
+    if not Sanity.BlueprintChecks then
         return
     end
 

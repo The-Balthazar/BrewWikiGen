@@ -79,6 +79,25 @@ GetUnitBodytextSectionData = function(ModInfo, bp)
             'Construction',
             check = arraySubfind(bp.Categories, 'BUILTBY'),
             Data = function(bp)
+                local function BuilderList(bp)
+                    local bilst = ''
+
+                    if not bp.Economy then return '<error:no economy table>' end
+                    if not bp.Economy.BuildCostEnergy then return '<error:no energy build cost>' end
+                    if not bp.Economy.BuildCostMass then return '<error:no mass build cost>' end
+                    if not bp.Economy.BuildTime then return '<error:no build time>' end
+
+                    for i, cat in ipairs(bp.Categories) do
+                        if buildercats[cat] then
+                            local secs = bp.Economy.BuildTime / buildercats[cat][2]
+                            bilst = bilst .. "\n* "..iconText('Time', string.format('%02d:%02d', math.floor(secs/60), math.floor(secs % 60) ) )..' ‒ '..iconText('Energy', math.floor(bp.Economy.BuildCostEnergy / secs + 0.5), '/s')..' ‒ '..iconText('Mass', math.floor(bp.Economy.BuildCostMass / secs + 0.5), '/s')..' — Built by '..buildercats[cat][1]
+                        elseif string.find(cat, 'BUILTBY') then
+                            bilst = bilst.."\n* <error:category />Unknown build category <code>"..cat.."</code>"
+                        end
+                    end
+
+                    return bilst
+                end
                 return "Build times from hard coded builders on the Steam/retail version of the game:"..BuilderList(bp)
             end
         },

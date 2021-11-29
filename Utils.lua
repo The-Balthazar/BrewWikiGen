@@ -234,30 +234,6 @@ BuildableLayer = function(phys)
     end
 end
 
-BuilderList = function(bp)
-    --local builders = {}
-    --local cathash = {}
-    local bilst = ''
-
-    if not bp.Economy then return 'error:no eco table' end
-    if not bp.Economy.BuildCostEnergy then return 'error:no build cost e' end
-    if not bp.Economy.BuildCostMass then return 'error:no build cost m' end
-    if not bp.Economy.BuildTime then return 'error:no build time' end
-
-    for i, cat in ipairs(bp.Categories) do
-        --cathash[cat] = string.find(cat, 'BUILTBY') and true or nil
-        if buildercats[cat] then
-            --table.insert(builders, )
-            local secs = bp.Economy.BuildTime / buildercats[cat][2]
-            bilst = bilst .. "\n* "..iconText('Time', string.format('%02d:%02d', math.floor(secs/60), math.floor(secs % 60) ) )..' ‒ '..iconText('Energy', math.floor(bp.Economy.BuildCostEnergy / secs + 0.5), '/s')..' ‒ '..iconText('Mass', math.floor(bp.Economy.BuildCostMass / secs + 0.5), '/s')..' — Built by '..buildercats[cat][1]
-        elseif string.find(cat, 'BUILTBY') then
-            bilst = bilst.."\n* <error:category />Unknown build category <code>"..cat.."</code>"
-        end
-    end
-
-    return bilst
-end
-
 CheckCaps = function(hash)
     if not hash then return end
     for k, v in pairs(hash) do
@@ -324,11 +300,11 @@ end
 GetModBlueprintPaths = function(dir)
     local BlueprintPathsArray = {}
 
-    local FileOrSystemFolder = function(file)
+    local function FileOrSystemFolder(file)
         return (string.find(file, '%.'))
     end
 
-    local GoodBlueprintFile = function(file)
+    local function GoodBlueprintFile(file)
         for i, v in ipairs(BlueprintExclusions) do
             if string.upper(string.sub(file,1, string.len(v))) == string.upper(v) then
                 return false
@@ -357,8 +333,8 @@ GetModHooks = function(ModDirectory)
     local log = 'Loading: '
     for name, fileDir in pairs({
         ['Build descriptions'] = 'hook/lua/ui/help/unitdescription.lua',
-           ['US localisation'] = 'hook/loc/US/strings_db.lua',
-                  ['Tooltips'] = 'hook/lua/ui/help/tooltips.lua',
+        ['US localisation']    = 'hook/loc/US/strings_db.lua',
+        ['Tooltips']           = 'hook/lua/ui/help/tooltips.lua',
     }) do
         log = log..(pcall(dofile, ModDirectory..fileDir) and '🆗 ' or '❌ ')..name..' '
     end
@@ -408,6 +384,10 @@ local function GetUnitTechAndDescStrings(bp)
     return nil, nil, LOC(bp.Description)
 end
 
+local function isValidBlueprint(bp)
+    return bp.Display and bp.Categories and bp.Defense and bp.Physics and bp.General
+end
+
 function GetBlueprintsFromFile(dir, file)
     local bpfile = io.open(dir..'/'..file, 'r')
     local bpstring = bpfile:read('a')
@@ -431,18 +411,21 @@ function GetBlueprintsFromFile(dir, file)
 
     assert(bps[1], "⚠️ Failed to load "..file)
 
+    local validbps = {}
+
     for i, bp in ipairs(bps) do
-        BlueprintSetShortId(bp, file)
-        BlueprintHashCategories(bp)
-        bp.unitTIndex, bp.unitTlevel, bp.unitTdesc = GetUnitTechAndDescStrings(bp)
-        bp.SourceFolder = dir
-        BlueprintMeshBones(bp)
-        BlueprintSanityChecks(bp)
+        if not isValidBlueprint(bp) then
+            print("⚠️ "..bp.id.." is missing parts")
+        else
+            BlueprintSetShortId(bp, file)
+            BlueprintHashCategories(bp)
+            bp.unitTIndex, bp.unitTlevel, bp.unitTdesc = GetUnitTechAndDescStrings(bp)
+            bp.SourceFolder = dir
+            BlueprintMeshBones(bp)
+            BlueprintSanityChecks(bp)
+            table.insert(validbps, bp)
+        end
     end
 
-    return bps
-end
-
-function isValidBlueprint(bp)
-    return bp.Display and bp.Categories and bp.Defense and bp.Physics and bp.General
+    return validbps
 end
