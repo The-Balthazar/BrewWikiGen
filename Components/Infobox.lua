@@ -45,7 +45,6 @@ GetUnitInfoboxData = function(ModInfo, bp)
         {'Mass cost:', iconText('Mass', bp.Economy and bp.Economy.BuildCostMass)},
         {'Build time:', iconText('Time-but-not', bp.Economy and bp.Economy.BuildTime, arraySubfind(bp.Categories, 'BUILTBY') and ' (<a href="#construction">Details</a>)' or '' )}, --I don't like the time icon for this, it looks too much and it's also not in real units
         {'Maintenance cost:', iconText('Energy', bp.Economy and bp.Economy.MaintenanceConsumptionPerSecondEnergy,'/s')},
-        --{''},
         {'Build rate:', iconText('Build', bp.Economy and bp.Economy.BuildRate)},
         {'Energy production:', iconText('Energy', bp.Economy and bp.Economy.ProductionPerSecondEnergy, '/s')},
         {'Mass production:', iconText('Mass', bp.Economy and bp.Economy.ProductionPerSecondMass, '/s')},
@@ -100,7 +99,6 @@ GetUnitInfoboxData = function(ModInfo, bp)
             ) and (
                 bp.Transport.Class1Capacity and
                 bp.Transport.Class1Capacity..' (<a href="#transport-capacity">Details</a>)'
-                --or '<a href="#transport-capacity">Details</a>'
             )
         )},
         {''},
@@ -180,7 +178,6 @@ end
 local InfoboxEnd = function(style)
     local styles = {
         ['main-right'] = "    </tbody>\n</table>\n\n",
-        --['mod-right'] = "    </tbody>\n</table>\n\n",
         ['detail-left'] = "    </table>\n</p>\n</details>\n",
     }
     return styles[style]

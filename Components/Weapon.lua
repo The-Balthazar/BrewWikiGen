@@ -26,9 +26,7 @@ local GetWeaponTargetLayers = function(weapon, unit)
 end
 
 local GetWeaponTargets = function(weapon, unit)
-    if IsDeathWeapon(weapon) then
-        return nil
-    end
+    if IsDeathWeapon(weapon) then return end
 
     if weapon.TargetType == 'RULEWTT_Projectile' then
         local s = '<code>RULEWTT_Projectile</code>'
@@ -162,9 +160,7 @@ local GetWeaponBuffs = function(wep)
                 buffs = buffs..'<code>'..buff.BuffType..'</code>'
             end
         end
-        if buffs == '' then
-            buffs = nil
-        end
+        if buffs == '' then return end
         return buffs
     end
 end
@@ -384,4 +380,3 @@ function NewDPSEstimate(weapon)
         return DPSEstimate(weapon)
     end
 end
-

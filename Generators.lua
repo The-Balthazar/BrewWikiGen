@@ -7,101 +7,87 @@ local sidebarData = {}
 local categoryData = {}
 
 function LoadModFilesMakeUnitPagesGatherData(ModDirectory, modsidebarindex)
+
     local ModInfo = GetModInfo(ModDirectory)
+    print('Starting '..ModInfo.name)
+    LoadModHooks(ModDirectory)
 
-    print('🔎 Searching for blueprints in '..ModInfo.name)
+    for id, bp in GetPairedModUnitBlueprints(ModDirectory) do
 
-    local BlueprintPathsArray = GetModBlueprintPaths(ModDirectory)
-    local numBlueprintsFiles = #BlueprintPathsArray
-    local numValidBlueprints = 0
+        local infoboxstring = tostring(Infobox{
+            Style = 'main-right',
+            Header = {string.format(
+                '<img align="left" title="%s unit icon" src="%s_icon.png" />%s<br />%s',
+                (LOC(bp.General.UnitName) or 'The'),
+                unitIconRepo..bp.ID,
+                (LOC(bp.General.UnitName) or '<i>Unnamed</i>'),
+                (bp.unitTdesc or [[<i>No description</i>]])
+            )},
+            Data = GetUnitInfoboxData(ModInfo, bp),
+        })
 
-    collectgarbage() -- Potentially a lot of garbage at this point.
+        local headerstring = bp.General.UnitName and bp.unitTdesc and string.format("\"%s\": %s\n----\n", LOC(bp.General.UnitName), bp.unitTdesc)
+        or bp.General.UnitName and string.format("\"%s\"\n----\n", LOC(bp.General.UnitName) )
+        or bp.unitTdesc and string.format("%s\n----\n", bp.unitTdesc)
+        or ''
 
-    GetModHooks(ModDirectory)
+        local BodyTextSections = GetUnitBodytextSectionData(ModInfo, bp)
 
-    for i, fileDir in ipairs(BlueprintPathsArray) do
-        for _, bp in ipairs(GetBlueprintsFromFile(fileDir[1],fileDir[2])) do
+        local bodytext = GetUnitBodytextLeadText(ModInfo, bp) .. TableOfContents(BodyTextSections) .. tostring( BodyTextSections )
 
-            numValidBlueprints = numValidBlueprints + 1
+        local UnitInfo = {
+            bpid = bp.ID,
+            name = LOC(bp.General.UnitName),
+            desc = bp.unitTdesc,
+            tech = bp.unitTIndex,
+        }
 
-            local infoboxstring = tostring(Infobox{
-                Style = 'main-right',
-                Header = {string.format(
-                    '<img align="left" title="%s unit icon" src="%s_icon.png" />%s<br />%s',
-                    (LOC(bp.General.UnitName) or 'The'),
-                    unitIconRepo..bp.ID,
-                    (LOC(bp.General.UnitName) or '<i>Unnamed</i>'),
-                    (bp.unitTdesc or [[<i>No description</i>]])
-                )},
-                Data = GetUnitInfoboxData(ModInfo, bp),
-            })
+        ----------------------------------------------------------------
 
-            local headerstring = bp.General.UnitName and bp.unitTdesc and string.format("\"%s\": %s\n----\n", LOC(bp.General.UnitName), bp.unitTdesc)
-            or bp.General.UnitName and string.format("\"%s\"\n----\n", LOC(bp.General.UnitName) )
-            or bp.unitTdesc and string.format("%s\n----\n", bp.unitTdesc)
-            or ''
+        local cattext = ''
 
-            local BodyTextSections = GetUnitBodytextSectionData(ModInfo, bp)
+        if _G.FooterCategories and _G.FooterCategories[1] then
+            for i, cat in ipairs(FooterCategories) do
+                if bp.CategoriesHash[cat] then
 
-            local bodytext = GetUnitBodytextLeadText(ModInfo, bp) .. TableOfContents(BodyTextSections) .. tostring( BodyTextSections )
-
-            local UnitInfo = {
-                bpid = bp.ID,
-                name = LOC(bp.General.UnitName),
-                desc = bp.unitTdesc,
-                tech = bp.unitTIndex,
-            }
-
-            ----------------------------------------------------------------
-
-            local cattext = ''
-
-            if _G.FooterCategories and _G.FooterCategories[1] then
-                for i, cat in ipairs(FooterCategories) do
-                    if bp.CategoriesHash[cat] then
-
-                        if not categoryData[cat] then
-                            categoryData[cat] = {}
-                        end
-
-                        table.insert(categoryData[cat], {
-                            UnitInfo = UnitInfo,
-                            ModInfo = ModInfo
-                        })
-
-                        if cattext ~= '' then
-                            cattext = cattext..' · '
-                        end
-
-                        cattext = cattext..'<a href="_categories.'..cat..'">'..cat..'</a>'
+                    if not categoryData[cat] then
+                        categoryData[cat] = {}
                     end
+
+                    table.insert(categoryData[cat], {
+                        UnitInfo = UnitInfo,
+                        ModInfo = ModInfo
+                    })
+
+                    if cattext ~= '' then
+                        cattext = cattext..' · '
+                    end
+
+                    cattext = cattext..'<a href="_categories.'..cat..'">'..cat..'</a>'
                 end
-                if cattext ~= '' then
-                    cattext = "\n<table align=center>\n<td>Categories : "..cattext
-                end
             end
-            ----------------------------------------------------------------
-
-            local md = io.open(OutputDirectory..bp.ID..'.md', "w"):write(headerstring..infoboxstring..bodytext..cattext.."\n"):close()
-
-            ----------------------------------------------------------------
-
-            if not sidebarData[modsidebarindex] then
-                sidebarData[modsidebarindex] = {ModInfo = ModInfo, Factions = {} }
+            if cattext ~= '' then
+                cattext = "\n<table align=center>\n<td>Categories : "..cattext
             end
-
-            local factioni = FactionIndexes[bp.General and bp.General.FactionName] or #FactionsByIndex
-
-            if not sidebarData[modsidebarindex].Factions[factioni] then
-                sidebarData[modsidebarindex].Factions[factioni] = {}
-            end
-
-            table.insert(sidebarData[modsidebarindex].Factions[factioni], UnitInfo)
         end
-    end
+        ----------------------------------------------------------------
 
-    print( numValidBlueprints..' unit wiki page'..pluralS(numValidBlueprints)
-    ..' created from '..numBlueprintsFiles..' file'..pluralS(numValidBlueprints)..'. ' )
+        local md = io.open(OutputDirectory..bp.ID..'.md', "w"):write(headerstring..infoboxstring..bodytext..cattext.."\n"):close()
+
+        ----------------------------------------------------------------
+
+        if not sidebarData[modsidebarindex] then
+            sidebarData[modsidebarindex] = {ModInfo = ModInfo, Factions = {} }
+        end
+
+        local factioni = FactionIndexes[bp.General and bp.General.FactionName] or #FactionsByIndex
+
+        if not sidebarData[modsidebarindex].Factions[factioni] then
+            sidebarData[modsidebarindex].Factions[factioni] = {}
+        end
+
+        table.insert(sidebarData[modsidebarindex].Factions[factioni], UnitInfo)
+    end
 end
 
 local sortData = function(sorttable, sort)

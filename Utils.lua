@@ -297,40 +297,8 @@ GetModInfo = function(dir)
     }
 end
 
-GetModBlueprintPaths = function(dir)
-    local BlueprintPathsArray = {}
-
-    local function FileOrSystemFolder(file)
-        return (string.find(file, '%.'))
-    end
-
-    local function GoodBlueprintFile(file)
-        for i, v in ipairs(BlueprintExclusions) do
-            if string.upper(string.sub(file,1, string.len(v))) == string.upper(v) then
-                return false
-            end
-        end
-        return (string.lower(string.sub(file,-8,-1)) == '_unit.bp')
-    end
-
-    local dirsearch; dirsearch = function(folder, p)
-        local file <close> = io.popen('dir "'..folder..'" /b '..(p or ''))
-        for line in file:lines() do
-            if GoodBlueprintFile(line) then
-                table.insert(BlueprintPathsArray, {folder, line})
-            elseif not FileOrSystemFolder(line) then
-                dirsearch(folder..'/'..line)
-            end
-        end
-    end
-
-    dirsearch(dir..(_G.UnitBlueprintsFolder or ''), '/ad')
-
-    return BlueprintPathsArray
-end
-
-GetModHooks = function(ModDirectory)
-    local log = 'Loading: '
+LoadModHooks = function(ModDirectory)
+    local log = '    Loaded: '
     for name, fileDir in pairs({
         ['Build descriptions'] = 'hook/lua/ui/help/unitdescription.lua',
         ['US localisation']    = 'hook/loc/US/strings_db.lua',
@@ -339,93 +307,4 @@ GetModHooks = function(ModDirectory)
         log = log..(pcall(dofile, ModDirectory..fileDir) and '🆗 ' or '❌ ')..name..' '
     end
     print(log)
-end
-
-local function BlueprintSetShortId(bp, file)
-    local id = bp.BlueprintId or string.gsub(file, "_unit.bp", "")--string.gsub(file, "^.*/([^/]+)_[a-z]+%.bp$", "%1" )
-    bp.id = string.lower(id)
-    bp.ID = id == bp.id and string.upper(id) or id
-end
-
-local function BlueprintHashCategories(bp)
-    bp.CategoriesHash = {}
-    bp.FactionCategoryHash = {}
-    if not bp.Categories then return end
-    for i, cat in ipairs(bp.Categories) do
-        cat = string.upper(cat)
-        bp.CategoriesHash[cat] = cat
-
-        if FactionCategoryIndexes[cat] then
-            bp.FactionCategoryHash[cat] = cat
-            if bp.FactionCategory == nil then
-                bp.FactionCategory = cat
-            else
-                bp.FactionCategory = false -- has multiple faction categories
-            end
-        end
-    end
-
-    if bp.FactionCategory == nil then
-        print(bp.ID..' has no identifiable faction categories')
-    end
-end
-
-local function GetUnitTechAndDescStrings(bp)
-    -- Tech 1-3 units don't have the tech level in their desc exclicitly,
-    -- Experimental *generally* do. This unified it so we don't have to check again.
-    for i = 1, 3 do
-        if bp.CategoriesHash['TECH'..i] then
-            return i, 'Tech '..i, bp.Description and 'Tech '..i..' '..LOC(bp.Description)
-        end
-    end
-    if bp.CategoriesHash.EXPERIMENTAL then
-        return 4, 'Experimental', LOC(bp.Description)
-    end
-    return nil, nil, LOC(bp.Description)
-end
-
-local function isValidBlueprint(bp)
-    return bp.Display and bp.Categories and bp.Defense and bp.Physics and bp.General
-end
-
-function GetBlueprintsFromFile(dir, file)
-    local bpfile = io.open(dir..'/'..file, 'r')
-    local bpstring = bpfile:read('a')
-
-    bpfile:close()
-
-    local sanitiseSteps = {
-        {'#',                 '--',         },
-        {'\\',                '/',          },
-        {'Sound%s*{',         '{',          },
-        {'UnitBlueprint%s*{', 'return {', 1 },
-        {'UnitBlueprint%s*{', '{',          },
-        {'}%s*{',             '}, {',       },
-    }
-
-    for i, v in ipairs(sanitiseSteps) do
-        bpstring = string.gsub(bpstring, v[1], v[2], v[3])
-    end
-
-    local bps = {load(bpstring)()}
-
-    assert(bps[1], "⚠️ Failed to load "..file)
-
-    local validbps = {}
-
-    for i, bp in ipairs(bps) do
-        if not isValidBlueprint(bp) then
-            print("⚠️ "..bp.id.." is missing parts")
-        else
-            BlueprintSetShortId(bp, file)
-            BlueprintHashCategories(bp)
-            bp.unitTIndex, bp.unitTlevel, bp.unitTdesc = GetUnitTechAndDescStrings(bp)
-            bp.SourceFolder = dir
-            BlueprintMeshBones(bp)
-            BlueprintSanityChecks(bp)
-            table.insert(validbps, bp)
-        end
-    end
-
-    return validbps
 end

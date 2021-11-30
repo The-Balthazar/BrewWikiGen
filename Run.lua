@@ -24,10 +24,21 @@ ModDirectories = { -- In order
 -- Optional, reduces scope of file search, which is the slowest part.
 UnitBlueprintsFolder = 'units'
 
--- Not case senstive, matches files and folders that start with any of these.
-BlueprintExclusions = {
-    'z',
-    'srl0000',
+BlueprintFileExclusions = { -- Excludes _unit.bp files that match any of these (regex)
+    '^[zZ]', --Starts with z or Z
+}
+
+BlueprintFolderExclusions = { -- Excludes folders that match any of these (regex)
+    '^[zZ]',
+}
+
+BlueprintIdExclusions = { -- Excludes blueprints with any of these IDs (case insensitive)
+    'srl0001',
+    'srl0002',
+    'srl0003',
+    'srl0004',
+    'srl0005',
+    'srl0006',
 }
 
 -- Web path for img src. Could be relative, but would break on edit previews.
@@ -56,9 +67,10 @@ FooterCategories = { -- In order
 
 Logging = {
     SCMLoadIssues = false,
+    BlueprintTotals = true,
 }
 Sanity = {
-    BlueprintChecks = true,
+    BlueprintChecks = false,
     BlueprintPedanticChecks = false,
 }
 
@@ -75,11 +87,12 @@ for i, file in ipairs({
     'Environment.lua',
     'Generators.lua',
     'Utils.lua',
+    'Utilities/Blueprint.lua',
+    'Utilities/Mesh.lua',
+    'Sanity.lua',
     'Components/Infobox.lua',
     'Components/Bodytext.lua',
     'Components/Weapon.lua',
-    'Sanity.lua',
-    'MeshUtils.lua',
 }) do
     safecall(dofile, WikiGeneratorDirectory..file)
 end
@@ -89,6 +102,8 @@ safecall(dofile, ModDirectories[1]..'documentation/Wiki Data.lua')
 for i, dir in ipairs(ModDirectories) do
     safecall(LoadModFilesMakeUnitPagesGatherData, dir, i)
 end
+
+safecall(printTotalBlueprintValues)
 
 safecall(GenerateSidebar)
 safecall(GenerateModPages)

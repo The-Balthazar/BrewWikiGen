@@ -160,9 +160,9 @@ function BlueprintSanityChecks(bp)
     end
 
     if #issues > 0 then
-        print(bp.id..' has the following issues:')
+        print('    '..bp.id..' has the following issues:')
         for i, str in ipairs(issues) do
-            print('    '..str)
+            print('      '..str)
         end
     end
 end
