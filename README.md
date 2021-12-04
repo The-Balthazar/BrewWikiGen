@@ -16,7 +16,7 @@ lua54.exe, open and [appropriately edit Run.lua](#Configuring) for your personal
 environment, and run.
 
 ## Configuring:
-The following values in `Run.lua` will probably need updating:
+Most of the following values in `Run.lua` will need updating for your setup:
 
 * `WikiGeneratorDirectory` should point to the cloned repo directory
 or location of `Generators.lua` and the other files. The actual location of
@@ -34,10 +34,13 @@ is used in the sidebar navigation ordering.
 for blueprints. Standard convention is `units`. This value can be removed, but
 execution can take double the time to complete.
 
-* `BlueprintExclusions` is a list of things to exclude from the blueprint search.
-It matches the first n characters of any file or folder to decide if it should
-proceed to do anything with it; be that open that folder and look in it, or add
-that `_unit.bp` file to the list of units to process.
+* `BlueprintFolderExclusions` and `BlueprintFileExclusions` are arrays of regex
+matches for what to exclude from the blueprint search. The first is used against
+anything without a . in it, assumed to be folders, the second is used against
+anything that ends in `_unit.bp`. It won't look in any folder that matches, or
+open any file that matches.
+
+* `BlueprintIdExclusions` is an array of exact blueprint IDs to exclude. Case insensitive.
 
 * `ImageRepo` should point to the web directory it will find the image files. If
 you maintain my directory structure but don't care about the images working on
@@ -62,6 +65,12 @@ on unit pages in the order written, so I tried to order them in a natural langua
 order, or as close to as possible. If you have no units in a given category, no
 page will be generated. Add or remove as seems appropriate for your mods needs.
 Can be completely removed if you don't need categories.
+
+* `Logging` contains several options for verbose logging of additional information
+which can be interesting or helpful in the case of any issues.
+
+* `Sanity` contains options for flagging anything in blueprints and their meshes
+that I consider anomalous or unnecessary. Exercise discretion when taking its advice.
 
 ## Usage notes:
 Since this generator runs mod files directly for data, any referenced files must

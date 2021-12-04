@@ -24,11 +24,11 @@ ModDirectories = { -- In order
 -- Optional, reduces scope of file search, which is the slowest part.
 UnitBlueprintsFolder = 'units'
 
-BlueprintFileExclusions = { -- Excludes _unit.bp files that match any of these (regex)
+BlueprintFolderExclusions = { -- Excludes folders that match any of these (regex)
     '^[zZ]', --Starts with z or Z
 }
 
-BlueprintFolderExclusions = { -- Excludes folders that match any of these (regex)
+BlueprintFileExclusions = { -- Excludes _unit.bp files that match any of these (regex)
     '^[zZ]',
 }
 
