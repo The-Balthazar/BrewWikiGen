@@ -4,7 +4,6 @@
 --------------------------------------------------------------------------------
 
 GetUnitBodytextLeadText = function(ModInfo, bp)
-
     local bodytext = (bp.General.UnitName and '"'..LOC(bp.General.UnitName)..'" is a' or 'This unamed unit is a')
     ..(bp.General and bp.General.FactionName and string.upper(string.sub(bp.General.FactionName, 1, 1)) == 'A' and 'n ' or ' ')
     ..(bp.General and bp.General.FactionName and bp.General.FactionName..' ' or 'factionless ')
@@ -19,7 +18,9 @@ GetUnitBodytextLeadText = function(ModInfo, bp)
         [3] = "\nThe build description for this unit is:\n\n<blockquote>"..LOC(Description[bp.id] or '').."</blockquote>\n",
     }
 
-    return bodytext..BuildIntroTexts[Binary2bit( Description[bp.id], arraySubfind(bp.Categories, 'BUILTBY') )]..GetModUnitData(bp.ID, 'LeadSuffix')
+    local function Binary2bit(a,b) return (a and 2 or 0) + (b and 1 or 0) end
+
+    return bodytext..BuildIntroTexts[Binary2bit( Description[bp.id], arraySubFind(bp.Categories, 'BUILTBY') )]..GetModUnitData(bp.ID, 'LeadSuffix')
 end
 
 GetUnitBodytextSectionData = function(ModInfo, bp)
@@ -37,9 +38,9 @@ GetUnitBodytextSectionData = function(ModInfo, bp)
         },
         {
             'Adjacency',
-            check = arraySubfind(bp.Categories, 'SIZE') or bp.Adjacency,
+            check = arraySubFind(bp.Categories, 'SIZE') or bp.Adjacency,
             Data = function(bp)
-                local CategorySizeString = arraySubfind(bp.Categories, 'SIZE')
+                local CategorySizeString = arraySubFind(bp.Categories, 'SIZE')
                 local CategorySizeNumber = CategorySizeString and tonumber(string.sub(CategorySizeString,5))
 
                 local function GetEffectiveSkirtSize(bp, axe)
@@ -77,7 +78,7 @@ GetUnitBodytextSectionData = function(ModInfo, bp)
         },
         {
             'Construction',
-            check = arraySubfind(bp.Categories, 'BUILTBY'),
+            check = arraySubFind(bp.Categories, 'BUILTBY'),
             Data = function(bp)
                 local function BuilderList(bp)
                     local bilst = ''
@@ -103,8 +104,19 @@ GetUnitBodytextSectionData = function(ModInfo, bp)
         },
         {
             'Order capabilities',
-            check = bp.General and ( CheckCaps(bp.General.CommandCaps) or CheckCaps(bp.General.ToggleCaps) ),
+            check = bp.General and ( tableHasTrueChild(bp.General.CommandCaps) or tableHasTrueChild(bp.General.ToggleCaps) ),
             Data = function(bp)
+                local orderButtonImage = function(orderName, bp)
+                    local Order = tableOverwrites(defaultOrdersTable[orderName], bp and bp[orderName])
+                    local returnstring
+
+                    if Order then
+                        local Tip = Tooltips[Order.helpText] or {title = 'error:'..Order.helpText..' no title'}
+                        returnstring = '<img float="left" src="'..IconRepo..'orders/'..string.lower(Order.bitmapId)..'.png" title="'..LOC(Tip.title or '')..(Tip.description and Tip.description ~= '' and "\n"..LOC(Tip.description) or '')..'" />'
+                    end
+                    return returnstring or orderName, Order
+                end
+
                 local ordersarray = {}
                 for i, hash in ipairs({bp.General.CommandCaps or {}, bp.General.ToggleCaps or {}}) do
                     for order, val in pairs(hash) do

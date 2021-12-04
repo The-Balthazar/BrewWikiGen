@@ -24,7 +24,7 @@ function BlueprintSanityChecks(bp)
 
     do -- Tech category, strategic icon tech level, transport class
         local t1, t2, t3, t4 = bp.CategoriesHash.TECH1, bp.CategoriesHash.TECH2, bp.CategoriesHash.TECH3, bp.CategoriesHash.EXPERIMENTAL
-        if BinaryCounter(t1, t2, t3, t4) > 1 then
+        if BinaryCounter{t1, t2, t3, t4} > 1 then
             table.insert(issues, 'Multiple tech level categories')
         elseif t4 then -- Experimental things
 
@@ -35,7 +35,7 @@ function BlueprintSanityChecks(bp)
         else -- Tech 1-3
             local t = t1 and 1 or t2 and 2 or t3 and 3
 
-            if t and bp.StrategicIconName and not string.find(bp.StrategicIconName, tostring(t)) and not arraySubfind(bp.Categories, 'WALL') then
+            if t and bp.StrategicIconName and not string.find(bp.StrategicIconName, tostring(t)) and not arraySubFind(bp.Categories, 'WALL') then
                 table.insert(issues, 'Tech '..t..' with strategic icon '..bp.StrategicIconName)
             end
 
@@ -46,7 +46,7 @@ function BlueprintSanityChecks(bp)
                 table.insert(issues, 'Tech '..t..' with transport class '..(bp.Transport and bp.Transport.TransportClass or 1))
             end
 
-            local builtby = arrayfindSub(bp.Categories, 1, 7, 'BUILTBY')
+            local builtby = arrayFindSub(bp.Categories, 1, 7, 'BUILTBY')
             if builtby then
 
                 for i = 1, 3 do
@@ -76,7 +76,7 @@ function BlueprintSanityChecks(bp)
             local BLwater = blc and (blc.LAYER_Water or blc.LAYER_Sub or blc.LAYER_Seabed) and 'sea'
             local BLland = (blc and blc.LAYER_Land or not blc) and 'land'
 
-            local BLbin = BinaryCounter(BLland, BLwater)
+            local BLbin = BinaryCounter{BLland, BLwater}
 
             physicaicon = (BLbin == 1) and (BLland or BLwater) or 'amph'
         else
@@ -88,7 +88,7 @@ function BlueprintSanityChecks(bp)
             local Cland = bp.CategoriesHash.LAND and 'land'
             local Cnaval = bp.CategoriesHash.NAVAL and 'sea'
 
-            local Cbin = BinaryCounter(Cair, Cland, Cnaval)
+            local Cbin = BinaryCounter{Cair, Cland, Cnaval}
 
             factoryicon = (Cbin == 1) and (Cair or Cnaval or (Cland and physicaicon) ) or (Cbin ~= 0) and 'amph'
         end
@@ -126,7 +126,7 @@ function BlueprintSanityChecks(bp)
             if bp.General and bp.General.CommandCaps
             and bp.General.CommandCaps.RULEUCC_CallTransport
             and bp.Physics.MotionType ~= 'RULEUMT_Air'
-            and not arrayfind(bp.Bones, 'AttachPoint')
+            and not arrayFind(bp.Bones, 'AttachPoint')
             then
                 table.insert(issues, "Mesh has no valid transport attach bone.")
             end
@@ -144,7 +144,7 @@ function BlueprintSanityChecks(bp)
             { bp.CategoriesHash.OVERLAYDEFENSE,                 'Redundant cat OVERLAYDEFENSE' },
             { bp.CategoriesHash.OVERLAYDIRECTFIRE,              'Redundant cat OVERLAYDIRECTFIRE' },
             { bp.CategoriesHash.OVERLAYINDIRECTFIRE,            'Redundant cat OVERLAYINDIRECTFIRE' },
-            { arrayfindSub(bp.Categories, 1, 7, 'PRODUCT'),     'Probably redundant PRODUCT cat' },
+            { arrayFindSub(bp.Categories, 1, 7, 'PRODUCT'),     'Probably redundant PRODUCT cat' },
             { bp.UseOOBTestZoom,                                'Redundant UseOOBTestZoom value' },
             { bp.General.Category,                              'Redundant bp.General.Category value' },
             { bp.General.Classification,                        'Redundant bp.General.Classification value' },

@@ -6,7 +6,7 @@
 GetUnitInfoboxData = function(ModInfo, bp)
     return {
         {'', "Note: Several units have stats defined at the<br />start of the game based on the stats of others."},
-        {'Source:', '<a href="'..stringSanitiseFile(ModInfo.name)..'">'..ModInfo.name..'</a>'},
+        {'Source:', '<a href="'..stringSanitiseFilename(ModInfo.name)..'">'..ModInfo.name..'</a>'},
         {'Unit ID:', '<code>'..bp.id..'</code>',},
         {'Faction:', (bp.General and bp.General.FactionName)},
         {'Tech level:', bp.unitTIndex and bp.unitTIndex..(bp.unitTIndex == 4 and ' (Experimental)' or '') },
@@ -43,7 +43,7 @@ GetUnitInfoboxData = function(ModInfo, bp)
         {''},
         {'Energy cost:', iconText('Energy', bp.Economy and bp.Economy.BuildCostEnergy)},
         {'Mass cost:', iconText('Mass', bp.Economy and bp.Economy.BuildCostMass)},
-        {'Build time:', iconText('Time-but-not', bp.Economy and bp.Economy.BuildTime, arraySubfind(bp.Categories, 'BUILTBY') and ' (<a href="#construction">Details</a>)' or '' )}, --I don't like the time icon for this, it looks too much and it's also not in real units
+        {'Build time:', iconText('Time-but-not', bp.Economy and bp.Economy.BuildTime, arraySubFind(bp.Categories, 'BUILTBY') and ' (<a href="#construction">Details</a>)' or '' )}, --I don't like the time icon for this, it looks too much and it's also not in real units
         {'Maintenance cost:', iconText('Energy', bp.Economy and bp.Economy.MaintenanceConsumptionPerSecondEnergy,'/s')},
         {'Build rate:', iconText('Build', bp.Economy and bp.Economy.BuildRate)},
         {'Energy production:', iconText('Energy', bp.Economy and bp.Economy.ProductionPerSecondEnergy, '/s')},

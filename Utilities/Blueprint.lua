@@ -12,8 +12,8 @@ local TotalIgnoredBlueprints = 0
 
 function printTotalBlueprintValues()
     if _G.Logging and _G.Logging.BlueprintTotals then
-        print(TotalBlueprintFiles..' blueprint file'..pluralS(TotalBlueprintFiles)..' processed')
-        print(TotalValidBlueprints..' blueprint'..pluralS(TotalValidBlueprints))
+        print(TotalBlueprintFiles..' opened .bp file'..pluralS(TotalBlueprintFiles))
+        print(TotalValidBlueprints..' processed blueprint'..pluralS(TotalValidBlueprints))
         print(TotalIgnoredBlueprints..' ignored blueprint'..pluralS(TotalIgnoredBlueprints))
     end
 end
@@ -107,12 +107,7 @@ end
 
 local function isExcludedId(id)
     if not _G.BlueprintIdExclusions then return end
-    for i, v in ipairs(BlueprintIdExclusions) do
-        if string.lower(v) == id then
-            TotalIgnoredBlueprints = TotalIgnoredBlueprints + 1
-            return true
-        end
-    end
+    for i, v in ipairs(BlueprintIdExclusions) do if string.lower(v) == id then return true end end
 end
 
 --[[ ---------------------------------------------------------------------- ]]--
@@ -125,12 +120,12 @@ local function GetBlueprintsFromFile(dir, file)
     bpfile:close()
 
     local sanitiseSteps = {
-        {'#',                 '--',         },
-        {'\\',                '/',          },
-        {'Sound%s*{',         '{',          },
-        {'%a+Blueprint%s*{', 'return {', 1 },
-        {'%a+Blueprint%s*{', '{',          },
-        {'}%s*{',             '}, {',       },
+        {'#',                 '--',       },
+        {'\\',                '/',        },
+        {'Sound%s*{',         '{',        },
+        {'%a+Blueprint%s*{', 'return {', 1},
+        {'%a+Blueprint%s*{', '{',         },
+        {'}%s*{',             '}, {',     },
     }
 
     for i, v in ipairs(sanitiseSteps) do
@@ -147,7 +142,7 @@ local function GetBlueprintsFromFile(dir, file)
         bp.SourceFolder = dir
         BlueprintSetShortId(bp, file)
         if isExcludedId(bp.id) then
-            --print("excluded "..bp.id)
+            TotalIgnoredBlueprints = TotalIgnoredBlueprints + 1
         elseif not isValidBlueprint(bp) then
             print("⚠️ "..bp.id.." is missing parts")
         else

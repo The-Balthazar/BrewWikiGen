@@ -9,7 +9,7 @@ local categoryData = {}
 function LoadModFilesMakeUnitPagesGatherData(ModDirectory, modsidebarindex)
 
     local ModInfo = GetModInfo(ModDirectory)
-    print('Starting '..ModInfo.name)
+    print(ModInfo.name)
     LoadModHooks(ModDirectory)
 
     for id, bp in GetPairedModUnitBlueprints(ModDirectory) do
@@ -120,7 +120,7 @@ function GenerateSidebar()
     for modindex, moddata in ipairs(sidebarData) do
         local modname = moddata[1]
 
-        sidebarstring = sidebarstring .. "<details markdown=\"1\">\n<summary>[Show] <a href=\""..stringSanitiseFile(moddata.ModInfo.name)..[[">]]..moddata.ModInfo.name.."</a></summary>\n<p>\n<table>\n<tr>\n<td>\n\n"
+        sidebarstring = sidebarstring .. "<details markdown=\"1\">\n<summary>[Show] <a href=\""..stringSanitiseFilename(moddata.ModInfo.name)..[[">]]..moddata.ModInfo.name.."</a></summary>\n<p>\n<table>\n<tr>\n<td>\n\n"
         for i, faction in ipairs(FactionsByIndex) do
             local unitarray = moddata.Factions[i]
             if unitarray then
@@ -150,7 +150,7 @@ function GenerateModPages()
             Style = 'main-right',
             Header = {
                 moddata.ModInfo.name,
-                '<img src="'..ImageRepo..'mods/'..(moddata.ModInfo.icon and stringSanitiseFile(moddata.ModInfo.name, true, true) or 'mod')..'.png" width="256px" />'
+                '<img src="'..ImageRepo..'mods/'..(moddata.ModInfo.icon and stringSanitiseFilename(moddata.ModInfo.name, true, true) or 'mod')..'.png" width="256px" />'
             },
             Data = {
                 { 'Author:', moddata.ModInfo.author },
@@ -198,7 +198,7 @@ function GenerateModPages()
 
         table.insert(ModInfobox.Data, { 'Total:', tableSubcount(moddata.Factions) })
 
-        md = io.open(OutputDirectory..stringSanitiseFile(moddata.ModInfo.name)..'.md', "w"):write(tostring(ModInfobox)..mulString):close()
+        md = io.open(OutputDirectory..stringSanitiseFilename(moddata.ModInfo.name)..'.md', "w"):write(tostring(ModInfobox)..mulString):close()
 
     end
 
@@ -218,7 +218,7 @@ function GenerateCategoryPages()
             catstring = catstring
             ..'<tr><td><a href="'..data.UnitInfo.bpid ..'"><img src="'..unitIconRepo..data.UnitInfo.bpid..'_icon.png" width="21px" /></a>'
             ..'<td><code>'..data.UnitInfo.bpid..'</code>'
-            ..'<td><a href="'.. stringSanitiseFile(data.ModInfo.name) ..'"><img src="'..IconRepo..'mods/'..(data.ModInfo.icon and stringSanitiseFile(data.ModInfo.name, true, true) or 'mod')..'.png" width="21px" /></a>'
+            ..'<td><a href="'.. stringSanitiseFilename(data.ModInfo.name) ..'"><img src="'..IconRepo..'mods/'..(data.ModInfo.icon and stringSanitiseFilename(data.ModInfo.name, true, true) or 'mod')..'.png" width="21px" /></a>'
             ..'<td><a href="'..data.UnitInfo.bpid..'">'
 
             local switch = {
@@ -227,7 +227,7 @@ function GenerateCategoryPages()
                 [2] = (data.UnitInfo.name or '')..': '..(data.UnitInfo.desc or ''),
             }
 
-            catstring = catstring..switch[BinaryCounter(data.UnitInfo.name, data.UnitInfo.desc)].."</a>\n"
+            catstring = catstring..switch[BinaryCounter{data.UnitInfo.name, data.UnitInfo.desc}].."</a>\n"
         end
 
         md = io.open(OutputDirectory..'_categories.'..cat..'.md', "w"):write(catstring):close()

@@ -66,11 +66,13 @@ FooterCategories = { -- In order
 }
 
 Logging = {
-    SCMLoadIssues = false,
-    BlueprintTotals = true,
+    ModHooksLoaded    = false,
+    LuaFileLoadIssues = true,
+    SCMLoadIssues     = false,
+    BlueprintTotals   = true,
 }
 Sanity = {
-    BlueprintChecks = false,
+    BlueprintChecks         = false,
     BlueprintPedanticChecks = false,
 }
 
@@ -83,12 +85,17 @@ local safecall = function(...)
     if not pass then print(msg) end
 end
 
+print("Starting BrewWikiGen")
+
 for i, file in ipairs({
-    'Environment.lua',
+    'Environment/Game.lua',
+    'Environment/Localization.lua',
     'Generators.lua',
-    'Utils.lua',
     'Utilities/Blueprint.lua',
+    'Utilities/File.lua',
     'Utilities/Mesh.lua',
+    'Utilities/String.lua',
+    'Utilities/Table.lua',
     'Sanity.lua',
     'Components/Infobox.lua',
     'Components/Bodytext.lua',
@@ -99,6 +106,9 @@ end
 
 safecall(dofile, ModDirectories[1]..'documentation/Wiki Data.lua')
 
+for i, dir in ipairs(ModDirectories) do
+    safecall(SetModLocalization, dir) -- Load all localisation first.
+end
 for i, dir in ipairs(ModDirectories) do
     safecall(LoadModFilesMakeUnitPagesGatherData, dir, i)
 end
