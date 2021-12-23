@@ -24,7 +24,6 @@ function SetWikiLocalization(WikiDirectory, lang)
 end
 
 function LOC(s)
-    --Lua regex could allow for '%b<>'
     if type(s) == 'string' and string.sub(s, 1, 4) == '<LOC' then
         local i = string.find(s,">")
         local locK = string.sub(s, 6, i-1)
@@ -35,4 +34,8 @@ function LOC(s)
         end
     end
     return s
+end
+
+function noLOC(s)
+    return string.gsub(s, '%b<>', '')
 end

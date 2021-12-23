@@ -12,10 +12,10 @@ UnitBodytextLeadText = function(ModInfo, bp)
     ..' unit'..((not bp.unitTlevel) and ' with no defined tech level' or '')..'.'
 
     local BuildIntroTexts = {
-        [0] = " It has no defined build description, and no categories to define common builders.\n",
-        [1] = " It has no defined build description.<error:buildable unit with no build description>\n",
-        [2] = "\nThis unit has no categories to define common builders, however the build description for it is:\n\n<blockquote>"..LOC(Description[bp.id] or '').."</blockquote>\n",
-        [3] = "\nThe build description for this unit is:\n\n<blockquote>"..LOC(Description[bp.id] or '').."</blockquote>\n",
+        [0] = LOC('<LOC wiki_intro_build_a> It has no defined build description, and no categories to define common builders.').."\n",
+        [1] = LOC('<LOC wiki_intro_build_b> It has no defined build description.').."<error:buildable unit with no build description>\n",
+        [2] = "\n"..LOC('<LOC wiki_intro_build_c>This unit has no categories to define common builders, however the build description for it is:').."\n\n<blockquote>"..LOC(Description[bp.id] or '').."</blockquote>\n",
+        [3] = "\n"..LOC('<LOC wiki_intro_build_d>The build description for this unit is:').."\n\n<blockquote>"..LOC(Description[bp.id] or '').."</blockquote>\n",
     }
 
     local function Binary2bit(a,b) return (a and 2 or 0) + (b and 1 or 0) end
@@ -31,7 +31,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
             Data = function(bp)
                 local text = LOC('<LOC wiki_abilities_hover_note>Hover over abilities to see effect descriptions.').."\n"
                 for i, ability in ipairs(bp.Display.Abilities) do
-                    text = text.."\n*"..abilityTitle(LOC(ability))
+                    text = text.."\n*"..abilityTitle(ability)
                 end
                 return text
             end
@@ -445,7 +445,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
             local bodytext = ''
             for i, section in ipairs(self) do
                 if section.check then
-                    bodytext = bodytext..MDHead(section[1])..GetModUnitData(bp.ID, section[1]..'Prefix')..section.Data(bp).."\n"..GetModUnitData(bp.ID, section[1]..'Suffix')
+                    bodytext = bodytext..MDHead(section[1])..GetModUnitData(bp.ID, noLOC(section[1])..'Prefix')..section.Data(bp).."\n"..GetModUnitData(bp.ID, noLOC(section[1])..'Suffix')
                 end
             end
             return bodytext

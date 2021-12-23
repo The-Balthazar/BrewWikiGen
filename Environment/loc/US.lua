@@ -1,6 +1,12 @@
 --ISO_639-1_code=EN
 	--Wiki strings
 --Note for translators: make sure things like %s and `%s` and %.1f and so on match the original; they are formating notation used by the wiki script to insert values.
+
+wiki_intro_build_a=" It has no defined build description, and no categories to define common builders."
+wiki_intro_build_b=" It has no defined build description."
+wiki_intro_build_c="This unit has no categories to define common builders, however the build description for it is:"
+wiki_intro_build_d="The build description for this unit is:"
+
 wiki_toc_contents="Contents"
 
 wiki_sect_abilities="Abilities"

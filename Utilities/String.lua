@@ -66,7 +66,7 @@ function transportClassHookType(transport)
 end
 
 function abilityTitle(ability)
-    return hoverTip( abilityDesc[ability] or 'error:description', ability)
+    return hoverTip( LOC(abilityDesc[noLOC(ability)]) or 'error:description', LOC(ability))
 end
 
 function BuildableLayer(phys)
