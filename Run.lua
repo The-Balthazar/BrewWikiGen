@@ -2,15 +2,16 @@
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
 -- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
 --------------------------------------------------------------------------------
-
+local Language = 'US'-- These are not ISO_639-1. As an Englishman I am offended.
 --[{ ---------------------------------------------------------------------- ]]--
 --[[ Inputs -- NOTE: Mod input files must be valid lua                      ]]--
 --[[ ---------------------------------------------------------------------- ]]--
 
-WikiGeneratorDirectory = "C:/BrewWikiGen/"
 OutputDirectory = "C:/BrewLAN.wiki/"
 
-ModDirectories = { -- In order
+local WikiGeneratorDirectory = "C:/BrewWikiGen/"
+
+local ModDirectories = { -- In order
     'C:/BrewLAN/mods/BrewLAN/',
     'C:/BrewLAN/mods/BrewLAN_Units/BrewAir/',
     'C:/BrewLAN/mods/BrewLAN_Units/BrewIntel/',
@@ -20,6 +21,8 @@ ModDirectories = { -- In order
     'C:/BrewLAN/mods/BrewLAN_Units/BrewTeaParty/',
     'C:/BrewLAN/mods/BrewLAN_Units/BrewTurrets/',
 }
+
+local WikiExtraData = 'C:/BrewLAN/mods/BrewLAN/documentation/Wiki Data.lua'
 
 -- Optional, reduces scope of file search, which is the slowest part.
 UnitBlueprintsFolder = 'units'
@@ -66,10 +69,11 @@ FooterCategories = { -- In order
 }
 
 Logging = {
-    ModHooksLoaded    = false,
-    LuaFileLoadIssues = true,
-    SCMLoadIssues     = false,
-    BlueprintTotals   = true,
+    ModHooksLoaded     = false,
+    LuaFileLoadIssues  = true,
+    SCMLoadIssues      = false,
+    ExcludedBlueprints = false,
+    BlueprintTotals    = true,
 }
 Sanity = {
     BlueprintChecks         = false,
@@ -80,41 +84,45 @@ Sanity = {
 --[[ Run                                                                    ]]--
 --[[ ---------------------------------------------------------------------- ]]--
 
-local safecall = function(...)
+local function safecall(...)
     local pass, msg = pcall(...)
     if not pass then print(msg) end
 end
 
 print("Starting BrewWikiGen")
 
-for i, file in ipairs({
+for i, file in ipairs{
     'Environment/Game.lua',
     'Environment/Localization.lua',
-    'Generators.lua',
     'Utilities/Blueprint.lua',
     'Utilities/File.lua',
     'Utilities/Mesh.lua',
+    'Utilities/Sanity.lua',
     'Utilities/String.lua',
     'Utilities/Table.lua',
-    'Sanity.lua',
-    'Components/Infobox.lua',
     'Components/Bodytext.lua',
+    'Components/Categories.lua',
+    'Components/Infobox.lua',
+    'Components/Navigation.lua',
+    'Components/Unit.lua',
     'Components/Weapon.lua',
-}) do
+} do
     safecall(dofile, WikiGeneratorDirectory..file)
 end
 
-safecall(dofile, ModDirectories[1]..'documentation/Wiki Data.lua')
-
+safecall(dofile, WikiExtraData)
+safecall(SetWikiLocalization, Language)
 for i, dir in ipairs(ModDirectories) do
-    safecall(SetModLocalization, dir) -- Load all localisation first.
-end
-for i, dir in ipairs(ModDirectories) do
-    safecall(LoadModFilesMakeUnitPagesGatherData, dir, i)
+    safecall(LoadModLocalization, dir) -- Load all localisation first.
+    safecall(LoadModHooks, dir)
 end
 
-safecall(printTotalBlueprintValues)
-
+for i, dir in ipairs(ModDirectories) do
+    safecall(GenerateModUnitPages, dir, i)
+end
 safecall(GenerateSidebar)
 safecall(GenerateModPages)
 safecall(GenerateCategoryPages)
+
+safecall(printTotalBlueprintValues)
+

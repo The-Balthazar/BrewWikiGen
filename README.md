@@ -18,12 +18,15 @@ environment, and run.
 ## Configuring:
 Most of the following values in `Run.lua` will need updating for your setup:
 
-* `WikiGeneratorDirectory` should point to the cloned repo directory
-or location of `Generators.lua` and the other files. The actual location of
-`Run.lua` isn't important as long as it's pointing at the other files correctly.
+* `Language` should be the two letter language code for which LOC files should be
+loaded. They are not ISO_639-1. Non-`'US'` is supported only for strings copied
+verbatim. Actual wiki prose and text is not yet translated, or prepared for such.
 
-* `OutputDirectory` needs to point to a real directory. I'd go for wherever you check
-out your mods wiki repository, but what you do with the output is up to you.
+* `OutputDirectory` needs to point to a real directory. I'd go for wherever you
+check out your mods wiki repository, but what you do with the output is up to you.
+
+* `WikiGeneratorDirectory` should point to the folder this readme and `Run.lua`
+are located in. Include a slash at the end.
 
 * `ModDirectories` should point to your local copies of the mod(s) you wish to
 generate wiki pages for. It assumes, but doesn't require, multiple mods. It
@@ -97,6 +100,6 @@ blueprint files are sanitised it will stop running that mod if it reaches a `.bp
 file that still doesn't validate as Lua. For the other files it will continue
 with a warning, but may have missing data on the pages.
 
-Only blueprint files that end in `_unit.bp` will be included, and only
-blueprints in those that contain a `Display`, `Categories`, `Defense`,
-`Physics`, and `General` table defined will be given pages.
+Only blueprint files that end in `_unit.bp` will be included, and only non-Merge
+blueprints in those that contain defined `Display`, `Categories`, `Defense`,
+`Physics`, and `General` tables will be given pages and included in navigation.

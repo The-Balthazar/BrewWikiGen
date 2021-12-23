@@ -3,7 +3,7 @@
 -- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
 --------------------------------------------------------------------------------
 
-GetUnitBodytextLeadText = function(ModInfo, bp)
+UnitBodytextLeadText = function(ModInfo, bp)
     local bodytext = (bp.General.UnitName and '"'..LOC(bp.General.UnitName)..'" is a' or 'This unamed unit is a')
     ..(bp.General and bp.General.FactionName and string.upper(string.sub(bp.General.FactionName, 1, 1)) == 'A' and 'n ' or ' ')
     ..(bp.General and bp.General.FactionName and bp.General.FactionName..' ' or 'factionless ')
@@ -23,7 +23,7 @@ GetUnitBodytextLeadText = function(ModInfo, bp)
     return bodytext..BuildIntroTexts[Binary2bit( Description[bp.id], arraySubFind(bp.Categories, 'BUILTBY') )]..GetModUnitData(bp.ID, 'LeadSuffix')
 end
 
-GetUnitBodytextSectionData = function(ModInfo, bp)
+UnitBodytextSectionData = function(ModInfo, bp)
     return setmetatable({
         {
             'Abilities',

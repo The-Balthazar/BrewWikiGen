@@ -113,7 +113,7 @@ end
 --[[ ---------------------------------------------------------------------- ]]--
 --[[ Blueprint loading                                                      ]]--
 --[[ ---------------------------------------------------------------------- ]]--
-local function GetBlueprintsFromFile(dir, file)
+local function GetPairedBlueprintsFromFile(dir, file)
     local bpfile = io.open(dir..'/'..file, 'r')
     local bpstring = bpfile:read('a')
 
@@ -141,20 +141,24 @@ local function GetBlueprintsFromFile(dir, file)
     for i, bp in ipairs(bps) do
         bp.SourceFolder = dir
         BlueprintSetShortId(bp, file)
-        if isExcludedId(bp.id) then
-            TotalIgnoredBlueprints = TotalIgnoredBlueprints + 1
-        elseif not isValidBlueprint(bp) then
-            print("⚠️ "..bp.id.." is missing parts")
-        else
+        if isValidBlueprint(bp) and not bp.Merge and not isExcludedId(bp.id) then
             BlueprintHashCategories(bp)
             BlueprintSetUnitTechAndDescStrings(bp)
             BlueprintMeshBones(bp)
             BlueprintSanityChecks(bp)
             table.insert(validbps, bp)
+        else
+            TotalIgnoredBlueprints = TotalIgnoredBlueprints + 1
+            if Logging.ExcludedBlueprints then
+                print("⚠️ Excluding "..bp.id,
+                    (bp.Merge and "Merge") or
+                    (not isValidBlueprint(bp) and "Invalid bp" ) or ""
+                )
+            end
         end
     end
 
-    return validbps
+    return ipairs(validbps)
 end
 
 function GetPairedModUnitBlueprints(modDir)
@@ -167,7 +171,8 @@ function GetPairedModUnitBlueprints(modDir)
     local ModUnitBlueprints = {}
 
     for i, fileDir in ipairs(BlueprintPathsArray) do
-        for _, bp in ipairs(GetBlueprintsFromFile(fileDir[1],fileDir[2])) do
+        for _, bp in GetPairedBlueprintsFromFile(fileDir[1],fileDir[2]) do
+            assert(not ModUnitBlueprints[bp.id], "⚠️ Found blueprints with clashing ID "..bp.id)
             ModUnitBlueprints[bp.id] = bp
             numValidBlueprints = numValidBlueprints + 1
         end

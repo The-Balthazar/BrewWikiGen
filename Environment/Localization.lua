@@ -2,11 +2,10 @@
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
 -- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
 --------------------------------------------------------------------------------
-local Language = 'US'--As an Englishman this offends me but that's what is in the game
-
+local Language
 local LocalizedStrings = {}
 
-function SetModLocalization(ModDirectory)
+function LoadModLocalization(ModDirectory)
     local good, loc = pcall(GetSandboxedLuaFile, ModDirectory..'hook/loc/'..Language..'/strings_db.lua')
     if good then
         for k, v in pairs(loc) do
@@ -15,8 +14,8 @@ function SetModLocalization(ModDirectory)
     end
 end
 
-function SetWikiLocalization()
-
+function SetWikiLocalization(lang)
+    Language = lang
 end
 
 function LOC(s)

@@ -2,7 +2,6 @@
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
 -- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
 --------------------------------------------------------------------------------
-
 function GetSandboxedLuaFile(file)
     local env = {}
     loadfile(file, 'bt', env)()
@@ -20,7 +19,7 @@ function GetModInfo(dir)
 end
 
 function LoadModHooks(ModDirectory)
-    local log = '    Loaded: '
+    local log = '  Preloading: '
     for name, fileDir in pairs({
         ['Build descriptions'] = 'hook/lua/ui/help/unitdescription.lua',
         ['Tooltips']           = 'hook/lua/ui/help/tooltips.lua',
