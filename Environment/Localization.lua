@@ -5,8 +5,8 @@
 local Language
 local LocalizedStrings = {}
 
-function LoadModLocalization(ModDirectory)
-    local good, loc = pcall(GetSandboxedLuaFile, ModDirectory..'hook/loc/'..Language..'/strings_db.lua')
+local function LoadLocalizationFile(FileLocation)
+    local good, loc = pcall(GetSandboxedLuaFile, FileLocation)
     if good then
         for k, v in pairs(loc) do
             LocalizedStrings[k] = v
@@ -14,8 +14,13 @@ function LoadModLocalization(ModDirectory)
     end
 end
 
-function SetWikiLocalization(lang)
+function LoadModLocalization(ModDirectory)
+    LoadLocalizationFile(ModDirectory..'hook/loc/'..Language..'/strings_db.lua')
+end
+
+function SetWikiLocalization(WikiDirectory, lang)
     Language = lang
+    LoadLocalizationFile(WikiDirectory..'Environment/loc/'..Language..'.lua')
 end
 
 function LOC(s)

@@ -26,10 +26,10 @@ end
 UnitBodytextSectionData = function(ModInfo, bp)
     return setmetatable({
         {
-            'Abilities',
+            '<LOC wiki_sect_abilities>Abilities',
             check = bp.Display and bp.Display.Abilities and #bp.Display.Abilities > 0,
             Data = function(bp)
-                local text = "Hover over abilities to see effect descriptions.\n"
+                local text = LOC('<LOC wiki_abilities_hover_note>Hover over abilities to see effect descriptions.').."\n"
                 for i, ability in ipairs(bp.Display.Abilities) do
                     text = text.."\n*"..abilityTitle(LOC(ability))
                 end
@@ -37,7 +37,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
             end
         },
         {
-            'Adjacency',
+            '<LOC wiki_sect_adjacency>Adjacency',
             check = arraySubFind(bp.Categories, 'SIZE') or bp.Adjacency,
             Data = function(bp)
                 local CategorySizeString = arraySubFind(bp.Categories, 'SIZE')
@@ -58,26 +58,36 @@ UnitBodytextSectionData = function(ModInfo, bp)
 
                 local EffectiveSize = math.max(2, GetEffectiveSkirtSize(bp,'X') ) + math.max(2, GetEffectiveSkirtSize(bp, 'Z'))
 
-                local text = (CategorySizeString and "This unit counts as `"..
-                CategorySizeString.."` for adjacency effects from other structures. This theoretically means that it can be surrounded by exactly "..
-                string.sub(CategorySizeString,5).." structures the size of a standard tech 1 power generator"..(
+                local text = (CategorySizeString
+                and string.format(
+                    LOC("<LOC wiki_adjacency_part1>This unit counts as `%s` for adjacency effects from other structures. This theoretically means that it can be surrounded by exactly %s structures the size of a standard tech 1 power generator"),
+                    CategorySizeString, string.sub(CategorySizeString,5)
+                )..(
                 EffectiveSize and (
                     EffectiveSize == CategorySizeNumber
-                    and ', which is accurate; meaning it can get the maximum intended buff effects'
+                    and LOC('<LOC wiki_adjacency_part2_a>, which is accurate; meaning it can get the maximum intended buff effects')
+
                     or EffectiveSize > CategorySizeNumber
-                    and ', however it is actually larger; meaning it receives '..string.format('%.1f', (EffectiveSize / CategorySizeNumber - 1) * 100)..'% better buffs than would normally be afforded it'
+                    and string.format(
+                        LOC('<LOC wiki_adjacency_part2_b>, however it is actually larger; meaning it receives %.1f%% better buffs than would normally be afforded it'),
+                        (EffectiveSize / CategorySizeNumber - 1) * 100
+                    )
+
                     or EffectiveSize < CategorySizeNumber
-                    and ', however it is actually smaller; meaning it receives '..string.format('%.1f', (1 - EffectiveSize / CategorySizeNumber) * 100)..'% weaker buffs than a standard structure of the same skirt size'
-                ) or '')..'. ' or '')
+                    and string.format(
+                        LOC('<LOC wiki_adjacency_part2_c>, however it is actually smaller; meaning it receives %.1f%% weaker buffs than a standard structure of the same skirt size'),
+                        (1 - EffectiveSize / CategorySizeNumber) * 100
+                    )
+                ) or '')..LOC('<LOC wiki_adjacency_part3>. ') or '')
 
                 if bp.Adjacency then
-                    text = text..[[The adjacency bonus `]]..bp.Adjacency..[[` is given by this unit.]]
+                    text = text..string.format(LOC('<LOC wiki_adjacency_bonus>The adjacency bonus `%s` is given by this unit.'), bp.Adjacency)
                 end
                 return text
             end
         },
         {
-            'Construction',
+            '<LOC wiki_sect_construction>Construction',
             check = arraySubFind(bp.Categories, 'BUILTBY'),
             Data = function(bp)
                 local function BuilderList(bp)
@@ -99,11 +109,11 @@ UnitBodytextSectionData = function(ModInfo, bp)
 
                     return bilst
                 end
-                return "Build times from hard coded builders on the Steam/retail version of the game:"..BuilderList(bp)
+                return LOC("<LOC wiki_builders_note>Build times from hard coded builders on the Steam/retail version of the game:")..BuilderList(bp)
             end
         },
         {
-            'Order capabilities',
+            '<LOC wiki_sect_orders>Order capabilities',
             check = bp.General and ( tableHasTrueChild(bp.General.CommandCaps) or tableHasTrueChild(bp.General.ToggleCaps) ),
             Data = function(bp)
                 local orderButtonImage = function(orderName, bp)
@@ -143,7 +153,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
             end
         },
         {
-            'Engineering',
+            '<LOC wiki_sect_engineering>Engineering',
             check = bp.Economy and bp.Economy.BuildRate and
             (
                 bp.Economy.BuildableCategory or bp.General and bp.General.CommandCaps and
@@ -200,7 +210,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
             end
         },
         {
-            'Enhancements',
+            '<LOC wiki_sect_enhancements>Enhancements',
             check = bp.Enhancements,
             Data = function(bp)
                 local EnhacementsSorted = {}
@@ -241,7 +251,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
             end
         },
         {
-            'Transport capacity',
+            '<LOC wiki_sect_transport>Transport capacity',
             check = bp.General and bp.General.CommandCaps and bp.General.CommandCaps.RULEUCC_Transport and bp.Transport,
             Data = function(bp)
                 if bp.Bones then
@@ -377,12 +387,12 @@ UnitBodytextSectionData = function(ModInfo, bp)
             end
         },
         {
-            'Weapons',
+            '<LOC wiki_sect_weapons>Weapons',
             check = bp.Weapon,
             Data = GetWeaponBodytextSectionString
         },
         {
-            'Veteran levels',
+            '<LOC wiki_sect_vet>Veteran levels',
             check = bp.Veteran and bp.Veteran.Level1,
             Data = function(bp)
                 local text
@@ -413,7 +423,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
             end
         },
         {
-            'Videos',
+            '<LOC wiki_sect_videos>Videos',
             check = pcall(function() assert(UnitData and UnitData[bp.ID] and UnitData[bp.ID].Videos and #UnitData[bp.ID].Videos > 0) end),
             Data = function(bp)
                 local text = ''
@@ -456,11 +466,12 @@ TableOfContents = function(BodyTextSections)
     end
 
     if sections >= 3 then
-        local text = "\n<details>\n<summary>Contents</summary>\n\n"
+        local text = "\n<details>\n<summary>"..LOC("<LOC wiki_toc_contents>Contents").."</summary>\n\n"
         local index = 1
         for i, section in ipairs(BodyTextSections) do
             if section.check then
-                text = text .. index..". – <a href=#" .. string.lower(string.gsub(section[1], ' ', '-')).." >"..section[1].."</a>\n"
+                local locsect = LOC(section[1])
+                text = text .. index..". – <a href=#" .. string.lower(string.gsub(locsect, ' ', '-')).." >"..locsect.."</a>\n"
                 index = index + 1
             end
         end
@@ -470,15 +481,7 @@ TableOfContents = function(BodyTextSections)
 end
 
 MDHead = function(header, hnum)
-    local h = '### '
-    if hnum then
-        h = ''
-        for i = 1, hnum do
-            h = h..'#'
-        end
-        h = h..' '
-    end
-    return "\n"..h..header.."\n"
+    return "\n"..string.rep('#', hnum or 3)..' '..LOC(header).."\n"
 end
 
 GetModUnitData = function(id, sect)

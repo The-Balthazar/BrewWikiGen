@@ -111,7 +111,7 @@ for i, file in ipairs{
 end
 
 safecall(dofile, WikiExtraData)
-safecall(SetWikiLocalization, Language)
+safecall(SetWikiLocalization, WikiGeneratorDirectory, Language)
 for i, dir in ipairs(ModDirectories) do
     safecall(LoadModLocalization, dir) -- Load all localisation first.
     safecall(LoadModHooks, dir)
