@@ -1,6 +1,6 @@
 --ISO_639-1_code=EN
 	--Wiki strings
---Note for translators: make sure things like %s and `%s` and %.1f and so on match the original; they are formating notation used by the wiki script to insert values.
+--Note for translators: make sure things like %s and `%s` and %.1f and so on match the original; they are formating notation used by the wiki script to insert values, and the auto generated ones get this wrong.
 
 wiki_intro_build_a=" It has no defined build description, and no categories to define common builders."
 wiki_intro_build_b=" It has no defined build description."
@@ -22,6 +22,31 @@ wiki_adjacency_bonus="The adjacency bonus `%s` is given by this unit."
 
 wiki_sect_construction="Construction"
 wiki_builders_note="Build times from hard coded builders on the Steam/retail version of the game:"
+wiki_builders_by="Built by %s"
+wiki_builder_t1_fe="Tech 1 Field Engineer"
+wiki_builder_t2_fe="Tech 2 Field Engineer"
+wiki_builder_t3_fe="Tech 3 Field Engineer"
+wiki_builder_t1_e="Tech 1 Engineer"
+wiki_builder_t2_e="Tech 2 Engineer"
+wiki_builder_t3_e="Tech 3 Engineer"
+wiki_builder_t1_acu="Armoured Command Unit"
+wiki_builder_t2_acu="Tech 2 Armoured Command Unit"
+wiki_builder_t3_acu="Tech 3 Armoured Command Unit"
+wiki_builder_t1_fact="Tech 1 Factory"
+wiki_builder_t2_fact="Tech 2 Factory"
+wiki_builder_t3_fact="Tech 3 Factory"
+wiki_builder_t1_lfact="Tech 1 Land Factory"
+wiki_builder_t2_lfact="Tech 2 Land Factory"
+wiki_builder_t3_lfact="Tech 3 Land Factory"
+wiki_builder_t1_amphfact="Tech 1 Amphibious Factory"
+wiki_builder_t2_amphfact="Tech 2 Amphibious Factory"
+wiki_builder_t3_amphfact="Tech 3 Amphibious Factory"
+wiki_builder_t3_qg="Tech 3 Quantum Gateway"
+wiki_builder_t3_afact="Tech 3 Air Factory"
+wiki_builder_t3_novax="Tech 3 Satellite Launch Complex"
+wiki_builder_t3_wall="Tech 3 Armored Wall Segment"
+wiki_builder_t4_gantry="Experimental Factory"
+
 
 wiki_sect_orders="Order capabilities"
 wiki_sect_engineering="Engineering"

@@ -101,7 +101,10 @@ UnitBodytextSectionData = function(ModInfo, bp)
                     for i, cat in ipairs(bp.Categories) do
                         if buildercats[cat] then
                             local secs = bp.Economy.BuildTime / buildercats[cat][2]
-                            bilst = bilst .. "\n* "..iconText('Time', string.format('%02d:%02d', math.floor(secs/60), math.floor(secs % 60) ) )..' ‒ '..iconText('Energy', math.floor(bp.Economy.BuildCostEnergy / secs + 0.5), '/s')..' ‒ '..iconText('Mass', math.floor(bp.Economy.BuildCostMass / secs + 0.5), '/s')..' — Built by '..buildercats[cat][1]
+                            bilst = bilst .. "\n* "..iconText('Time', string.format('%02d:%02d', math.floor(secs/60), math.floor(secs % 60) ) )
+                            ..' ‒ '..iconText('Energy', math.floor(bp.Economy.BuildCostEnergy / secs + 0.5), '/s')
+                            ..' ‒ '..iconText('Mass', math.floor(bp.Economy.BuildCostMass / secs + 0.5), '/s')
+                            ..' — '..string.format(LOC('Built by %s'), LOC(buildercats[cat][1]))
                         elseif string.find(cat, 'BUILTBY') then
                             bilst = bilst.."\n* <error:category />Unknown build category <code>"..cat.."</code>"
                         end
