@@ -23,10 +23,5 @@ function SetWikiLocalization(WikiDirectory, lang)
     LoadLocalizationFile(WikiDirectory..'Environment/loc/'..Language..'.lua')
 end
 
-function LOC(s)
-    return s and (LocalizedStrings[string.match(s, '<LOC ([^>.]*)>')] or noLOC(s)) or s
-end
-
-function noLOC(s)
-    return string.gsub(s, '<LOC [^>.]*>', '')
-end
+function LOC(s) return s and (LocalizedStrings[string.match(s, '<LOC ([^>.]*)>')] or noLOC(s)) end
+function noLOC(s) return string.gsub(s, '<LOC [^>.]*>', '') end

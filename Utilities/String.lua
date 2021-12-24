@@ -69,6 +69,10 @@ function abilityTitle(ability)
     return hoverTip( LOC(abilityDesc[noLOC(ability)]) or 'error:description', LOC(ability))
 end
 
+function detailsLink(section)
+    return string.format(LOC('<LOC wiki_bracket_text> (%s)'), '<a href="#'..string.lower(string.gsub(LOC(section), ' ', '-'))..'">'..LOC('<LOC wiki_infobox_details>Details')..'</a>')
+end
+
 function BuildableLayer(phys)
     --This script assumes it's a structure. This doesn't matter to non-structures.
     if not phys.BuildOnLayerCaps then

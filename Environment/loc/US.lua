@@ -1,6 +1,56 @@
 --ISO_639-1_code=EN
 	--Wiki strings
---Note for translators: make sure things like %s and `%s` and %.1f and so on match the original; they are formating notation used by the wiki script to insert values, and the auto generated ones get this wrong.
+--Note for translators: make sure html tags and things like %s and `%s` and %.1f and so on match the original; they are formating notation used by the wiki script to insert values, and the auto generated ones get this wrong.
+	--Infobox meta
+wiki_infobox_stats_note="Note: Several units have stats defined at the<br />start of the game based on the stats of others."
+wiki_infobox_mod_source="Source:"
+wiki_infobox_unitid="Unit ID:"
+wiki_infobox_faction="Faction:"
+wiki_infobox_tech="Tech level:"
+	--Infobox defence
+wiki_infobox_health="Health:"
+wiki_infobox_armor="Armour:"
+wiki_infobox_shieldh="Shield health:"
+wiki_infobox_shieldr="Shield radius:"
+wiki_infobox_defflags="Flags:"
+	--Infobox economy
+wiki_infobox_cost_e="Energy cost:"
+wiki_infobox_cost_m="Mass cost:"
+wiki_infobox_cost_t="Build time:"
+wiki_infobox_maint_e="Maintenance cost:"
+wiki_infobox_buildrate="Build rate:"
+wiki_infobox_prod_e="Energy production:"
+wiki_infobox_prod_m="Mass production:"
+wiki_infobox_store_e="Energy storage:"
+wiki_infobox_store_m="Mass storage:"
+	--Infobox intel
+wiki_infobox_vision_r="Vision radius:"
+wiki_infobox_w_vision_r="Water vision radius:"
+wiki_infobox_radar_r="Radar radius:"
+wiki_infobox_sonar_r="Sonar radius:"
+wiki_infobox_omni_r="Omni radius:"
+wiki_infobox_jammer_blips="Jammer blips (radii):"
+wiki_infobox_cloak_r="Cloak radius:"
+wiki_infobox_steath_radar_r="Radar stealth radius:"
+wiki_infobox_steath_sonar_r="Sonar stealth radius:"
+wiki_infobox_intelflags="Flags:"
+	--Infobox motion
+wiki_infobox_motion="Motion type:"
+wiki_infobox_build_layers="Buildable layers:"
+wiki_infobox_movement_speed="Movement speed:"
+wiki_infobox_fuel="Fuel:"
+wiki_infobox_elevation="Elevation:"
+wiki_infobox_transport_class="Transport class:"
+wiki_infobox_transport_capacity="Transport capacity:"
+	--Infobox other
+wiki_infobox_miscrad="Misc radius:"
+wiki_infobox_weapons="Weapons:"
+
+	--Brackets with an arbitrary string inserted
+wiki_bracket_text=" (%s)"
+wiki_infobox_details="Details"
+	--'%s' is for formatting in a string, '/s' is shortform for 'per second'
+wiki_per_second="%s/s"
 
 wiki_intro_build_a=" It has no defined build description, and no categories to define common builders."
 wiki_intro_build_b=" It has no defined build description."
@@ -47,8 +97,9 @@ wiki_builder_t3_novax="Tech 3 Satellite Launch Complex"
 wiki_builder_t3_wall="Tech 3 Armored Wall Segment"
 wiki_builder_t4_gantry="Experimental Factory"
 
-
 wiki_sect_orders="Order capabilities"
+wiki_orders_note="The following orders can be issued to the unit:"
+
 wiki_sect_engineering="Engineering"
 wiki_sect_enhancements="Enhancements"
 wiki_sect_transport="Transport capacity"

@@ -140,7 +140,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
                 end
                 table.sort(ordersarray, function(a, b) return (defaultOrdersTable[a].preferredSlot or 99) < (defaultOrdersTable[b].preferredSlot or 99) end)
 
-                local text = "The following orders can be issued to the unit:\n<table>\n"
+                local text = LOC('<LOC wiki_orders_note>The following orders can be issued to the unit:').."\n<table>\n"
                 local slot = 99
                 for i, v in ipairs(ordersarray) do
                     local orderstring, order = orderButtonImage(v, bp.General.OrderOverrides)
