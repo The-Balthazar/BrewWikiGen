@@ -24,18 +24,9 @@ function SetWikiLocalization(WikiDirectory, lang)
 end
 
 function LOC(s)
-    if type(s) == 'string' and string.sub(s, 1, 4) == '<LOC' then
-        local i = string.find(s,">")
-        local locK = string.sub(s, 6, i-1)
-        if LocalizedStrings[locK] then
-            return LocalizedStrings[locK]
-        else
-            return string.sub(s, i+1)
-        end
-    end
-    return s
+    return s and (LocalizedStrings[string.match(s, '<LOC ([^>.]*)>')] or noLOC(s)) or s
 end
 
 function noLOC(s)
-    return string.gsub(s, '%b<>', '')
+    return string.gsub(s, '<LOC [^>.]*>', '')
 end
