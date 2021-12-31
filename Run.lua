@@ -92,9 +92,10 @@ end
 print("Starting BrewWikiGen")
 
 for i, file in ipairs{
-    'Environment/Game.lua',
     'Environment/Localization.lua',
+    'Environment/Game.lua',
     'Utilities/Blueprint.lua',
+    'Utilities/Builders.lua',
     'Utilities/File.lua',
     'Utilities/Mesh.lua',
     'Utilities/Sanity.lua',
@@ -112,14 +113,14 @@ end
 
 safecall(dofile, WikiExtraData)
 safecall(SetWikiLocalization, WikiGeneratorDirectory, Language)
+
 for i, dir in ipairs(ModDirectories) do
     safecall(LoadModLocalization, dir) -- Load all localisation first.
     safecall(LoadModHooks, dir)
+    safecall(LoadModUnitBlueprints, dir, i)
 end
 
-for i, dir in ipairs(ModDirectories) do
-    safecall(GenerateModUnitPages, dir, i)
-end
+safecall(GenerateUnitPages)
 safecall(GenerateSidebar)
 safecall(GenerateModPages)
 safecall(GenerateCategoryPages)

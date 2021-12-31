@@ -27,12 +27,30 @@ FactionCategoryIndexes = {
     OTHER = 5,
 }
 
-Layers = {
+LayerBits = {
     Land   = 1,
     Seabed = 2,
     Sub    = 4,
     Water  = 8,
     Air    = 16,
+}
+
+LayerHash = {
+    LAYER_Land   = LOC('<LOC wiki_layer_land>Land'),
+    LAYER_Seabed = LOC('<LOC wiki_layer_seabed>Seabed'),
+    LAYER_Sub    = LOC('<LOC wiki_layer_sub>Sub'),
+    LAYER_Water  = LOC('<LOC wiki_later_water>water'),
+    LAYER_Air    = LOC('<LOC wiki_layer_air>Air'),
+    --LAYER_Orbit  = LOC('<LOC wiki_layer_orbit>Orbit'),
+}
+
+LayersByIndex = {
+    'LAYER_Land',
+    'LAYER_Seabed',
+    'LAYER_Sub',
+    'LAYER_Water',
+    'LAYER_Air',
+    --'LAYER_Orbit',
 }
 
 -- Motion types mapped to plain text string descriptions, and layers they relevantly be firing from.
@@ -142,32 +160,23 @@ Tooltips = {
     toggle_cloak                = { title = "<LOC tooltipui0339>Personal Cloak",                    description = "<LOC tooltipui0342>Turn the selected units cloaking on/off" },
 }
 
-buildercats = {
-    BUILTBYTIER1FIELD            = {'<LOC wiki_builder_t1_fe>Tech 1 Field Engineer',              5},  -- BrewLAN
-    BUILTBYTIER2FIELD            = {'<LOC wiki_builder_t2_fe>Tech 2 Field Engineer',              10}, -- BrewLAN
-    BUILTBYTIER3FIELD            = {'<LOC wiki_builder_t3_fe>Tech 3 Field Engineer',              15}, -- BrewLAN
-    BUILTBYENGINEER              = {'<LOC wiki_builder_t1_e>Tech 1 Engineer',                     5},  -- R&D
-    BUILTBYTIER1ENGINEER         = {'<LOC wiki_builder_t1_e>Tech 1 Engineer',                     5},
-    BUILTBYTIER2ENGINEER         = {'<LOC wiki_builder_t2_e>Tech 2 Engineer',                     10},
-    BUILTBYTIER3ENGINEER         = {'<LOC wiki_builder_t3_e>Tech 3 Engineer',                     15},
-    BUILTBYCOMMANDER             = {'<LOC wiki_builder_t1_acu>Armoured Command Unit',             10},
-    BUILTBYTIER2COMMANDER        = {'<LOC wiki_builder_t2_acu>Tech 2 Armoured Command Unit',      30},
-    BUILTBYTIER3COMMANDER        = {'<LOC wiki_builder_t3_acu>Tech 3 Armoured Command Unit',      90},
-    BUILTBYTIER1FACTORY          = {'<LOC wiki_builder_t1_fact>Tech 1 Factory',                   20},
-    BUILTBYTIER2FACTORY          = {'<LOC wiki_builder_t2_fact>Tech 2 Factory',                   40},
-    BUILTBYTIER3FACTORY          = {'<LOC wiki_builder_t3_fact>Tech 3 Factory',                   60},
-    BUILTBYLANDTIER1FACTORY      = {'<LOC wiki_builder_t1_lfact>Tech 1 Land Factory',             20}, -- BrewLAN
-    BUILTBYLANDTIER2FACTORY      = {'<LOC wiki_builder_t2_lfact>Tech 2 Land Factory',             40},
-    BUILTBYLANDTIER3FACTORY      = {'<LOC wiki_builder_t3_lfact>Tech 3 Land Factory',             60}, -- BrewLAN
-    BUILTBYTIER1SURFACEFACTORY   = {'<LOC wiki_builder_t1_amphfact>Tech 1 Amphibious Factory',    20}, -- R&D
-    BUILTBYTIER2SURFACEFACTORY   = {'<LOC wiki_builder_t2_amphfact>Tech 2 Amphibious Factory',    40}, -- R&D
-    BUILTBYTIER3SURFACEFACTORY   = {'<LOC wiki_builder_t3_amphfact>Tech 3 Amphibious Factory',    60}, -- R&D
-    BUILTBYQUANTUMGATE           = {'<LOC wiki_builder_t3_qg>Tech 3 Quantum Gateway',             120},
-    TRANSPORTBUILTBYTIER3FACTORY = {'<LOC wiki_builder_t3_afact>Tech 3 Air Factory',              60},
-    BUILTBYTIER3SPACEPORT        = {'<LOC wiki_builder_t3_novax>Tech 3 Satellite Launch Complex', 100}, -- BrewLAN
-    BUILTBYTIER3WALL             = {'<LOC wiki_builder_t3_wall>Tech 3 Armored Wall Segment',      1},   --BrewLAN
-    BUILTBYGANTRY                = {'<LOC wiki_builder_t4_gantry>Experimental Factory',           240}, -- BrewLAN
-    BUILTBYEXPERIMENTALSUB       = nil, -- Referenced in vanilla, but nothing uses this
+defaultBuilderCats = {
+    BUILTBYTIER2FIELD            = {'<LOC wiki_builder_t2_fe>Tech 2 Field Engineer',              10}, -- BrewLAN cat for vanilla unit
+    BUILTBYENGINEER              = {'<LOC wiki_builder_t1_e>Tech 1 Engineer',                     5,  true},  -- R&D
+    BUILTBYTIER1ENGINEER         = {'<LOC wiki_builder_t1_e>Tech 1 Engineer',                     5,  true},
+    BUILTBYTIER2ENGINEER         = {'<LOC wiki_builder_t2_e>Tech 2 Engineer',                     10, true},
+    BUILTBYTIER3ENGINEER         = {'<LOC wiki_builder_t3_e>Tech 3 Engineer',                     15, true},
+    BUILTBYCOMMANDER             = {'<LOC wiki_builder_t1_acu>Armoured Command Unit',             10, true},
+    BUILTBYTIER2COMMANDER        = {'<LOC wiki_builder_t2_acu>Tech 2 Armoured Command Unit',      30, true},
+    BUILTBYTIER3COMMANDER        = {'<LOC wiki_builder_t3_acu>Tech 3 Armoured Command Unit',      90, true},
+    BUILTBYTIER1FACTORY          = {'<LOC wiki_builder_t1_fact>Tech 1 Factory',                   20, true},
+    BUILTBYTIER2FACTORY          = {'<LOC wiki_builder_t2_fact>Tech 2 Factory',                   40, true},
+    BUILTBYTIER3FACTORY          = {'<LOC wiki_builder_t3_fact>Tech 3 Factory',                   60, true},
+    BUILTBYLANDTIER1FACTORY      = {'<LOC wiki_builder_t1_lfact>Tech 1 Land Factory',             20, true}, -- BrewLAN
+    BUILTBYLANDTIER2FACTORY      = {'<LOC wiki_builder_t2_lfact>Tech 2 Land Factory',             40, true},
+    BUILTBYLANDTIER3FACTORY      = {'<LOC wiki_builder_t3_lfact>Tech 3 Land Factory',             60, true}, -- BrewLAN
+    BUILTBYQUANTUMGATE           = {'<LOC wiki_builder_t3_qg>Tech 3 Quantum Gateway',             120, true},
+    TRANSPORTBUILTBYTIER3FACTORY = {'<LOC wiki_builder_t3_afact>Tech 3 Air Factory',              60,  true},
 }
 
 abilityDesc = {

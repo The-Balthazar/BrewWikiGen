@@ -59,6 +59,11 @@ function arrayAllCellsEqual(t)
     return t[1] or true
 end
 
+function arrayRemoveByValue(t, val)
+    local i = arrayFind(t, val)
+    return i and table.remove(t, i)
+end
+
 function tableHasTrueChild(hash)
     if not hash then return end
     for k, v in pairs(hash) do
@@ -84,6 +89,25 @@ function tableOverwrites(t1, t2)
     return new
 end
 
+-- shallow copies t2 into t1, returns t1 for good measure, but the original t1 reference would be the same
+function tableMergeCopy(t1, t2)
+    if t1 and t2 then
+        for k, v in pairs(t2) do
+            t1[k] = v
+        end
+    end
+    return t1
+end
+
+-- #t for keyed tables
+function tableTcount(t)
+    local num = 0
+    for i, v in pairs(t) do
+        num = num+1
+    end
+    return num
+end
+
 -- Returns the number of grandchild elements. (Children of children, and no further)
 function tableSubcount(t)
     local num = 0
@@ -91,15 +115,6 @@ function tableSubcount(t)
         num = num + #v
     end
     return num
-end
-
--- Returns a new table mapped with child keys and grandchild-count values (Children of children per child)
-function tableSubcounts(t)
-    local nums = {}
-    for i, v in pairs(t) do
-        nums[i] = #v
-    end
-    return nums
 end
 
 -- Returns the sum value of all children values

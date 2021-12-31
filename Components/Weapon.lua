@@ -10,7 +10,7 @@ local GetWeaponTargetLayers = function(weapon, unit)
         for layer, targetstring in pairs(weapon.FireTargetLayerCapsTable) do
             if fromLayers[layer] then
                 --Reusing the layer reference here, because we don't need the other one again.
-                for layer, bit in pairs(Layers) do
+                for layer, bit in pairs(LayerBits) do
                     if string.find(targetstring, layer) then
                         targetLayers[layer] = bit
                     end
@@ -371,7 +371,7 @@ function NewDPSEstimate(weapon)
         else
             local dps = DPSEstimate(weapon)
             if dps and max and dps > max then
-                return 'error:estimate exceeds max '..max
+                return '<error:estimate exceeds max theoretically possible>Less than '..max
             else
                 return dps
             end

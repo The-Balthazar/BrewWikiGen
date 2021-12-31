@@ -26,6 +26,43 @@ local function sortData(sorttable, sort)
     end
 end
 
+function MenuSortUnitsByTech(units)
+    local techs = {
+        'TECH1',
+        'TECH2',
+        'TECH3',
+        'EXPERIMENTAL',
+    }
+    local groups = {{},{},{},{}}
+    for id, bp in pairs(units) do
+        for i = 1, 4 do
+            if bp.CategoriesHash[techs[i] ] then
+                table.insert(groups[i], bp)
+                break
+            end
+        end
+    end
+    local MenuSortCats = {
+        SORTCONSTRUCTION = 1000,
+        SORTECONOMY = 2000,
+        SORTDEFENSE = 3000,
+        SORTSTRATEGIC = 4000,
+        SORTINTEL = 5000,
+        SORTOTHER = 6000,
+    }
+    local function sortKey(bp)
+        return tonumber((MenuSortCats[bp.SortCategory] + (bp.BuildIconSortPriority or bp.StrategicIconSortPriority))..'.'..tonumber(string.gsub(bp.id, '%W', ''), 36))
+    end
+    local function MenuSort(a, b)
+        return sortKey(a) < sortKey(b)
+    end
+
+    for i = 1, 4 do
+        table.sort(groups[i], MenuSort)
+    end
+    return groups
+end
+
 function InsertInNavigationData(index, ModInfo, UnitInfo)
 
     if not NavigationData[index] then

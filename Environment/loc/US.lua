@@ -1,19 +1,19 @@
 --ISO_639-1_code=EN
-	--Wiki strings
+--Wiki strings
 --Note for translators: make sure html tags and things like %s and `%s` and %.1f and so on match the original; they are formating notation used by the wiki script to insert values, and the auto generated ones get this wrong.
-	--Infobox meta
+--Infobox meta
 wiki_infobox_stats_note="Note: Several units have stats defined at the<br />start of the game based on the stats of others."
 wiki_infobox_mod_source="Source:"
 wiki_infobox_unitid="Unit ID:"
 wiki_infobox_faction="Faction:"
 wiki_infobox_tech="Tech level:"
-	--Infobox defence
+--Infobox defence
 wiki_infobox_health="Health:"
 wiki_infobox_armor="Armour:"
 wiki_infobox_shieldh="Shield health:"
 wiki_infobox_shieldr="Shield radius:"
 wiki_infobox_defflags="Flags:"
-	--Infobox economy
+--Infobox economy
 wiki_infobox_cost_e="Energy cost:"
 wiki_infobox_cost_m="Mass cost:"
 wiki_infobox_cost_t="Build time:"
@@ -23,7 +23,7 @@ wiki_infobox_prod_e="Energy production:"
 wiki_infobox_prod_m="Mass production:"
 wiki_infobox_store_e="Energy storage:"
 wiki_infobox_store_m="Mass storage:"
-	--Infobox intel
+--Infobox intel
 wiki_infobox_vision_r="Vision radius:"
 wiki_infobox_w_vision_r="Water vision radius:"
 wiki_infobox_radar_r="Radar radius:"
@@ -34,24 +34,37 @@ wiki_infobox_cloak_r="Cloak radius:"
 wiki_infobox_steath_radar_r="Radar stealth radius:"
 wiki_infobox_steath_sonar_r="Sonar stealth radius:"
 wiki_infobox_intelflags="Flags:"
-	--Infobox motion
+--Infobox motion
 wiki_infobox_motion="Motion type:"
 wiki_infobox_build_layers="Buildable layers:"
+wiki_layer_land="Land"
+wiki_layer_seabed="Seabed"
+wiki_layer_sub="Sub"
+wiki_later_water="Water"
+wiki_layer_air="Air"
+wiki_layer_orbit="Orbit"
+
 wiki_infobox_movement_speed="Movement speed:"
 wiki_infobox_fuel="Fuel:"
 wiki_infobox_elevation="Elevation:"
 wiki_infobox_transport_class="Transport class:"
 wiki_infobox_transport_capacity="Transport capacity:"
-	--Infobox other
+--Infobox other
 wiki_infobox_miscrad="Misc radius:"
 wiki_infobox_weapons="Weapons:"
 
-	--Brackets with an arbitrary string inserted
+--Brackets with an arbitrary string inserted
 wiki_bracket_text=" (%s)"
 wiki_infobox_details="Details"
-	--'%s' is for formatting in a string, '/s' is shortform for 'per second'
+--'%s' is for formatting in a string, '/s' is shortform for 'per second'
 wiki_per_second="%s/s"
 
+-- in tdesc b tech level is inserted (ie 'tech 1'), in c&d tech level and short description is inserted (ie 'tech 1 assault bot')
+--Body lead text
+wiki_intro_tdesc_a="It is an unclassified unit with no defined tech level."
+wiki_intro_tdesc_b="It is an unclassified %s unit."
+wiki_intro_tdesc_c="It is classified as a %s unit with no defined tech level."
+wiki_intro_tdesc_d="It is classified as a %s unit."
 wiki_intro_build_a=" It has no defined build description, and no categories to define common builders."
 wiki_intro_build_b=" It has no defined build description."
 wiki_intro_build_c="This unit has no categories to define common builders, however the build description for it is:"

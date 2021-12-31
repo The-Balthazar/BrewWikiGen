@@ -2,25 +2,32 @@
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
 -- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
 --------------------------------------------------------------------------------
+local function Binary2bit(a,b) return (a and 2 or 0) + (b and 1 or 0) end
 
 UnitBodytextLeadText = function(ModInfo, bp)
+
     local bodytext = (bp.General.UnitName and '"'..LOC(bp.General.UnitName)..'" is a' or 'This unamed unit is a')
     ..(bp.General and bp.General.FactionName and string.upper(string.sub(bp.General.FactionName, 1, 1)) == 'A' and 'n ' or ' ')
     ..(bp.General and bp.General.FactionName and bp.General.FactionName..' ' or 'factionless ')
     ..(bp.Physics.MotionType and motionTypes[bp.Physics.MotionType][1] or 'structure')..' unit included in *'..ModInfo.name.."*.\n"
-    ..(bp.unitTdesc and 'It is classified as a '..string.lower(bp.unitTdesc) or 'It is an unclassified'..(bp.unitTlevel and ' '..string.lower(bp.unitTlevel) or '' ) )
-    ..' unit'..((not bp.unitTlevel) and ' with no defined tech level' or '')..'.'
 
-    local BuildIntroTexts = {
+    local BuildIntroTDesc = {
+        [0] = LOC('<LOC wiki_intro_tdesc_a>It is an unclassified unit with no defined tech level.'),
+        [1] = string.format(LOC('<LOC wiki_intro_tdesc_b>It is an unclassified %s unit.'), string.lower(bp.unitTlevel or '')),
+        [2] = string.format(LOC('<LOC wiki_intro_tdesc_c>It is classified as a %s unit with no defined tech level.'), string.lower(bp.unitTdesc or '')),
+        [3] = string.format(LOC('<LOC wiki_intro_tdesc_d>It is classified as a %s unit.'), string.lower(bp.unitTdesc or '')),
+    }
+    BuildIntroTDesc = BuildIntroTDesc[Binary2bit(bp.unitTdesc,bp.unitTlevel)]
+
+    local BuildIntroBuild = {
         [0] = LOC('<LOC wiki_intro_build_a> It has no defined build description, and no categories to define common builders.').."\n",
         [1] = LOC('<LOC wiki_intro_build_b> It has no defined build description.').."<error:buildable unit with no build description>\n",
         [2] = "\n"..LOC('<LOC wiki_intro_build_c>This unit has no categories to define common builders, however the build description for it is:').."\n\n<blockquote>"..LOC(Description[bp.id] or '').."</blockquote>\n",
         [3] = "\n"..LOC('<LOC wiki_intro_build_d>The build description for this unit is:').."\n\n<blockquote>"..LOC(Description[bp.id] or '').."</blockquote>\n",
     }
+    BuildIntroBuild = BuildIntroBuild[Binary2bit(Description[bp.id], --[[bp.BuiltByCategories or]] arraySubFind(bp.Categories, 'BUILTBY'))]
 
-    local function Binary2bit(a,b) return (a and 2 or 0) + (b and 1 or 0) end
-
-    return bodytext..BuildIntroTexts[Binary2bit( Description[bp.id], arraySubFind(bp.Categories, 'BUILTBY') )]..GetModUnitData(bp.ID, 'LeadSuffix')
+    return bodytext..BuildIntroTDesc..BuildIntroBuild..GetModUnitData(bp.ID, 'LeadSuffix')
 end
 
 UnitBodytextSectionData = function(ModInfo, bp)
@@ -88,27 +95,80 @@ UnitBodytextSectionData = function(ModInfo, bp)
         },
         {
             '<LOC wiki_sect_construction>Construction',
-            check = arraySubFind(bp.Categories, 'BUILTBY'),
+            check = bp.Economy and (bp.BuiltByCategories or arraySubFind(bp.Categories, 'BUILTBY')),
             Data = function(bp)
                 local function BuilderList(bp)
                     local bilst = ''
 
-                    if not bp.Economy then return '<error:no economy table>' end
                     if not bp.Economy.BuildCostEnergy then return '<error:no energy build cost>' end
                     if not bp.Economy.BuildCostMass then return '<error:no mass build cost>' end
                     if not bp.Economy.BuildTime then return '<error:no build time>' end
 
-                    for i, cat in ipairs(bp.Categories) do
-                        if buildercats[cat] then
-                            local secs = bp.Economy.BuildTime / buildercats[cat][2]
-                            bilst = bilst .. "\n* "..iconText('Time', string.format('%02d:%02d', math.floor(secs/60), math.floor(secs % 60) ) )
+                    local function UpgradesFrom(to, from)
+                        return to.General.UpgradesFrom == from.id and from.General.UpgradesTo == to.id
+                    end
+
+                    local function BuildByBulletPoint(bp, buildername, buildrate, upgrade)
+                        if buildername and buildrate then
+                            local secs = bp.Economy.BuildTime / buildrate
+                            return "\n* "..iconText('Time', formatTime(secs) )
                             ..' ‒ '..iconText('Energy', math.floor(bp.Economy.BuildCostEnergy / secs + 0.5), '/s')
                             ..' ‒ '..iconText('Mass', math.floor(bp.Economy.BuildCostMass / secs + 0.5), '/s')
-                            ..' — '..string.format(LOC('Built by %s'), LOC(buildercats[cat][1]))
-                        elseif string.find(cat, 'BUILTBY') then
-                            bilst = bilst.."\n* <error:category />Unknown build category <code>"..cat.."</code>"
+                            ..' — '..string.format(LOC(upgrade and 'Upgrade from %s' or 'Built by %s'), buildername)
+                        elseif buildername then
+                            return "\n* "..string.format(LOC('Built by %s'), buildername)
                         end
                     end
+
+                    local builtbycats = {}
+
+                    for i, cat in ipairs(bp.Categories) do
+                        if string.find(cat, 'BUILTBY') then
+                            builtbycats[cat] = defaultBuilderCats[cat] and (defaultBuilderCats[cat][3] or defaultBuilderCats[cat][2]) or true
+                        end
+                    end
+
+                    local builderunits = {}
+                    for buildcat, _ in pairs(bp.BuiltByCategories) do
+                        local catunits = GetBuilderUnits(buildcat)
+                        tableMergeCopy(builderunits, catunits)
+                        local bbcat = string.match(buildcat, '(BUILTBY[%w]*)')
+                        if builtbycats[bbcat] then
+                            for builderid, builderbp in pairs(catunits) do
+                                if (not defaultBuilderCats[bbcat]) or builderbp.Economy.BuildRate == builtbycats[bbcat] then
+                                    builtbycats[bbcat] = nil
+                                    break
+                                end
+                            end
+                        end
+                    end
+
+                    for tech, group in ipairs(MenuSortUnitsByTech(builderunits)) do
+                        for i, builderbp in ipairs(group) do
+                            bilst = bilst..BuildByBulletPoint(bp, pageLink(builderbp.ID, builderbp.unitTdesc), builderbp.Economy.BuildRate, UpgradesFrom(bp, builderbp))
+                        end
+                    end
+
+                    local tempcats = {}
+                    for cat, v in pairs(builtbycats) do
+                        table.insert(tempcats, cat)
+                    end
+                    table.sort(tempcats, function(a,b)
+                        local function key(c) return string.gsub(c, '(%a*)(TIER%d)(%w*)','%1%3%2') end
+                        return key(a) < key(b)
+                    end)
+
+                    for i, cat in ipairs(tempcats) do
+                        if defaultBuilderCats[cat] then
+                            bilst = bilst..BuildByBulletPoint(bp, LOC(defaultBuilderCats[cat][1]), defaultBuilderCats[cat][2])
+                        elseif string.find(cat, 'BUILTBY') then
+                            bilst = bilst..BuildByBulletPoint(bp, LOC('units with ').."<error:category /><code>"..cat.."</code>" )
+                        end
+                    end
+
+                    --[[if bp.General.UpgradesFrom and not getBP(bp.General.UpgradesFrom) then
+                        bilst = bilst..BuildByBulletPoint(bp, "<waring:unverifiable /><code>"..bp.General.UpgradesFrom.."</code>", nil, true )
+                    end]]
 
                     return bilst
                 end
@@ -200,13 +260,92 @@ UnitBodytextSectionData = function(ModInfo, bp)
                 end
 
                 if bp.Economy.BuildableCategory then
-                    if #bp.Economy.BuildableCategory == 1 then
-                        text = text..'It has the build category <code>'..bp.Economy.BuildableCategory[1].."</code>.\n"
-                    elseif #bp.Economy.BuildableCategory > 1 then
+
+                    local BuildableUnits = GetBuildableUnits(bp.Economy.BuildableCategory)
+                    local NumBuildable = tableTcount(BuildableUnits)
+
+                    local TempBuildableCategory = tableMergeCopy({}, bp.Economy.BuildableCategory)
+
+                    if bp.General.UpgradesTo then
+                        if BuildableUnits[bp.General.UpgradesTo] then
+                            local upgradeBp = BuildableUnits[bp.General.UpgradesTo]
+                            text = text..'It can be upgraded into the '..pageLink(upgradeBp.ID, upgradeBp.unitTdesc)..".\n"
+
+                            BuildableUnits[upgradeBp.id] = nil
+                            NumBuildable = NumBuildable-1
+
+                        elseif getBP(bp.General.UpgradesTo) then
+                            local upgradeBp = getBP(bp.General.UpgradesTo)
+                            text = text..'<error:upgrade not verified>It claims to upgradable into the '..pageLink(upgradeBp.ID, upgradeBp.unitTdesc)..", however build categories would indicate otherwise.\n"
+
+                        else
+                            local cat = arrayFind(TempBuildableCategory, bp.General.UpgradesTo)
+                            if cat then
+                                text = text..'It can be upgraded into <code>'..string.lower(bp.General.UpgradesTo).."</code>.\n"
+                            else
+                                text = text..'It is listed as upgradable into <code>'..string.lower(bp.General.UpgradesTo).."</code>.\n"
+                            end
+
+                        end
+                        arrayRemoveByValue(TempBuildableCategory, bp.General.UpgradesTo)
+                    end
+
+                    if #TempBuildableCategory == 1 then
+                        local buildBp = getBP(TempBuildableCategory[1])
+                        if buildBp then
+                            text = text..'It can build the '..pageLink(buildBp.ID, buildBp.unitTdesc)..".\n"
+
+                            BuildableUnits[buildBp.id] = nil
+                            NumBuildable = NumBuildable-1
+
+                        else
+                            text = text..'It has the build category <code>'..TempBuildableCategory[1]..'</code>.'..(NumBuildable~=0 and ' ' or "\n")
+                        end
+                    elseif #TempBuildableCategory > 1 then
                         text = text.."It has the build categories:\n"
-                        for i, cat in ipairs(bp.Economy.BuildableCategory) do
+                        for i, cat in ipairs(TempBuildableCategory) do
                             text = text.."* <code>"..cat.."</code>\n"
                         end
+                        text = text..(NumBuildable > 0 and NumBuildable < 30 and "\n" or '')
+                    end
+
+                    local limit = 200 -- This is basically just to remove the list from the iyadesu page
+
+                    if NumBuildable > 0 and NumBuildable <= limit then
+                        do
+                            local _,unitbp = next(BuildableUnits)
+                            local bitcheck = {
+                                [0] = string.format(LOC('This build category allows it to build the mod unit %s.'), pageLink(unitbp.ID, unitbp.unitTdesc) ).."\n",
+                                [1] = "\n<details>\n<summary>"..LOC('This build category allows it to build the following mod units:').."\n\n".."</summary>\n\n",
+                                [2] = string.format(LOC('These build categories allow it to build the mod unit %s.'), pageLink(unitbp.ID, unitbp.unitTdesc) ).."\n",
+                                [3] = "\n<details>\n<summary>"..LOC('These build categories allow it to build the following mod units:').."\n\n".."</summary>\n\n",
+                            }
+                            text = text..bitcheck[Binary2bit(#TempBuildableCategory ~= 1, NumBuildable ~= 1)]
+                        end
+
+                        local maxcols = 8
+
+                        if NumBuildable > 1 then
+                            local trtext = "\n"
+                            for i, group in ipairs(MenuSortUnitsByTech(BuildableUnits)) do
+                                if group[1] then
+                                    local trows = math.ceil(#group/maxcols)
+                                    for trow = 1, trows do
+                                        local tdtext = "\n"..(trow == 1 and '        '..xml:td{rowspan=trows~=1 and trows or nil}(xml:img{src=IconRepo..'T'..i..'.png', title='T'..i}).."\n" or '')
+                                        for coli = 1, maxcols do
+                                            local buildbp = group[maxcols*(trow-1)+coli]
+                                            if buildbp then
+                                                tdtext = tdtext..'        '..xml:td( pageLink(buildbp.ID, xml:img{src=unitIconRepo..buildbp.ID..'_icon.png', width='64px'}) ).."\n"
+                                            end
+                                        end
+                                        trtext = trtext..'    '..xml:tr(tdtext..'    ').."\n"
+                                    end
+                                end
+                            end
+                            text = text..xml:table(trtext).."\n\n</details>\n"
+                        end
+                    elseif NumBuildable >= limit then
+                        --text = text.."\nThis boi can build a lot of things.\n"
                     end
                 end
                 return text
@@ -435,7 +574,12 @@ UnitBodytextSectionData = function(ModInfo, bp)
                         text = text..tostring(Infobox{
                             Style = 'detail-left',
                             Header = {video[1]},
-                            Data = '        <td><a href="https://youtu.be/'..video.YouTube..'"><img title="'..video[1]..'" src="https://i.ytimg.com/vi/'..video.YouTube.."/mqdefault.jpg\" /></a>\n",
+                            Data =
+                            '        '..xml:td(
+                            '            '..xml:a{href='https://youtu.be/'..video.YouTube}(
+                            '                '..xml:img{title=video[1], src='https://i.ytimg.com/vi/'..video.YouTube..'/mqdefault.jpg'},
+                            '            '),
+                            '        ').."\n"
                         })
                     end
                 end
@@ -473,8 +617,7 @@ TableOfContents = function(BodyTextSections)
         local index = 1
         for i, section in ipairs(BodyTextSections) do
             if section.check then
-                local locsect = LOC(section[1])
-                text = text .. index..". – <a href=#" .. string.lower(string.gsub(locsect, ' ', '-')).." >"..locsect.."</a>\n"
+                text = text .. index..'. – '..sectionLink(LOC(section[1])).."\n"
                 index = index + 1
             end
         end

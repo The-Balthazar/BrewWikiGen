@@ -21,11 +21,14 @@ function numberFormatNoTrailingZeros(n)
     return string.sub(str, -2) == '.0' and tonumber(string.sub(str, 1, -3)) or n
 end
 
-function hoverTip(s1, s2)
-    return s1 and ' '..'<span title="'..s1..'" >'..(s2 and s2 or "(<u>?</u>)")..'</span>' or ''
+function hoverTip(title, text)
+    return title and ' '..xml:span{title=title}(text or "(<u>?</u>)") or ''
 end
 
 function pluralS(n) return n ~= 1 and 's' or '' end
+
+function    pageLink(page,    text) return xml:a{href=     stringSanitiseFilename(page)}       (text or page   ) end
+function sectionLink(section, text) return xml:a{href='#'..stringSanitiseFilename(section,1,1)}(text or section) end
 
 --------------------------------------------------------------------------------
 
@@ -46,12 +49,21 @@ function iconText(icon, text, text2)
 
         Fuel = IconRepo..'fuel.png',
         Attached = IconRepo..'attached.png',
+
+        [1] = IconRepo..'T1.png',
+        [2] = IconRepo..'T2.png',
+        [3] = IconRepo..'T3.png',
+        [4] = IconRepo..'T4.png',
     }
-    if icons[icon] and text then
-        return '<img src="'..icons[icon]..'" title="'..icon..'" /> '..text..(text2 or '')
-    elseif text then
-        return text..(text2 or '')
-    end
+    local titles = {
+        [1] = 'Tech 1',
+        [2] = 'Tech 2',
+        [3] = 'Tech 3',
+        [4] = 'Experimental',
+    }
+    return text and ((icons[icon] and
+        xml:img{src=icons[icon], title=(titles[icon] or icon)}..' ' or '')..text..(text2 or '')
+    )
 end
 
 function transportClassHookType(transport)
@@ -69,28 +81,118 @@ function abilityTitle(ability)
     return hoverTip( LOC(abilityDesc[noLOC(ability)]) or 'error:description', LOC(ability))
 end
 
+function stringConcatLB(args)
+    local s = ''
+    if #args == 1 then s = args[1] else
+        for i, v in ipairs(args) do
+            s = s.."\n"..v
+        end
+    end
+    return s
+end
+
+local EmptyHTML = {
+    area = true,
+    base = true,
+    br = true,
+    col = true,
+    embed = true,
+    hr = true,
+    img = true,
+    input = true,
+    link = true,
+    meta = true,
+    param = true,
+    source = true,
+    track = true,
+    wbr = true,
+}
+
+-- xml module
+-- usage exammple:
+-- xml:a{title='example' href='#rel-link'}('link text')
+-- returns '<a href="#rel-link" title="example">link text</a>'
+xml = setmetatable({},{
+    __index = function(self, tag)
+        tag = string.lower(tag)
+        return function(self, data, ...)
+
+            local attributes = ''
+            if type(data) == 'table' then
+                local sorteddata = {}
+                for key, val in pairs(data) do
+                    table.insert(sorteddata,{key,val})
+                end
+                table.sort(sorteddata, function(a, b) return a[1]<b[1] end)
+                for i, v in ipairs(sorteddata) do
+                    attributes = attributes..' '..v[1]..'="'..v[2]..'"'
+                end
+            end
+
+            if EmptyHTML[tag] then return '<'..tag..attributes..' />' end
+
+            self.empty = '<'..tag..attributes..' />'
+            self.open, self.close = '<'..tag..attributes..'>', '</'..tag..'>'
+
+            if type(data) == 'string' then
+                return self.open..stringConcatLB{data,...}..self.close
+            end
+
+            return setmetatable(
+                {self.open, self.close, self.empty},
+                {
+                    __call = function(self, ...)
+                        return self[1]..stringConcatLB{...}..self[2]
+                    end
+                }
+            )
+        end
+    end,
+})
+
+--[[
+print(
+''..xml:table{align='right'}(
+'    '..xml:thead(
+'        '..xml:tr(
+'            '..xml:th{align='left', colspan=2}(
+'                %s',
+'            '),
+'        '),
+'    '),
+'    '..xml:tbody(
+'        ',
+'    '),
+''))
+]]
+
 function detailsLink(section)
-    return string.format(LOC('<LOC wiki_bracket_text> (%s)'), '<a href="#'..string.lower(string.gsub(LOC(section), ' ', '-'))..'">'..LOC('<LOC wiki_infobox_details>Details')..'</a>')
+    return string.format(
+        LOC('<LOC wiki_bracket_text> (%s)'),
+        xml:a{href='#'..stringSanitiseFilename(LOC(section), true, true)}
+        (LOC('<LOC wiki_infobox_details>Details'))
+    )
+end
+
+function formatTime(n)
+    local h, m, s = math.floor(n/3600), math.floor(n/60)%60, math.floor(n%60)
+    return string.format(
+        (h~=0 and '%d:' or '')..'%02d:%02d',
+        h~=0 and h or m,
+        h~=0 and m or s,
+        h~=0 and s or nil
+    )
 end
 
 function BuildableLayer(phys)
     --This script assumes it's a structure. This doesn't matter to non-structures.
     if not phys.BuildOnLayerCaps then
-        return 'Land'
+        return LayerHash.LAYER_Land
     else
         local str = ''
-        local IndexedLayers = {
-            'LAYER_Land',
-            'LAYER_Seabed',
-            'LAYER_Sub',
-            'LAYER_Water',
-            'LAYER_Air',
-        }
-        for i, key in ipairs(IndexedLayers) do
-        --for key, val in pairs(phys.BuildOnLayerCaps) do
-            local val = phys.BuildOnLayerCaps[key]
-            if val then
-                str = str..string.sub(key, 7)..'<br />'
+        for i, layer in ipairs(LayersByIndex) do
+            if phys.BuildOnLayerCaps[layer] then
+                str = str..LayerHash[layer]..xml:br()
             end
         end
         return str
