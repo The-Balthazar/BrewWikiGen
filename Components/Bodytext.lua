@@ -161,8 +161,8 @@ UnitBodytextSectionData = function(ModInfo, bp)
                     for i, cat in ipairs(tempcats) do
                         if defaultBuilderCats[cat] then
                             bilst = bilst..BuildByBulletPoint(bp, LOC(defaultBuilderCats[cat][1]), defaultBuilderCats[cat][2])
-                        elseif string.find(cat, 'BUILTBY') then
-                            bilst = bilst..BuildByBulletPoint(bp, LOC('units with ').."<error:category /><code>"..cat.."</code>" )
+                        --elseif string.find(cat, 'BUILTBY') then
+                            --bilst = bilst..BuildByBulletPoint(bp, LOC('units with ').."<error:category /><code>"..cat.."</code>" )
                         end
                     end
 

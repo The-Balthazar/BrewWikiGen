@@ -8,6 +8,27 @@ function GetSandboxedLuaFile(file)
     return env
 end
 
+function GetExecutableSandboxedLuaFile(file)
+    local env = {
+        pairs = pairs,
+        ipairs = ipairs,
+
+        print = print,
+        LOG = print,
+        SPEW = print,
+        _ALERT = print,
+        WARN = print,
+
+        table = table,
+        string = string,
+        math = math,
+    }
+    env.table.find = arrayFind
+    local chunk = loadfile(file, 'bt', env)
+    if chunk then chunk() end
+    return env
+end
+
 function SafeGetSandboxedLuaFile(file)
     local ok, f = pcall(GetSandboxedLuaFile, file)
     return ok and f or Logging.LuaFileLoadIssues and print("Failed to load "..file)

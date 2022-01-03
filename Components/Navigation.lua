@@ -63,10 +63,12 @@ function MenuSortUnitsByTech(units)
     return groups
 end
 
-function InsertInNavigationData(index, ModInfo, UnitInfo)
+function InsertInNavigationData(bp)
+    local UnitInfo = UnitConciseInfo(bp)
+    local index = bp.ModInfo.ModIndex
 
     if not NavigationData[index] then
-        NavigationData[index] = {ModInfo = ModInfo, Factions = {} }
+        NavigationData[index] = {ModInfo = bp.ModInfo, Factions = {} }
     end
 
     local factioni = FactionIndexes[UnitInfo.faction] or #FactionsByIndex

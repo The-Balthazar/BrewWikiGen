@@ -76,6 +76,7 @@ which can be interesting or helpful in the case of any issues.
 that I consider anomalous or unnecessary. Exercise discretion when taking its advice.
 
 ## Usage notes:
+### Home and sidebar:
 If you have a pre-existing `Home.md` or `_Sidebar.md` page in your wiki, you can
 specify where within those pages you want the generator to output by using the
 xml tags `<brewwikihome></brewwikihome>` and `<brewwikisidebar></brewwikisidebar>`
@@ -84,6 +85,17 @@ If you do not wish it to generate one or both of those pages at all, comment out
 or remove the lines `safecall(GenerateHomePage)` and/or `safecall(GenerateSidebar)`
 from your updated `Run.lua`.
 
+### Blueprints.lua:
+If you have content generated in `Blueprints.lua` that would be important to the
+wiki, you can have the wiki run it by adding a `WikiBlueprints` function to that
+file. That function is called in much the same way as `ModBlueprints`, except by
+the wiki instead of the game. Input argument is the same, except only `.Unit` is
+populated currently, and will only contain blueprints from included mods. This
+is easier to achieve if your `Blueprints.lua` is formatted such that your
+`ModBlueprints` hook is populated with function calls rather than with code ran
+directly within that hook.
+
+### Lua validation:
 Since this generator runs mod files directly for data, any referenced files must
 be valid for Lua 5.4. This notably means **not** using `#` instead of `--`, not
 using `!=` instead of `~=`, and probably several other things.
@@ -101,8 +113,10 @@ Files this affects are as follows:
 *    `/mod_info.lua`
 *    `/hook/lua/ui/help/tooltips.lua`
 *    `/hook/lua/ui/help/unitdescription.lua`
+*    `/hook/lua/system/blueprints.lua`
 *    `/hook/loc/US/strings_db.lua`
 
+### Included files:
 It will skip any mod that doesn't have a valid `mod_info.lua`, and, while
 blueprint files are sanitised it will stop running that mod if it reaches a `.bp`
 file that still doesn't validate as Lua. For the other files it will continue

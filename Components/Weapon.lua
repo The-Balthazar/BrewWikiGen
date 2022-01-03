@@ -38,19 +38,19 @@ local GetWeaponTargets = function(weapon, unit)
         }
         for i, cats in ipairs(mapping) do
             if (weapon.TargetRestrictOnlyAllow == cats[1] or string.find(weapon.TargetRestrictOnlyAllow, cats[1])) then
-                return s..'<br />'..cats[2]
+                return s..xml:br()..cats[2]
             end
         end
         return s
 
     elseif weapon.TargetType == 'RULEWTT_Prop' then
-        return '<code>RULEWTT_Prop</code><error:prop weapon;its a real thing but why>'
+        return xml:code('RULEWTT_Prop')..'<error:prop weapon;its a real thing but why>'
 
     else --'RULEWTT_Unit' is the default and generally not written
-        local s = '<code>RULEWTT_Unit</code>'
+        local s = xml:code('RULEWTT_Unit')
 
         if weapon.TargetRestrictOnlyAllow and (weapon.TargetRestrictOnlyAllow == 'AIR' --[[or string.find(weapon.TargetRestrictOnlyAllow, 'AIR')]]) then
-            return s .. '<br />(Anti-Air)'
+            return s..xml:br()..'(Anti-Air)'
         end
 
         local targetLayers, bitwiselayers = GetWeaponTargetLayers(weapon, unit)

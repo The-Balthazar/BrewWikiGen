@@ -36,12 +36,15 @@ BlueprintFileExclusions = { -- Excludes _unit.bp files that match any of these (
 }
 
 BlueprintIdExclusions = { -- Excludes blueprints with any of these IDs (case insensitive)
+    'seb0105',
+    'srl0000',
     'srl0001',
     'srl0002',
     'srl0003',
     'srl0004',
     'srl0005',
     'srl0006',
+    'ssb2380',
 }
 
 -- Web path for img src. Could be relative, but would break on edit previews.
@@ -118,6 +121,9 @@ for i, dir in ipairs(ModDirectories) do
     safecall(LoadModLocalization, dir) -- Load all localisation first.
     safecall(LoadModHooks, dir)
     safecall(LoadModUnitBlueprints, dir, i)
+end
+for i, dir in ipairs(ModDirectories) do
+    safecall(LoadModSystemBlueprintsFile, dir)
 end
 
 safecall(GenerateUnitPages)

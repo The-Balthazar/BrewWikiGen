@@ -29,7 +29,7 @@ local function UnitInfobox(ModInfo, bp)
     }
 end
 
-local function UnitConciseInfo(bp)
+function UnitConciseInfo(bp)
     return {
         bpid = bp.ID,
         name = LOC(bp.General.UnitName),
@@ -41,18 +41,20 @@ end
 
 function LoadModUnitBlueprints(ModDirectory, ModIndex) -- First pass
     local ModInfo = GetModInfo(ModDirectory)
+    ModInfo.ModIndex = ModIndex
+
     print(ModInfo.name)
     for id, bp in GetPairedModUnitBlueprints(ModDirectory) do
         assert( not all_units[id], "⚠️ Found blueprints between mods with clashing ID "..id)
         bp.ModInfo = ModInfo
         all_units[id] = bp
-
-        InsertInNavigationData(ModIndex, ModInfo, UnitConciseInfo(bp))
-        GetBuildableCategoriesFromBp(bp)
     end
 end
 
 function GenerateUnitPages() -- Second pass
+    for id, bp in pairs(all_units) do
+        ProcessBlueprint(bp)
+    end
     for id, bp in pairs(all_units) do
         BlueprintBuiltBy(bp)
     end
@@ -71,5 +73,17 @@ function GenerateUnitPages() -- Second pass
             "\n"
         ):close()
 
+    end
+end
+
+--[[ ---------------------------------------------------------------------- ]]--
+--[[ Blueprint loading                                                      ]]--
+--[[ ---------------------------------------------------------------------- ]]--
+
+function LoadModSystemBlueprintsFile(modDir)
+    local SystemBlueprints = GetExecutableSandboxedLuaFile(modDir..'hook/lua/system/Blueprints.lua')
+
+    if SystemBlueprints and SystemBlueprints.WikiBlueprints then
+        SystemBlueprints.WikiBlueprints({Unit=all_units})
     end
 end

@@ -156,11 +156,7 @@ local function GetPairedBlueprintsFromFile(dir, file)
     for i, bp in ipairs(bps) do
         bp.SourceFolder = dir
         BlueprintSetShortId(bp, file)
-        if isValidBlueprint(bp) and not bp.Merge and not isExcludedId(bp.id) then
-            BlueprintHashCategories(bp)
-            BlueprintSetUnitTechAndDescStrings(bp)
-            BlueprintMeshBones(bp)
-            BlueprintSanityChecks(bp)
+        if not bp.Merge and isValidBlueprint(bp) and not isExcludedId(bp.id) then
             table.insert(validbps, bp)
         else
             TotalIgnoredBlueprints = TotalIgnoredBlueprints + 1
@@ -174,6 +170,16 @@ local function GetPairedBlueprintsFromFile(dir, file)
     end
 
     return ipairs(validbps)
+end
+
+function ProcessBlueprint(bp)
+    BlueprintHashCategories(bp)
+    BlueprintSetUnitTechAndDescStrings(bp)
+    BlueprintMeshBones(bp)
+    BlueprintSanityChecks(bp)
+
+    InsertInNavigationData(bp)
+    GetBuildableCategoriesFromBp(bp)
 end
 
 function GetPairedModUnitBlueprints(modDir)
