@@ -76,6 +76,14 @@ which can be interesting or helpful in the case of any issues.
 that I consider anomalous or unnecessary. Exercise discretion when taking its advice.
 
 ## Usage notes:
+If you have a pre-existing `Home.md` or `_Sidebar.md` page in your wiki, you can
+specify where within those pages you want the generator to output by using the
+xml tags `<brewwikihome></brewwikihome>` and `<brewwikisidebar></brewwikisidebar>`
+respectively, otherwise it will append said content, tags included to the end.
+If you do not wish it to generate one or both of those pages at all, comment out
+or remove the lines `safecall(GenerateHomePage)` and/or `safecall(GenerateSidebar)`
+from your updated `Run.lua`.
+
 Since this generator runs mod files directly for data, any referenced files must
 be valid for Lua 5.4. This notably means **not** using `#` instead of `--`, not
 using `!=` instead of `~=`, and probably several other things.

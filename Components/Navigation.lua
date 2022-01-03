@@ -78,6 +78,21 @@ function InsertInNavigationData(index, ModInfo, UnitInfo)
     table.insert(NavigationData[index].Factions[factioni], UnitInfo)
 end
 
+local function UpdateGeneratedPartOfPage(page, tag, content)
+    local md = io.open(OutputDirectory..page, "r")
+    local mdstring = md and md:read('a')
+    pcall(io.close,md)
+
+    content = '<'..tag..">\n"..content..'</'..tag..'>'
+
+    io.open(OutputDirectory..page, "w"):write(
+        mdstring and string.find( mdstring, '<'..tag..'>' )
+        and string.gsub( mdstring, '<'..tag..'>.*</'..tag..'>', content )
+        or mdstring and mdstring.."\n"..content.."\n"
+        or content
+    ):close()
+end
+
 function GenerateSidebar()
     sortData(NavigationData, 'TechDescending-DescriptionAscending')
 
@@ -102,7 +117,7 @@ function GenerateSidebar()
         sidebarstring = sidebarstring .. "\n</td>\n</tr>\n</table>\n</p>\n</details>\n"
     end
 
-    local md = io.open(OutputDirectory..'_Sidebar.md', "w"):write(sidebarstring):close()
+    UpdateGeneratedPartOfPage('_Sidebar.md', 'brewwikisidebar', sidebarstring)
 
     print("Generated navigation sidebar")
 end
@@ -169,4 +184,45 @@ function GenerateModPages()
     end
 
     print("Generated "..#NavigationData.." mod pages")
+end
+
+function GenerateHomePage()
+    local colLimit = 6
+
+    local numMods = #NavigationData
+    local rows = math.ceil(numMods/colLimit)
+    local col = math.floor(numMods / rows)
+    local extra = rows - (numMods % rows)
+    local cols = {}
+    for i = 1, rows do
+        cols[i] = col + (i <= extra and 0 or 1) -- Adds the remainders to the last rows so the first is/are bigger
+    end
+
+    local homestring = ''
+
+    local modindex = 0
+    for i = 1, #cols do
+        local homeModNav1, homeModNav2 = '', ''
+        for j = modindex+1, modindex+cols[i] do
+            local ModInfo = NavigationData[j].ModInfo
+
+            homeModNav1 = homeModNav1.."\n"..xml:th{align='center'}(xml:a{href=stringSanitiseFilename(ModInfo.name)}(xml:img{
+                src=ImageRepo..'mods/'..(ModInfo.icon and stringSanitiseFilename(ModInfo.name, true, true) or 'mod')..'.png',
+                title=stringSanitiseFilename(ModInfo.name)
+            }))
+
+            homeModNav2 = homeModNav2.."\n"..xml:th{align='center'}(xml:a{href=stringSanitiseFilename(ModInfo.name)}(ModInfo.name))
+        end
+        homestring = homestring.. xml:table{align='center'}(xml:tr(homeModNav1),xml:tr(homeModNav2),'').."\n"
+        modindex = cols[i]
+    end
+
+    homestring = homestring..xml:dl(
+        xml:dt(xml:img{align='left', height='27px', src='https://raw.githubusercontent.com/The-Balthazar/BrewWikiGen/master/BrewWikiGen.png'}),
+        xml:dd("\n\n*Powered by [BrewWikiGen](https://github.com/The-Balthazar/BrewWikiGen)*\n\n"),''
+    )
+
+    UpdateGeneratedPartOfPage('Home.md', 'brewwikihome', homestring)
+
+    print("Generated home page")
 end

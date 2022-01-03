@@ -124,6 +124,7 @@ safecall(GenerateUnitPages)
 safecall(GenerateSidebar)
 safecall(GenerateModPages)
 safecall(GenerateCategoryPages)
+safecall(GenerateHomePage)
 
 safecall(printTotalBlueprintValues)
 
