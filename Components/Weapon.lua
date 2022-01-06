@@ -4,7 +4,10 @@
 --------------------------------------------------------------------------------
 
 local GetWeaponTargetLayers = function(weapon, unit)
-    local fromLayers = motionTypes[unit.Physics.MotionType][2]
+    if not motionTypes[unit.Physics.MotionType] then
+        print(unit.id, unit.Physics.MotionType)
+    end
+    local fromLayers = motionTypes[unit.Physics.MotionType or 'RULEUMT_None'][2]
     local targetLayers = {}
     if weapon.FireTargetLayerCapsTable then
         for layer, targetstring in pairs(weapon.FireTargetLayerCapsTable) do
@@ -37,7 +40,7 @@ local GetWeaponTargets = function(weapon, unit)
             {  'TORPEDO', '(Anti-torpedo)'},
         }
         for i, cats in ipairs(mapping) do
-            if (weapon.TargetRestrictOnlyAllow == cats[1] or string.find(weapon.TargetRestrictOnlyAllow, cats[1])) then
+            if weapon.TargetRestrictOnlyAllow and (weapon.TargetRestrictOnlyAllow == cats[1] or string.find(weapon.TargetRestrictOnlyAllow, cats[1])) then
                 return s..xml:br()..cats[2]
             end
         end

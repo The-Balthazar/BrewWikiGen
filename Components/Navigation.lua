@@ -103,7 +103,7 @@ function GenerateSidebar()
     for modindex, moddata in ipairs(NavigationData) do
         local modname = moddata[1]
 
-        sidebarstring = sidebarstring .. "<details markdown=\"1\">\n<summary>[Show] <a href=\""..stringSanitiseFilename(moddata.ModInfo.name)..[[">]]..moddata.ModInfo.name.."</a></summary>\n<p>\n<table>\n<tr>\n<td>\n\n"
+        sidebarstring = sidebarstring .. "<details markdown=\"1\">\n<summary>[Show] <a href=\""..stringSanitiseFilename(moddata.ModInfo.name)..[[">]]..moddata.ModInfo.name.."</a></summary>\n<p>\n<table>\n<tr>\n<td width=\"269px\">\n\n"
         for i, faction in ipairs(FactionsByIndex) do
             local unitarray = moddata.Factions[i]
             if unitarray then
