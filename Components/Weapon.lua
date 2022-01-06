@@ -4,9 +4,6 @@
 --------------------------------------------------------------------------------
 
 local GetWeaponTargetLayers = function(weapon, unit)
-    if not motionTypes[unit.Physics.MotionType] then
-        print(unit.id, unit.Physics.MotionType)
-    end
     local fromLayers = motionTypes[unit.Physics.MotionType or 'RULEUMT_None'][2]
     local targetLayers = {}
     if weapon.FireTargetLayerCapsTable then
