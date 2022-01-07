@@ -60,7 +60,7 @@ FooterCategories = { -- In order
     'AIR',          'LAND',         'NAVAL',
     'HOVER',
     'ECONOMIC',
-    'SHIELD',
+    'SHIELD',       'PERSONALSHIELD',
     'BOMBER',       'TORPEDOBOMBER',
     'MINE',
     'COMMAND',      'SUBCOMMANDER', 'ENGINEER',     'FIELDENGINEER',

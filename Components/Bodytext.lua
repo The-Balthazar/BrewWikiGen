@@ -323,11 +323,26 @@ UnitBodytextSectionData = function(ModInfo, bp)
                             text = text..bitcheck[Binary2bit(#TempBuildableCategory ~= 1, NumBuildable ~= 1)]
                         end
 
+                        local SortedUnits = MenuSortUnitsByTech(BuildableUnits)
+
                         local maxcols = 8
 
                         if NumBuildable > 1 then
+
+                            local colsneeded = 0
+
+                            for i, group in ipairs(SortedUnits) do
+                                if #group > maxcols then
+                                    colsneeded = math.max(colsneeded, math.ceil(#group/ math.ceil(#group/maxcols) ))
+                                else
+                                    colsneeded = math.max(colsneeded, #group)
+                                end
+                            end
+
+                            maxcols = math.min(maxcols, colsneeded)
+
                             local trtext = "\n"
-                            for i, group in ipairs(MenuSortUnitsByTech(BuildableUnits)) do
+                            for i, group in ipairs(SortedUnits) do
                                 if group[1] then
                                     local trows = math.ceil(#group/maxcols)
                                     for trow = 1, trows do
