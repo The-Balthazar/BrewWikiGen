@@ -44,10 +44,20 @@ function LoadModUnitBlueprints(ModDirectory, ModIndex) -- First pass
     ModInfo.ModIndex = ModIndex
 
     print(ModInfo.name)
-    for id, bp in GetPairedModUnitBlueprints(ModDirectory) do
+    for id, bp in GetPairedModUnitBlueprints(ModDirectory..(_G.UnitBlueprintsFolder or '')) do
         assert( not all_units[id], "⚠️ Found blueprints between mods with clashing ID "..id)
         bp.ModInfo = ModInfo
+        bp.WikiPage = true
         all_units[id] = bp
+    end
+end
+
+function LoadEnvUnitBlueprints(GeneratorDir)
+    print("Loading environmental units")
+    for id, bp in GetPairedModUnitBlueprints(GeneratorDir..'Environment') do
+        if not all_units[id] then
+            all_units[id] = bp
+        end
     end
 end
 
@@ -59,20 +69,21 @@ function GenerateUnitPages() -- Second pass
         BlueprintBuiltBy(bp)
     end
     for id, bp in pairs(all_units) do
-        local ModInfo = bp.ModInfo
-        local UnitInfo = UnitConciseInfo(bp)
-        local BodyTextSections = UnitBodytextSectionData(ModInfo, bp)
+        if bp.WikiPage then
+            local ModInfo = bp.ModInfo
+            local UnitInfo = UnitConciseInfo(bp)
+            local BodyTextSections = UnitBodytextSectionData(ModInfo, bp)
 
-        local md = io.open(OutputDirectory..stringSanitiseFilename(bp.ID)..'.md', "w"):write(
-            UnitHeaderString(bp)..
-            tostring(UnitInfobox(ModInfo, bp))..
-            UnitBodytextLeadText(ModInfo, bp)..
-            TableOfContents(BodyTextSections)..
-            tostring(BodyTextSections)..
-            UnitPageCategories(ModInfo, UnitInfo, bp.CategoriesHash)..
-            "\n"
-        ):close()
-
+            local md = io.open(OutputDirectory..stringSanitiseFilename(bp.ID)..'.md', "w"):write(
+                UnitHeaderString(bp)..
+                tostring(UnitInfobox(ModInfo, bp))..
+                UnitBodytextLeadText(ModInfo, bp)..
+                TableOfContents(BodyTextSections)..
+                tostring(BodyTextSections)..
+                UnitPageCategories(ModInfo, UnitInfo, bp.CategoriesHash)..
+                "\n"
+            ):close()
+        end
     end
 end
 

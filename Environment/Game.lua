@@ -160,25 +160,6 @@ Tooltips = {
     toggle_cloak                = { title = "<LOC tooltipui0339>Personal Cloak",                    description = "<LOC tooltipui0342>Turn the selected units cloaking on/off" },
 }
 
-defaultBuilderCats = {
-    BUILTBYTIER2FIELD            = {'<LOC wiki_builder_t2_fe>Tech 2 Field Engineer',              10}, -- BrewLAN cat for vanilla unit
-    BUILTBYENGINEER              = {'<LOC wiki_builder_t1_e>Tech 1 Engineer',                     5,  true},  -- R&D
-    BUILTBYTIER1ENGINEER         = {'<LOC wiki_builder_t1_e>Tech 1 Engineer',                     5,  true},
-    BUILTBYTIER2ENGINEER         = {'<LOC wiki_builder_t2_e>Tech 2 Engineer',                     10, true},
-    BUILTBYTIER3ENGINEER         = {'<LOC wiki_builder_t3_e>Tech 3 Engineer',                     15, true},
-    BUILTBYCOMMANDER             = {'<LOC wiki_builder_t1_acu>Armoured Command Unit',             10, true},
-    BUILTBYTIER2COMMANDER        = {'<LOC wiki_builder_t2_acu>Tech 2 Armoured Command Unit',      30, true},
-    BUILTBYTIER3COMMANDER        = {'<LOC wiki_builder_t3_acu>Tech 3 Armoured Command Unit',      90, true},
-    BUILTBYTIER1FACTORY          = {'<LOC wiki_builder_t1_fact>Tech 1 Factory',                   20, true},
-    BUILTBYTIER2FACTORY          = {'<LOC wiki_builder_t2_fact>Tech 2 Factory',                   40, true},
-    BUILTBYTIER3FACTORY          = {'<LOC wiki_builder_t3_fact>Tech 3 Factory',                   60, true},
-    BUILTBYLANDTIER1FACTORY      = {'<LOC wiki_builder_t1_lfact>Tech 1 Land Factory',             20, true}, -- BrewLAN
-    BUILTBYLANDTIER2FACTORY      = {'<LOC wiki_builder_t2_lfact>Tech 2 Land Factory',             40, true},
-    BUILTBYLANDTIER3FACTORY      = {'<LOC wiki_builder_t3_lfact>Tech 3 Land Factory',             60, true}, -- BrewLAN
-    BUILTBYQUANTUMGATE           = {'<LOC wiki_builder_t3_qg>Tech 3 Quantum Gateway',             120, true},
-    TRANSPORTBUILTBYTIER3FACTORY = {'<LOC wiki_builder_t3_afact>Tech 3 Air Factory',              60,  true},
-}
-
 abilityDesc = {
     ['Anti-Air']                        = 'Can shoot aircraft, including high-altitude air',
     ['Air Staging']                     = 'Aircraft can land on it for refuel and/or repair',

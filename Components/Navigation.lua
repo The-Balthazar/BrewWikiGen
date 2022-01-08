@@ -64,6 +64,7 @@ function MenuSortUnitsByTech(units)
 end
 
 function InsertInNavigationData(bp)
+    if not bp.WikiPage then return end
     local UnitInfo = UnitConciseInfo(bp)
     local index = bp.ModInfo.ModIndex
 

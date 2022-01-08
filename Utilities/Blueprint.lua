@@ -46,7 +46,7 @@ local function GetModBlueprintPaths(dir)
         end
     end
 
-    dirsearch(dir..(_G.UnitBlueprintsFolder or ''), '/ad')
+    dirsearch(dir, '/ad')
 
     return BlueprintPathsArray
 end
@@ -147,8 +147,10 @@ local function GetPairedBlueprintsFromFile(dir, file)
         bpstring = string.gsub(bpstring, v[1], v[2], v[3])
     end
 
-    local bps = {load(bpstring)()}
+    local chunk, msg = load(bpstring)
+    assert(chunk, "⚠️ Failed to load "..file..(msg or ''))
 
+    local bps = {chunk()}
     assert(bps[1], "⚠️ Failed to load "..file)
 
     local validbps = {}

@@ -120,62 +120,39 @@ UnitBodytextSectionData = function(ModInfo, bp)
                         end
                     end
 
-                    local builtbycats = {}
-
-                    for i, cat in ipairs(bp.Categories) do
-                        if string.find(cat, 'BUILTBY') then
-                            builtbycats[cat] = defaultBuilderCats[cat] and (defaultBuilderCats[cat][3] or defaultBuilderCats[cat][2]) or true
-                        end
-                    end
-
                     local builderunits = {}
 
                     if bp.BuiltByCategories then
                         for buildcat, _ in pairs(bp.BuiltByCategories) do
                             local catunits = GetBuilderUnits(buildcat)
                             tableMergeCopy(builderunits, catunits)
-                            local bbcat = string.match(buildcat, '(BUILTBY[%w]*)')
-                            if builtbycats[bbcat] then
-                                for builderid, builderbp in pairs(catunits) do
-                                    if (not defaultBuilderCats[bbcat]) or builderbp.Economy.BuildRate == builtbycats[bbcat] then
-                                        builtbycats[bbcat] = nil
-                                        break
-                                    end
-                                end
-                            end
                         end
                     end
 
                     for tech, group in ipairs(MenuSortUnitsByTech(builderunits)) do
                         for i, builderbp in ipairs(group) do
                             bilst = bilst..BuildByBulletPoint(bp, pageLink(builderbp.ID, builderbp.unitTdesc), builderbp.Economy.BuildRate, UpgradesFrom(bp, builderbp))
+                            builderunits[builderbp.id] = nil
                         end
                     end
 
-                    local tempcats = {}
-                    for cat, v in pairs(builtbycats) do
-                        table.insert(tempcats, cat)
-                    end
-                    table.sort(tempcats, function(a,b)
-                        local function key(c) return string.gsub(c, '(%a*)(TIER%d)(%w*)','%1%3%2') end
-                        return key(a) < key(b)
-                    end)
+                    local remaining = {}
 
-                    for i, cat in ipairs(tempcats) do
-                        if defaultBuilderCats[cat] then
-                            bilst = bilst..BuildByBulletPoint(bp, LOC(defaultBuilderCats[cat][1]), defaultBuilderCats[cat][2])
-                        --elseif string.find(cat, 'BUILTBY') then
-                            --bilst = bilst..BuildByBulletPoint(bp, LOC('units with ').."<error:category /><code>"..cat.."</code>" )
+                    for id, bp in pairs(builderunits) do
+                        table.insert(remaining, {id, bp})
+                    end
+
+                    if remaining[1] then
+                        table.sort(remaining, function(a, b) return a[1]<b[1] end)
+                        for i, dat in ipairs(remaining) do
+                            local builderbp = dat[2]
+                            bilst = bilst..BuildByBulletPoint(bp, pageLink(builderbp.ID, builderbp.unitTdesc), builderbp.Economy.BuildRate, UpgradesFrom(bp, builderbp))
                         end
                     end
-
-                    --[[if bp.General.UpgradesFrom and not getBP(bp.General.UpgradesFrom) then
-                        bilst = bilst..BuildByBulletPoint(bp, "<waring:unverifiable /><code>"..bp.General.UpgradesFrom.."</code>", nil, true )
-                    end]]
 
                     return bilst
                 end
-                return LOC("<LOC wiki_builders_note>Build times from hard coded builders on the Steam/retail version of the game:")..BuilderList(bp)
+                return LOC("<LOC wiki_builders_note>Build times from the Steam/retail version of the game:")..BuilderList(bp)
             end
         },
         {
@@ -264,7 +241,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
 
                 if bp.Economy.BuildableCategory then
 
-                    local BuildableUnits = GetBuildableUnits(bp.Economy.BuildableCategory)
+                    local BuildableUnits = GetBuildableModUnits(bp.Economy.BuildableCategory)
                     local NumBuildable = tableTcount(BuildableUnits)
 
                     local TempBuildableCategory = tableMergeCopy({}, bp.Economy.BuildableCategory)

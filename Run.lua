@@ -122,6 +122,7 @@ for i, dir in ipairs(ModDirectories) do
     safecall(LoadModHooks, dir)
     safecall(LoadModUnitBlueprints, dir, i)
 end
+safecall(LoadEnvUnitBlueprints, WikiGeneratorDirectory)
 for i, dir in ipairs(ModDirectories) do
     safecall(LoadModSystemBlueprintsFile, dir)
 end

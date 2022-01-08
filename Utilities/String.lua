@@ -27,7 +27,14 @@ end
 
 function pluralS(n) return n ~= 1 and 's' or '' end
 
-function    pageLink(page,    text) return xml:a{href=     stringSanitiseFilename(page)}       (text or page   ) end
+function pageLink(page,text)
+    local bp = getBP(page)
+    if (bp and not bp.WikiPage) then
+        return text
+    else
+        return xml:a{href=stringSanitiseFilename(page)} (text or page)
+    end
+end
 function sectionLink(section, text) return xml:a{href='#'..stringSanitiseFilename(section,1,1)}(text or section) end
 
 --------------------------------------------------------------------------------
