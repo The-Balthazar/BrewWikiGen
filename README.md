@@ -85,6 +85,12 @@ If you do not wish it to generate one or both of those pages at all, comment out
 or remove the lines `safecall(GenerateHomePage)` and/or `safecall(GenerateSidebar)`
 from your updated `Run.lua`.
 
+### Environmental blueprints:
+If you include blueprints in a sub-folder of the `/Environment/` folder, the
+generator will load them for built-by lists and upgrades to/from information. It
+won't generate wiki pages for them or include them in navigation/category pages
+or include them in built-by lists.
+
 ### Blueprints.lua:
 If you have content generated in `Blueprints.lua` that would be important to the
 wiki, you can have the wiki run it by adding a `WikiBlueprints` function to that
