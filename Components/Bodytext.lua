@@ -105,15 +105,19 @@ UnitBodytextSectionData = function(ModInfo, bp)
                     if not bp.Economy.BuildTime then return '<error:no build time>' end
 
                     local function UpgradesFrom(to, from)
-                        return to.General.UpgradesFrom == from.id and from.General.UpgradesTo == to.id
+                        return (to.General.UpgradesFrom == from.id and from.General.UpgradesTo == to.id) and from
                     end
 
                     local function BuildByBulletPoint(bp, buildername, buildrate, upgrade)
                         if buildername and buildrate then
                             local secs = bp.Economy.BuildTime / buildrate
+                            local costmult = upgrade and bp.Economy.HalfPriceUpgradeFromID and 0.5 or 1
+                            local costminusE = upgrade and bp.Economy.DifferentialUpgradeCostCalculation and upgrade.Economy.BuildCostEnergy or 0
+                            local costminusM = upgrade and bp.Economy.DifferentialUpgradeCostCalculation and upgrade.Economy.BuildCostMass or 0
+
                             return "\n* "..iconText('Time', formatTime(secs) )
-                            ..' ‒ '..iconText('Energy', math.floor(bp.Economy.BuildCostEnergy / secs + 0.5), '/s')
-                            ..' ‒ '..iconText('Mass', math.floor(bp.Economy.BuildCostMass / secs + 0.5), '/s')
+                            ..' ‒ '..iconText('Energy', math.floor((bp.Economy.BuildCostEnergy * costmult - costminusE) / secs + 0.5), '/s')
+                            ..' ‒ '..iconText('Mass', math.floor((bp.Economy.BuildCostMass * costmult - costminusM) / secs + 0.5), '/s')
                             ..' — '..string.format(LOC(upgrade and 'Upgrade from %s' or 'Built by %s'), buildername)
                         elseif buildername then
                             return "\n* "..string.format(LOC('Built by %s'), buildername)
@@ -131,7 +135,9 @@ UnitBodytextSectionData = function(ModInfo, bp)
 
                     for tech, group in ipairs(MenuSortUnitsByTech(builderunits)) do
                         for i, builderbp in ipairs(group) do
-                            bilst = bilst..BuildByBulletPoint(bp, pageLink(builderbp.ID, builderbp.unitTdesc), builderbp.Economy.BuildRate, UpgradesFrom(bp, builderbp))
+                            if builderbp.id ~= 'ssl0403' or bp.Wreckage or bp.CategoriesHash.RECLAIMABLE then
+                                bilst = bilst..BuildByBulletPoint(bp, pageLink(builderbp.ID, builderbp.unitTdesc), builderbp.Economy.BuildRate, UpgradesFrom(bp, builderbp))
+                            end
                             builderunits[builderbp.id] = nil
                         end
                     end
@@ -146,7 +152,9 @@ UnitBodytextSectionData = function(ModInfo, bp)
                         table.sort(remaining, function(a, b) return a[1]<b[1] end)
                         for i, dat in ipairs(remaining) do
                             local builderbp = dat[2]
-                            bilst = bilst..BuildByBulletPoint(bp, pageLink(builderbp.ID, builderbp.unitTdesc), builderbp.Economy.BuildRate, UpgradesFrom(bp, builderbp))
+                            if builderbp.id ~= 'ssa0001' or bp.Wreckage or bp.CategoriesHash.RECLAIMABLE then
+                                bilst = bilst..BuildByBulletPoint(bp, pageLink(builderbp.ID, builderbp.unitTdesc), builderbp.Economy.BuildRate, UpgradesFrom(bp, builderbp))
+                            end
                         end
                     end
 
