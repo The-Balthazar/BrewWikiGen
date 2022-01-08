@@ -129,15 +129,18 @@ UnitBodytextSectionData = function(ModInfo, bp)
                     end
 
                     local builderunits = {}
-                    for buildcat, _ in pairs(bp.BuiltByCategories) do
-                        local catunits = GetBuilderUnits(buildcat)
-                        tableMergeCopy(builderunits, catunits)
-                        local bbcat = string.match(buildcat, '(BUILTBY[%w]*)')
-                        if builtbycats[bbcat] then
-                            for builderid, builderbp in pairs(catunits) do
-                                if (not defaultBuilderCats[bbcat]) or builderbp.Economy.BuildRate == builtbycats[bbcat] then
-                                    builtbycats[bbcat] = nil
-                                    break
+
+                    if bp.BuiltByCategories then
+                        for buildcat, _ in pairs(bp.BuiltByCategories) do
+                            local catunits = GetBuilderUnits(buildcat)
+                            tableMergeCopy(builderunits, catunits)
+                            local bbcat = string.match(buildcat, '(BUILTBY[%w]*)')
+                            if builtbycats[bbcat] then
+                                for builderid, builderbp in pairs(catunits) do
+                                    if (not defaultBuilderCats[bbcat]) or builderbp.Economy.BuildRate == builtbycats[bbcat] then
+                                        builtbycats[bbcat] = nil
+                                        break
+                                    end
                                 end
                             end
                         end
