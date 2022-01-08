@@ -242,17 +242,20 @@ UnitBodytextSectionData = function(ModInfo, bp)
                 if bp.Economy.BuildableCategory then
 
                     local BuildableUnits = GetBuildableModUnits(bp.Economy.BuildableCategory)
+                    local BuildableEnvUnits = GetBuildableUnits(bp.Economy.BuildableCategory)
                     local NumBuildable = tableTcount(BuildableUnits)
 
                     local TempBuildableCategory = tableMergeCopy({}, bp.Economy.BuildableCategory)
 
                     if bp.General.UpgradesTo then
-                        if BuildableUnits[bp.General.UpgradesTo] then
-                            local upgradeBp = BuildableUnits[bp.General.UpgradesTo]
+                        if BuildableEnvUnits[bp.General.UpgradesTo] then
+                            local upgradeBp = BuildableEnvUnits[bp.General.UpgradesTo]
                             text = text..'It can be upgraded into the '..pageLink(upgradeBp.ID, upgradeBp.unitTdesc)..".\n"
 
-                            BuildableUnits[upgradeBp.id] = nil
-                            NumBuildable = NumBuildable-1
+                            if BuildableUnits[upgradeBp.id] then
+                                BuildableUnits[upgradeBp.id] = nil
+                                NumBuildable = NumBuildable-1
+                            end
 
                         elseif getBP(bp.General.UpgradesTo) then
                             local upgradeBp = getBP(bp.General.UpgradesTo)
@@ -265,8 +268,8 @@ UnitBodytextSectionData = function(ModInfo, bp)
                             else
                                 text = text..'It is listed as upgradable into <code>'..string.lower(bp.General.UpgradesTo).."</code>.\n"
                             end
-
                         end
+
                         arrayRemoveByValue(TempBuildableCategory, bp.General.UpgradesTo)
                     end
 
