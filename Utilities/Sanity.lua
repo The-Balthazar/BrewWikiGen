@@ -148,6 +148,16 @@ function BlueprintSanityChecks(bp)
         local pedantry = {
             { bp.Interface,                                     'Redundant bp.Interface table' },
             { bp.Physics.MotionType ~= 'RULEUMT_None' and bp.Physics.BuildOnLayerCaps, 'Redundant bp.Physics.BuildOnLayerCaps table' },
+            { bp.Physics.MotionType == 'RULEUMT_None' and bp.Physics.BuildOnLayerCaps and
+                (
+                    bp.Physics.BuildOnLayerCaps.LAYER_Air == false or
+                    bp.Physics.BuildOnLayerCaps.LAYER_Land == false or
+                    bp.Physics.BuildOnLayerCaps.LAYER_Orbit == false or
+                    bp.Physics.BuildOnLayerCaps.LAYER_Seabed == false or
+                    bp.Physics.BuildOnLayerCaps.LAYER_Sub == false or
+                    bp.Physics.BuildOnLayerCaps.LAYER_Water == false
+                ),                                              'Redundant false bp.Physics.BuildOnLayerCaps value'
+            },
             { bp.Display.SpawnRandomRotation,                   'Redundant bp.Display.SpawnRandomRotation value' },
             { bp.Display.PlaceholderMeshName,                   'Redundant bp.Display.PlaceholderMeshName value' },
             { bp.CategoriesHash.OVERLAYANTIAIR,                 'Redundant cat OVERLAYANTIAIR' },
