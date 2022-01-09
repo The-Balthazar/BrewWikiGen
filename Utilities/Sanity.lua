@@ -16,7 +16,7 @@ local IconMotionTypes = {
 }
 
 function BlueprintSanityChecks(bp)
-    if not Sanity.BlueprintChecks then
+    if not Sanity.BlueprintChecks or not bp.WikiPage then
         return
     end
 
@@ -41,28 +41,39 @@ function BlueprintSanityChecks(bp)
 
             if t and bp.Physics.MotionType ~= 'RULEUMT_None'
             and (bp.General.CommandCaps and bp.General.CommandCaps.RULEUCC_CallTransport)
-            and not bp.CategoriesHash.CANNOTUSEAIRSTAGING
-            and (bp.Transport and bp.Transport.TransportClass or 1) ~= t then
-                table.insert(issues, 'Tech '..t..' with transport class '..(bp.Transport and bp.Transport.TransportClass or 1))
+            and not bp.CategoriesHash.CANNOTUSEAIRSTAGING then
+                local hook = bp.CategoriesHash.POD and 5 or t
+                if (bp.Transport and bp.Transport.TransportClass or 1) ~= hook then
+                    table.insert(issues, 'Tech '..t..(hook == 5 and ' drone unit' or '')..' with transport class '..(bp.Transport and bp.Transport.TransportClass or 1))
+                end
             end
 
-            local builtby = arrayFindSub(bp.Categories, 1, 7, 'BUILTBY')
+            local builtby = arraySubFind(bp.Categories, 'BUILTBY')
             if builtby then
 
-                for i = 1, 3 do
-                    local builtI = string.gsub(builtby, '%d', i)
-                    if bp.CategoriesHash[builtI] then
-                        if i < t then
-                            table.insert(issues, 'Tech '..t..' unit appears to have tier '..i..' built by cat.')
-                        end
-                    else
-                        if i >= t then
-                            table.insert(issues, 'Tech '..t..' unit appears to be missing tier '..i..' built by cat.')
+                local function UpgradesFrom(to, from)
+                    return (to.General.UpgradesFrom == from.id and from.General.UpgradesTo == to.id) and from
+                end
+
+                local upgrade = getBP(bp.General.UpgradesFrom)
+
+                if upgrade and UpgradesFrom(bp, upgrade) then
+                    --Upgrade
+                else
+                    for i = 1, 3 do
+                        local builtI = string.gsub(builtby, '%d', i)
+                        if bp.CategoriesHash[builtI] then
+                            if i < t then
+                                table.insert(issues, 'Tech '..t..' unit appears to have tier '..i..' built by cat.')
+                            end
+                        else
+                            if i >= t then
+                                table.insert(issues, 'Tech '..t..' unit appears to be missing tier '..i..' built by cat.')
+                            end
                         end
                     end
                 end
             end
-
         end
     end
 

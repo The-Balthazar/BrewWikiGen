@@ -5,7 +5,7 @@
 local all_units = {}
 
 function getBP(id)
-    return all_units[string.lower(id)]
+    return id and all_units[string.lower(id)]
 end
 
 local function UnitHeaderString(bp)
