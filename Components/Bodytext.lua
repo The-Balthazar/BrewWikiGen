@@ -173,7 +173,11 @@ UnitBodytextSectionData = function(ModInfo, bp)
 
                     if Order then
                         local Tip = Tooltips[Order.helpText] or {title = 'error:'..Order.helpText..' no title'}
-                        returnstring = '<img float="left" src="'..IconRepo..'orders/'..string.lower(Order.bitmapId)..'.png" title="'..LOC(Tip.title or '')..(Tip.description and Tip.description ~= '' and "\n"..LOC(Tip.description) or '')..'" />'
+                        returnstring = xml:img{
+                            float = 'left',
+                            src = IconRepo..'orders/'..string.lower(Order.bitmapId)..'.png',
+                            title = LOC(Tip.title or '')..(Tip.description and Tip.description ~= '' and "\n"..LOC(Tip.description) or '')
+                        }
                     end
                     return returnstring or orderName, Order
                 end
@@ -198,7 +202,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
                         end
                         slot = order.preferredSlot
                     end
-                    text = text .. "<td>"..orderstring.."</td>\n"
+                    text = text..xml:td(orderstring).."\n"
                 end
                 return text.."</table>"
             end
@@ -386,7 +390,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
                             Style = 'detail-left',
                             Header = {enh.Name and LOC(enh.Name) or 'error:name'},
                             Data = {
-                                { 'Description:', (LOC(Description[bp.id..'-'..string.lower(enh.Icon)]) or 'error:description') },
+                                { 'Description:', (LOC(Description[bp.id..'-'..string.lower(enh.Icon or 'error:icon')]) or 'error:description') },
                                 { 'Energy cost:', iconText('Energy', enh.BuildCostEnergy or 'error:energy') },
                                 { 'Mass cost:', iconText('Mass', enh.BuildCostMass or 'error:mass') },
                                 { 'Build time:', iconText('Time', enh.BuildTime and bp.Economy and bp.Economy.BuildRate and math.ceil(enh.BuildTime / bp.Economy.BuildRate) or 'error:time').." seconds" },
