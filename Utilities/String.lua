@@ -199,7 +199,10 @@ function BuildableLayer(phys)
         local str = ''
         for i, layer in ipairs(LayersByIndex) do
             if phys.BuildOnLayerCaps[layer] then
-                str = str..LayerHash[layer]..xml:br()
+                if str ~= '' then
+                    str = str..xml:br()
+                end
+                str = str..LayerHash[layer]
             end
         end
         return str
