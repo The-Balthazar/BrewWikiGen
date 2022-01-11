@@ -33,6 +33,31 @@ generate wiki pages for. It assumes, but doesn't require, multiple mods. It
 expects a `mod_info.lua` file directly in each item on the list. The order listed
 is used in the sidebar navigation ordering.
 
+* `WikiExtraData` can point to an optional extra document of hand written content
+for specific sections of specific unit pages. It expects data to be formatted as
+a `UnitData` table, keyed with unit IDs (upper case, or however the bp files are
+named if they are anything other than entirely lower case), with table values
+containing keys that match the syntax `[Section]Prefix` or `[Section]Suffix`, where
+`[Section]` matches the English names of sections, like `Weapons` or `Adjacency`,
+or `LeadSuffix`, with string values, or keyed with `Videos` with an array of tables
+that match the format `{YouTube = '[Video ID]', '[Display name]'}`, where
+`[Video ID]` is the 11-ish character YouTube video ID, and `[Display name]` is the
+link caption to display. Which is a very wordy way to say to look like this
+example:
+  ```lua
+  UnitData = {
+      SSL0403 = {
+          Videos = {
+              {YouTube = 'IInITjdtaPM', 'Time-lapse'},
+          },
+          LeadSuffix = "Paragraph to appear after the generated lead paragraph.",
+          AdjacencyPrefix = "Paragraph to appear before the Adjacency section."
+      },
+  }
+  ```
+  While the `WikiExtraData` value is optional, if you remove the key you will need
+  to comment out the line `safecall(dofile, WikiExtraData)`, otherwise it will crash.
+
 * `UnitBlueprintsFolder` is where within the mod folders it should start looking
 for blueprints. Standard convention is `units`. This value can be removed, but
 execution can take double the time to complete.
