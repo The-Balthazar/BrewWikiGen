@@ -51,7 +51,7 @@ function MenuSortUnitsByTech(units)
         SORTOTHER = 6000,
     }
     local function sortKey(bp)
-        return tonumber(math.floor(MenuSortCats[bp.SortCategory] + (bp.BuildIconSortPriority or bp.StrategicIconSortPriority))..'.'..tonumber(string.gsub(bp.id, '%W', ''), 36))
+        return MenuSortCats[bp.SortCategory] + (bp.BuildIconSortPriority or bp.StrategicIconSortPriority or 0) + tonumber('0.0'..tonumber(string.gsub(bp.id, '%W', ''), 36))
     end
     local function MenuSort(a, b)
         return sortKey(a) < sortKey(b)
