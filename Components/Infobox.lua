@@ -86,6 +86,7 @@ GetUnitInfoboxData = function(ModInfo, bp)
                     bp.General and bp.General.CommandCaps and (
                         bp.General.CommandCaps.RULEUCC_CallTransport or bp.General.CommandCaps.RULEUCC_Dock
                     )
+                    or bp.CategoriesHash.POD
                 )
             ) and iconText('Attached',
                 transportClassHookType(bp.Transport and bp.Transport.TransportClass or 1)
