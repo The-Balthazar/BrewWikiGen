@@ -64,6 +64,8 @@ function arrayRemoveByValue(t, val)
     return i and table.remove(t, i)
 end
 
+table.removeByValue = arrayRemoveByValue
+
 function tableHasTrueChild(hash)
     if not hash then return end
     for k, v in pairs(hash) do

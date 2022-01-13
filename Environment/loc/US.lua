@@ -2,7 +2,7 @@
 --Wiki strings
 --Note for translators: make sure html tags and things like %s and `%s` and %.1f and so on match the original; they are formating notation used by the wiki script to insert values, and the auto generated ones get this wrong.
 --Infobox meta
-wiki_infobox_stats_note="Note: Several units have stats defined at the<br />start of the game based on the stats of others."
+wiki_infobox_stats_note="Note: This unit has some of its stats<br />redefined at the start of the game."
 wiki_infobox_mod_source="Source:"
 wiki_infobox_unitid="Unit ID:"
 wiki_infobox_faction="Faction:"

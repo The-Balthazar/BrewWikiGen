@@ -22,6 +22,8 @@ function GetExecutableSandboxedLuaFile(file)
         table = table,
         string = string,
         math = math,
+
+        type = type,
     }
     env.table.find = arrayFind
     local chunk = loadfile(file, 'bt', env)

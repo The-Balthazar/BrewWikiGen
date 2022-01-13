@@ -5,7 +5,8 @@
 
 GetUnitInfoboxData = function(ModInfo, bp)
     return {
-        {'', LOC('<LOC wiki_infobox_stats_note>Note: Several units have stats defined at the<br />start of the game based on the stats of others.')},
+        {bp.WikiInfoboxNote and '', bp.WikiInfoboxNote and LOC(bp.WikiInfoboxNote)..(bp.WikiBalance and detailsLink('<LOC wiki_sect_balance>Balance') or '')},
+        ----
         {'<LOC wiki_infobox_mod_source>'..'Source:',    xml:a{href=stringSanitiseFilename(ModInfo.name)}(ModInfo.name)},
         {'<LOC wiki_infobox_unitid>'    ..'Unit ID:',   xml:code(bp.id)},
         {'<LOC wiki_infobox_faction>'   ..'Faction:',   (bp.General and bp.General.FactionName)},
