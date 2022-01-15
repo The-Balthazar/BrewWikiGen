@@ -183,12 +183,18 @@ end
 
 function formatTime(n)
     local h, m, s = math.floor(n/3600), math.floor(n/60)%60, math.floor(n%60)
-    return string.format(
+    local good, time = pcall(string.format,
         (h~=0 and '%d:' or '')..'%02d:%02d',
         h~=0 and h or m,
         h~=0 and m or s,
         h~=0 and s or nil
     )
+    if not good then
+        print(time, h, m, s)
+        return '<error: time>'..n
+    else
+        return time
+    end
 end
 
 function BuildableLayer(phys)

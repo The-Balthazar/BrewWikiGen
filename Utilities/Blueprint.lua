@@ -38,6 +38,12 @@ local function GetModBlueprintPaths(dir)
     local dirsearch; dirsearch = function(folder, p)
         local file <close> = io.popen('dir "'..folder..'" /b '..(p or ''))
         for line in file:lines() do
+            if string.sub(line, -4) == '.lnk' then
+                local lnk = GetDirFromShellLnk(folder..'/'..line)
+                print("    Loading: ", lnk)
+                dirsearch(lnk)
+            end
+
             if IsGoodBlueprintFile(line) and not MatchesFileExclusion(line) then
                 table.insert(BlueprintPathsArray, {folder, line})
             elseif not IsFileOrSystemFolder(line) and not MatchesFolderExclusion(line) then
@@ -136,7 +142,7 @@ local function GetPairedBlueprintsFromFile(dir, file)
 
     local sanitiseSteps = {
         {'#',                 '--',       },
-        {'\\',                '/',        },
+        {'\\[^"^\']',         '/',        },
         {'Sound%s*{',         '{',        },
         {'%a+Blueprint%s*{', 'return {', 1},
         {'%a+Blueprint%s*{', '{',         },

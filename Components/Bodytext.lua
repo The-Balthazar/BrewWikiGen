@@ -109,7 +109,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
                     end
 
                     local function BuildByBulletPoint(bp, buildername, buildrate, upgrade)
-                        if buildername and buildrate then
+                        if buildername and buildrate and buildrate ~= 0 then
                             local secs = bp.Economy.BuildTime / buildrate
                             local costmult = upgrade and bp.Economy.HalfPriceUpgradeFromID and 0.5 or 1
                             local costminusE = upgrade and bp.Economy.DifferentialUpgradeCostCalculation and upgrade.Economy.BuildCostEnergy or 0
@@ -120,7 +120,9 @@ UnitBodytextSectionData = function(ModInfo, bp)
                             ..' ‒ '..iconText('Mass', math.floor((bp.Economy.BuildCostMass * costmult - costminusM) / secs + 0.5), '/s')
                             ..' — '..string.format(LOC(upgrade and 'Upgrade from %s' or 'Built by %s'), buildername)
                         elseif buildername then
-                            return "\n* "..string.format(LOC('Built by %s'), buildername)
+                            return "\n* "..
+                            (buildrate == 0 and "<error:buildrate 0>" or '')..
+                            string.format(LOC('Built by %s'), buildername)
                         end
                     end
 

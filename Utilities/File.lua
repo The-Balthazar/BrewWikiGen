@@ -67,3 +67,8 @@ function LoadModHooks(ModDirectory)
         print(log)
     end
 end
+
+function GetDirFromShellLnk(lnk)
+    local linkfile = io.open(lnk, 'rb'):read('*all')
+    return string.gsub(string.match(linkfile, '%a:\\[ \\%w%s%p]+'), '\\', '/')
+end

@@ -45,6 +45,7 @@ BlueprintIdExclusions = { -- Excludes blueprints with any of these IDs (case ins
     'srl0005',
     'srl0006',
     'ssb2380',
+    'ura0001',
 }
 
 -- Web path for img src. Could be relative, but would break on edit previews.
