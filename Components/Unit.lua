@@ -45,7 +45,7 @@ function LoadModUnitBlueprints(ModDirectory, ModIndex) -- First pass
 
     print(ModInfo.name)
     for id, bp in GetPairedModUnitBlueprints(ModDirectory..(_G.UnitBlueprintsFolder or '')) do
-        assert( not all_units[id], "⚠️ Found blueprints between mods with clashing ID "..id)
+        assert( not all_units[id], LogEmoji('⚠️').." Found blueprints between mods with clashing ID "..id)
         bp.ModInfo = ModInfo
         bp.WikiPage = true
         all_units[id] = bp

@@ -208,3 +208,13 @@ function BuildableLayer(phys)
         return str
     end
 end
+
+local LogEmojiHash = {
+    ['⚠️'] = '(!)',
+    ['🆗'] = '(OK)',
+    ['❌'] = '(><)',
+}
+
+function LogEmoji(emoji)
+    return Logging.LogEmojiSupported and emoji or LogEmojiHash[emoji]
+end

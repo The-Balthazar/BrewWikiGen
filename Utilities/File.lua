@@ -8,16 +8,30 @@ function GetSandboxedLuaFile(file)
     return env
 end
 
+local FileMessages = {}
+
+local function SandboxedPrint(file, logtype)
+    return function(...)
+        if Logging.SandboxedFileLogs then
+            if not FileMessages[file] then
+                FileMessages[file] = true
+                print('Logs from ', file)
+            end
+            print('        '..logtype,...)
+        end
+    end
+end
+
 function GetExecutableSandboxedLuaFile(file)
     local env = {
         pairs = pairs,
         ipairs = ipairs,
 
-        print = print,
-        LOG = print,
-        SPEW = print,
-        _ALERT = print,
-        WARN = print,
+        print = SandboxedPrint(file, 'Print: '),
+        LOG = SandboxedPrint(file, 'Log: '),
+        SPEW = SandboxedPrint(file, 'Debug: '),
+        _ALERT = SandboxedPrint(file, 'Log: '),
+        WARN = SandboxedPrint(file, 'Warn: '),
 
         table = table,
         string = string,
@@ -38,7 +52,7 @@ end
 
 function GetModInfo(dir)
     local modinfo = SafeGetSandboxedLuaFile(dir..'mod_info.lua')
-    return assert(modinfo, "⚠️ Failed to load "..dir.."mod_info.lua")
+    return assert(modinfo, LogEmoji('⚠️').." Failed to load "..dir.."mod_info.lua")
 end
 
 function LoadModHooks(ModDirectory)
@@ -47,7 +61,7 @@ function LoadModHooks(ModDirectory)
         ['Build descriptions'] = 'hook/lua/ui/help/unitdescription.lua',
         ['Tooltips']           = 'hook/lua/ui/help/tooltips.lua',
     }) do
-        log = log..(pcall(dofile, ModDirectory..fileDir) and '🆗 ' or '❌ ')..name..' '
+        log = log..' '..name..' '..(pcall(dofile, ModDirectory..fileDir) and LogEmoji('🆗') or LogEmoji('❌'))
     end
     if Logging.ModHooksLoaded then
         print(log)

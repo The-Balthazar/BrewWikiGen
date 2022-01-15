@@ -148,10 +148,10 @@ local function GetPairedBlueprintsFromFile(dir, file)
     end
 
     local chunk, msg = load(bpstring)
-    assert(chunk, "⚠️ Failed to load "..file..(msg or ''))
+    assert(chunk, LogEmoji('⚠️').." Failed to load "..file..(msg or ''))
 
     local bps = {chunk()}
-    assert(bps[1], "⚠️ Failed to load "..file)
+    assert(bps[1], LogEmoji('⚠️').." Failed to load "..file)
 
     local validbps = {}
 
@@ -163,7 +163,7 @@ local function GetPairedBlueprintsFromFile(dir, file)
         else
             TotalIgnoredBlueprints = TotalIgnoredBlueprints + 1
             if Logging.ExcludedBlueprints then
-                print("⚠️ Excluding "..bp.id,
+                print(LogEmoji('⚠️').." Excluding "..bp.id,
                     (bp.Merge and "Merge") or
                     (not isValidBlueprint(bp) and "Invalid bp" ) or ""
                 )

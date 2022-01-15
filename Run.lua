@@ -72,11 +72,13 @@ FooterCategories = { -- In order
 }
 
 Logging = {
+    LogEmojiSupported  = false,
     ModHooksLoaded     = false,
     LuaFileLoadIssues  = true,
     SCMLoadIssues      = false,
     ExcludedBlueprints = false,
     BlueprintTotals    = true,
+    SandboxedFileLogs  = true,
 }
 Sanity = {
     BlueprintChecks         = false,

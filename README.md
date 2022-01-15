@@ -114,7 +114,7 @@ from your updated `Run.lua`.
 If you include blueprints in a sub-folder of the `/Environment/` folder, the
 generator will load them for built-by lists and upgrades to/from information. It
 won't generate wiki pages for them or include them in navigation/category pages
-or include them in built-by lists.
+or include them in engineering build lists.
 
 ### Blueprints.lua:
 If you have content generated in `Blueprints.lua` that would be important to the
