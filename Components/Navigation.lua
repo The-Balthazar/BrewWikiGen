@@ -5,7 +5,7 @@
 local NavigationData = {}
 
 local function sortData(sorttable, sort)
-    for modindex, moddata in ipairs(sorttable) do
+    for modindex, moddata in pairs(sorttable) do
         for i, faction in ipairs(FactionsByIndex) do
             local unitarray = moddata.Factions[i]
             if unitarray then
@@ -97,11 +97,17 @@ local function UpdateGeneratedPartOfPage(page, tag, content)
 end
 
 function GenerateSidebar()
-    sortData(NavigationData, 'TechDescending-DescriptionAscending')
+    local SidebarNavigationData = {}
+
+    for i = (NavigationData[0] and 0 or 1), #NavigationData do
+        SidebarNavigationData[i+(NavigationData[0] and 1 or 0)] = NavigationData[i]
+    end
+
+    sortData(SidebarNavigationData, 'TechDescending-DescriptionAscending')
 
     local sidebarstring = ''
 
-    for modindex, moddata in ipairs(NavigationData) do
+    for modindex, moddata in ipairs(SidebarNavigationData) do
         local modname = moddata[1]
 
         sidebarstring = sidebarstring .. "<details markdown=\"1\">\n<summary>[Show] <a href=\""..stringSanitiseFilename(moddata.ModInfo.name)..[[">]]..moddata.ModInfo.name.."</a></summary>\n<p>\n<table>\n<tr>\n<td width=\"269px\">\n\n"
@@ -111,7 +117,10 @@ function GenerateSidebar()
                 sidebarstring = sidebarstring .. "<details>\n<summary>"..faction.."</summary>\n<p>\n\n"
                 for unitI, unitData in ipairs(unitarray) do
 
-                    sidebarstring = sidebarstring .. "* <a title=\""..(unitData.name or unitData.bpid)..[[" href="]]..unitData.bpid..[[">]]..(unitData.desc or unitData.bpid).."</a>\n"
+                    sidebarstring = sidebarstring .. '* '..xml:a{
+                        title=(unitData.name or unitData.bpid),
+                        href=stringSanitiseFilename(unitData.bpid)
+                    }(unitData.desc or unitData.bpid).."\n"
 
                 end
                 sidebarstring = sidebarstring .. "</p>\n</details>\n"
@@ -128,7 +137,7 @@ end
 function GenerateModPages()
     sortData(NavigationData, 'TechAscending-IDAscending')
 
-    for modindex, moddata in ipairs(NavigationData) do
+    for modindex, moddata in pairs(NavigationData) do
 
         local ModInfobox = Infobox{
             Style = 'main-right',
@@ -144,10 +153,10 @@ function GenerateModPages()
             }
         }
 
-        local mulString = '***'..moddata.ModInfo.name..'*** is a mod by '..(moddata.ModInfo.author or 'an unknown author')
-        ..". Its mod menu description is:\n"
-        .."<blockquote>"..(moddata.ModInfo.description or 'No description.').."</blockquote>\nVersion "
-        ..moddata.ModInfo.version.." contains the following units:\n"
+        local mulString = '***'..moddata.ModInfo.name..'*** is'..(modindex ~= 0 and' a mod' or '')..' by '..(moddata.ModInfo.author or 'an unknown author')..'.'
+        ..(moddata.ModInfo.description and " Its mod menu description is:\n"
+        .."<blockquote>"..(moddata.ModInfo.description or 'No description.').."</blockquote>\n" or ' ')..(moddata.ModInfo.version and "Version "
+        ..moddata.ModInfo.version or 'It').." contains the following units:\n"
 
         for i = 1, #FactionsByIndex do
             local faction = FactionsByIndex[i]
@@ -175,7 +184,11 @@ function GenerateModPages()
                         mulString = mulString ..MDHead(TechNames[tech])
                     end
 
-                    mulString = mulString .. [[<a title="]]..(unitData.name or unitData.bpid)..[[" href="]]..unitData.bpid..[["><img src="]]..unitIconRepo..unitData.bpid.."_icon.png\" /></a>\n"
+                    mulString = mulString .. xml:a{
+                        href=stringSanitiseFilename(unitData.bpid),
+                        title=stringSanitiseXMLAttribute(unitData.name or unitData.bpid)
+                    }(xml:img{src=unitIconRepo..stringSanitiseFilename(unitData.bpid).."_icon.png"})
+                    .."\n"
                 end
             end
         end
@@ -192,7 +205,7 @@ end
 function GenerateHomePage()
     local colLimit = 6
 
-    local numMods = #NavigationData
+    local numMods = #NavigationData + (NavigationData[0] and 1 or 0)
     local rows = math.ceil(numMods/colLimit)
     local col = math.floor(numMods / rows)
     local extra = rows - (numMods % rows)
@@ -207,7 +220,7 @@ function GenerateHomePage()
     for i = 1, #cols do
         local homeModNav1, homeModNav2 = '', ''
         for j = modindex+1, modindex+cols[i] do
-            local ModInfo = NavigationData[j].ModInfo
+            local ModInfo = NavigationData[j - (NavigationData[0] and 1 or 0)].ModInfo
 
             homeModNav1 = homeModNav1.."\n"..xml:th{align='center'}(xml:a{href=stringSanitiseFilename(ModInfo.name)}(xml:img{
                 src=ImageRepo..'mods/'..(ModInfo.icon and stringSanitiseFilename(ModInfo.name, true, true) or 'mod')..'.png',

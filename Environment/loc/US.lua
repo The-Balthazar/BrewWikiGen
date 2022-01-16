@@ -84,7 +84,7 @@ wiki_adjacency_part3=". "
 wiki_adjacency_bonus="The adjacency bonus `%s` is given by this unit."
 
 wiki_sect_construction="Construction"
-wiki_builders_note="Build times from the Steam/retail version of the game:"
+wiki_builders_note_steam="Build times from the Steam/retail version of the game:"
 wiki_builders_by="Built by %s"
 
 wiki_sect_orders="Order capabilities"

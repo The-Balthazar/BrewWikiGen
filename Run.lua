@@ -11,6 +11,19 @@ OutputDirectory = "C:/BrewLAN.wiki/"
 
 local WikiGeneratorDirectory = "C:/BrewWikiGen/"
 
+EnvironmentData = {
+    Blueprints = true, --Search env for blueprints
+    GenerateWikiPages = false, --Generate pages for env blueprints
+    --Extra information
+    ConstructionNote = '<LOC wiki_builders_note_steam>Build times from the Steam/retail version of the game:',
+    ExtraData = 'C:/BrewLAN/mods/BrewLAN/documentation/Wiki Data.lua',
+    --Psuedo mod-info for env.
+    name = 'Forged Alliance',
+    author = 'Gas Powered Games',
+    version = '1.6.6',
+    icon = false,
+}
+
 local ModDirectories = { -- In order
     'C:/BrewLAN/mods/BrewLAN/',
     'C:/BrewLAN/mods/BrewLAN_Units/BrewAir/',
@@ -22,13 +35,13 @@ local ModDirectories = { -- In order
     'C:/BrewLAN/mods/BrewLAN_Units/BrewTurrets/',
 }
 
-local WikiExtraData = 'C:/BrewLAN/mods/BrewLAN/documentation/Wiki Data.lua'
-
 -- Optional, reduces scope of file search, which is the slowest part.
 UnitBlueprintsFolder = 'units'
 
 BlueprintFolderExclusions = { -- Excludes folders that match any of these (regex)
     '^[zZ]', --Starts with z or Z
+    '^OP[EC]', --Exclude operation units, like OPE2001
+    '^[UX][ARSE]C', --Exclude civilian units.
 }
 
 BlueprintFileExclusions = { -- Excludes _unit.bp files that match any of these (regex)
@@ -45,7 +58,7 @@ BlueprintIdExclusions = { -- Excludes blueprints with any of these IDs (case ins
     'srl0005',
     'srl0006',
     'ssb2380',
-    'ura0001',
+    'ura0001', --Cybran build effect
 }
 
 -- Web path for img src. Could be relative, but would break on edit previews.
@@ -116,8 +129,9 @@ for i, file in ipairs{
 } do
     safecall(dofile, WikiGeneratorDirectory..file)
 end
-
-safecall(dofile, WikiExtraData)
+if EnvironmentData.ExtraData then
+    safecall(dofile, EnvironmentData.ExtraData)
+end
 safecall(SetWikiLocalization, WikiGeneratorDirectory, Language)
 
 for i, dir in ipairs(ModDirectories) do
@@ -125,7 +139,9 @@ for i, dir in ipairs(ModDirectories) do
     safecall(LoadModHooks, dir)
     safecall(LoadModUnitBlueprints, dir, i)
 end
-safecall(LoadEnvUnitBlueprints, WikiGeneratorDirectory)
+if EnvironmentData.Blueprints then
+    safecall(LoadEnvUnitBlueprints, WikiGeneratorDirectory)
+end
 for i, dir in ipairs(ModDirectories) do
     safecall(LoadModSystemBlueprintsFile, dir)
 end

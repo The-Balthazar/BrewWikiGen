@@ -162,7 +162,8 @@ UnitBodytextSectionData = function(ModInfo, bp)
 
                     return bilst
                 end
-                return LOC("<LOC wiki_builders_note>Build times from the Steam/retail version of the game:")..BuilderList(bp)
+
+                return (EnvironmentData.ConstructionNote and LOC(EnvironmentData.ConstructionNote) or '')..BuilderList(bp)
             end
         },
         {

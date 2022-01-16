@@ -57,6 +57,11 @@ function LoadEnvUnitBlueprints(GeneratorDir)
     for id, bp in GetPairedModUnitBlueprints(GeneratorDir..'Environment') do
         if not all_units[id] then
             all_units[id] = bp
+            bp.ModInfo = EnvironmentData.GenerateWikiPages and EnvironmentData
+            if bp.ModInfo then
+                bp.ModInfo.ModIndex = 0
+            end
+            bp.WikiPage = EnvironmentData.GenerateWikiPages
         end
     end
 end

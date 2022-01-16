@@ -16,6 +16,10 @@ function stringSanitiseFilename(s, lower, nospace)
     return string.gsub(s, WindowsReserved..URIReserved, '')
 end
 
+function stringSanitiseXMLAttribute(s)
+    return string.gsub(s, '"', "''")
+end
+
 function numberFormatNoTrailingZeros(n)
     str = tostring(n)
     return string.sub(str, -2) == '.0' and tonumber(string.sub(str, 1, -3)) or n
@@ -132,7 +136,7 @@ xml = setmetatable({},{
                 end
                 table.sort(sorteddata, function(a, b) return a[1]<b[1] end)
                 for i, v in ipairs(sorteddata) do
-                    attributes = attributes..' '..v[1]..'="'..v[2]..'"'
+                    attributes = attributes..' '..v[1]..'="'..stringSanitiseXMLAttribute(v[2])..'"'
                 end
             end
 
