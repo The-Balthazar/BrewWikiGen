@@ -88,8 +88,9 @@ wiki_balance_dynamic_script="A dynamic balance script changes the stats of this 
 wiki_balance_stats_steam="Displayed stats are from when launched on the steam/retail version of the game."
 wiki_balance_stats_affected="Stats effected are from the %s blueprint sections"
 wiki_balance_stats_affected_singular="Stats effected are from the %s blueprint section"
-wiki_balance_based=" and are based on %s."
-wiki_balance_based_average=" and are based on an average of %s and %s."
+wiki_balance_based=" and are based on %s"
+wiki_balance_based_average=" and are based on an average of %s and %s"
+
 
 wiki_sect_construction="Construction"
 wiki_builders_note_steam="Build times from the Steam/retail version of the game:"

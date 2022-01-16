@@ -21,7 +21,7 @@ UnitBodytextLeadText = function(ModInfo, bp)
 
     local BuildIntroBuild = {
         [0] = LOC('<LOC wiki_intro_build_a> It has no defined build description, and no categories to define common builders.').."\n",
-        [1] = LOC('<LOC wiki_intro_build_b> It has no defined build description.').."<error:buildable unit with no build description>\n",
+        [1] = "\n<p><error:buildable unit with no build description></p>\n",--[[LOC('<LOC wiki_intro_build_b> It has no defined build description.')..]]
         [2] = "\n"..LOC('<LOC wiki_intro_build_c>This unit has no categories to define common builders, however the build description for it is:').."\n\n<blockquote>"..LOC(Description[bp.id] or '').."</blockquote>\n",
         [3] = "\n"..LOC('<LOC wiki_intro_build_d>The build description for this unit is:').."\n\n<blockquote>"..LOC(Description[bp.id] or '').."</blockquote>\n",
     }
@@ -415,7 +415,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
                 for i, enh in ipairs(EnhacementsSorted) do
                     local key = enh[1]
                     local enh = enh[2]
-                    if key ~= 'Slots' and string.sub(key, -6, -1) ~= 'Remove' then
+                    if key ~= 'Slots' and enh.BuildTime and string.sub(key, -6, -1) ~= 'Remove' then
                         text = text..tostring(Infobox{
                             Style = 'detail-left',
                             Header = {enh.Name and LOC(enh.Name) or 'error:name'},
@@ -589,7 +589,21 @@ UnitBodytextSectionData = function(ModInfo, bp)
                     if bp.Veteran[lev] then
                         text = text .. "\n"..i..'. '..bp.Veteran[lev]..' kills gives: '..(bp.Defense and bp.Defense.MaxHealth and iconText('Health', '+'..numberFormatNoTrailingZeros(bp.Defense.MaxHealth / 10 * i) ) or 'error:vet defined and no defense defined' )
                         if bp.Buffs then
+
+                            local sortedBuffs = {}
                             for buffname, buffD in pairs(bp.Buffs) do
+                                if buffname ~= 'Regen' then
+                                    table.insert(sortedBuffs, {buffname, buffD})
+                                end
+                            end
+                            table.sort(sortedBuffs)
+                            if bp.Buffs.Regen then
+                                table.insert(sortedBuffs, 1, {'Regen', bp.Buffs.Regen})
+                            end
+
+                            for i, sortedbuff in ipairs(sortedBuffs) do
+                                local buffname = sortedbuff[1]
+                                local buffD = sortedbuff[2]
                                 if buffD[lev] then
                                     if buffname == 'Regen' then
                                         text = text..' (+'..buffD[lev]..'/s)'
