@@ -395,27 +395,67 @@ UnitBodytextSectionData = function(ModInfo, bp)
             '<LOC wiki_sect_enhancements>Enhancements',
             check = bp.Enhancements,
             Data = function(bp)
-                local EnhacementsSorted = {}
+
+                local EnhNames = {}
+                local GoodEnhancements = {}
+                local NumEnhs = 0
+                local Slots = {}
+
                 for key, enh in pairs(bp.Enhancements) do
-                    local SearchForRquisits
-                    SearchForRquisits = function(enhancements, req)
-                        for key, enh in pairs(enhancements) do
-                            if req == enh.Prerequisite then
-                                table.insert(EnhacementsSorted, {key, enh})
-                                SearchForRquisits(enhancements, key)
-                            end
+                    if key ~= 'Slots' and enh.BuildTime and string.sub(key, -6) ~= 'Remove' then
+
+                        GoodEnhancements[key] = enh
+                        NumEnhs = NumEnhs+1
+                        Slots[enh.Slot] = true
+
+                        if not enh.Prerequisite then
+                            table.insert(EnhNames, key)
                         end
                     end
-                    if not enh.Prerequisite then
-                        table.insert(EnhacementsSorted, {key, enh})
-                        SearchForRquisits(bp.Enhancements, key)
+                end
+                table.sort(EnhNames)
+
+                local SortedSlots = {}
+                for slot, slotname in pairs(Slots) do
+                    table.insert(SortedSlots, slot)
+                end
+                table.sort(SortedSlots)
+
+                local NumSortKeyed = 0
+
+                for i, name in pairs(EnhNames) do
+                    GoodEnhancements[name].SortKey = i*10
+                    NumSortKeyed = NumSortKeyed+1
+                end
+
+                -- Definitely could do this with less loops, but who's counting.
+                while NumSortKeyed < NumEnhs do
+                    for key, enh in pairs(GoodEnhancements) do
+                        if not enh.SortKey and enh.Prerequisite and GoodEnhancements[enh.Prerequisite].SortKey then
+                            enh.SortKey = 0.1 + GoodEnhancements[enh.Prerequisite].SortKey
+                            NumSortKeyed = NumSortKeyed+1
+                        end
                     end
                 end
+
+                local SortedEnhancements = {}
+                for key, enh in pairs(GoodEnhancements) do
+                    SortedEnhancements[enh.Slot] = SortedEnhancements[enh.Slot] or {}
+                    table.insert(SortedEnhancements[enh.Slot], {key, enh})
+                    table.sort(SortedEnhancements[enh.Slot], function(a, b)
+                        return a[2].SortKey < b[2].SortKey
+                    end)
+                end
+
                 local text = ''
-                for i, enh in ipairs(EnhacementsSorted) do
-                    local key = enh[1]
-                    local enh = enh[2]
-                    if key ~= 'Slots' and enh.BuildTime and string.sub(key, -6, -1) ~= 'Remove' then
+                for islot, slot in ipairs(SortedSlots) do
+                    if #SortedSlots > 1 then
+                        text = text..MDHead('<LOC wiki_enhancements_slot_'..slot..'>'..slot, 4)
+                    end
+
+                    for ienh, enhD in ipairs(SortedEnhancements[slot]) do
+                        local key = enhD[1]
+                        local enh = enhD[2]
                         text = text..tostring(Infobox{
                             Style = 'detail-left',
                             Header = {enh.Name and LOC(enh.Name) or 'error:name'},

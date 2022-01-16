@@ -100,7 +100,12 @@ wiki_sect_orders="Order capabilities"
 wiki_orders_note="The following orders can be issued to the unit:"
 
 wiki_sect_engineering="Engineering"
+
 wiki_sect_enhancements="Enhancements"
+wiki_enhancements_slot_LCH="Left Arm"
+wiki_enhancements_slot_Back="Back"
+wiki_enhancements_slot_RCH="Right Arm"
+
 wiki_sect_transport="Transport capacity"
 wiki_sect_weapons="Weapons"
 wiki_sect_vet="Veteran levels"
