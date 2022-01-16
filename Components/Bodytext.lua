@@ -94,6 +94,33 @@ UnitBodytextSectionData = function(ModInfo, bp)
             end
         },
         {
+            '<LOC wiki_sect_balance>Balance',
+            check = bp.WikiBalance,
+            Data = function(bp)
+                local text = EnvironmentData.BalanceNote and LOC('<LOC wiki_balance_dynamic_script>A dynamic balance script changes the stats of this unit on game launch based on the stats of other units.') or ''
+
+                if bp.WikiBalance.Affects then
+                    text = (text ~= '' and text..' ' or '')..string.format(LOC((#bp.WikiBalance.Affects == 1) and
+                        '<LOC wiki_balance_stats_affected_singular>Stats effected are from the %s blueprint section' or
+                        '<LOC wiki_balance_stats_affected>Stats effected are from the %s blueprint sections'
+                    ), stringConcatOxfordComma(bp.WikiBalance.Affects, xml:code{}))
+
+                    if bp.WikiBalance.ReferenceIDs then
+                        local refNum = #bp.WikiBalance.ReferenceIDs
+
+                        text = text..string.format(LOC(refNum == 1 and '<LOC wiki_balance_based> and are based on %s' or
+                        refNum == 2 and '<LOC wiki_balance_based_average> and are based on an average of %s and %s'),
+                        unitDescLink(bp.WikiBalance.ReferenceIDs[1]),
+                        unitDescLink(bp.WikiBalance.ReferenceIDs[2]))
+                    end
+
+                    text = text..".\n\n"
+                end
+
+                return text..(EnvironmentData.BalanceNote and LOC(EnvironmentData.BalanceNote) or '')
+            end
+        },
+        {
             '<LOC wiki_sect_construction>Construction',
             check = bp.Economy and (bp.BuiltByCategories or arraySubFind(bp.Categories, 'BUILTBY')),
             Data = function(bp)

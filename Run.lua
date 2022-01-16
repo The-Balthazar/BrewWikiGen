@@ -16,6 +16,7 @@ EnvironmentData = {
     GenerateWikiPages = false, --Generate pages for env blueprints
     --Extra information
     ConstructionNote = '<LOC wiki_builders_note_steam>Build times from the Steam/retail version of the game:',
+    BalanceNote = '<LOC wiki_balance_stats_steam>Displayed stats are from when launched on the steam/retail version of the game.',
     ExtraData = 'C:/BrewLAN/mods/BrewLAN/documentation/Wiki Data.lua',
     --Psuedo mod-info for env.
     name = 'Forged Alliance',

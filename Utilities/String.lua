@@ -33,12 +33,23 @@ function pluralS(n) return n ~= 1 and 's' or '' end
 
 function pageLink(page,text)
     local bp = getBP(page)
-    if (bp and not bp.WikiPage) then
-        return text
+    if not bp or (bp and not bp.WikiPage) then
+        return text or page
     else
         return xml:a{href=stringSanitiseFilename(page)} (text or page)
     end
 end
+
+function unitDescLink(id)
+    local bp = getBP(id)
+    if bp and not bp.WikiPage then
+        return bp.unitTdesc
+    elseif bp and bp.WikiPage then
+        return xml:a{href=stringSanitiseFilename(id)} (bp.unitTdesc or id)
+    end
+    return id and xml:code(id) or nil
+end
+
 function sectionLink(section, text) return xml:a{href='#'..stringSanitiseFilename(section,1,1)}(text or section) end
 
 --------------------------------------------------------------------------------
@@ -97,6 +108,22 @@ function stringConcatLB(args)
     if #args == 1 then s = args[1] else
         for i, v in ipairs(args) do
             s = s.."\n"..v
+        end
+    end
+    return s
+end
+
+function stringConcatOxfordComma(args, toeach)
+    local s = ''
+    if #args == 1 then s = toeach and toeach(args[1]) or args[1] else
+        for i, v in ipairs(args) do
+            if s ~= '' then
+                s = s..', '
+            end
+            if i == #args then
+                s = s..'and '
+            end
+            s = s..(toeach and toeach(v) or v)
         end
     end
     return s

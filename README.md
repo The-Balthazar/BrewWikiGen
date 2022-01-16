@@ -44,8 +44,19 @@ are located in. Include a slash at the end.
   * `name` (lowercase) is how it refers to the environment in navigation.
   * `author`, `version`, and `icon` (all lowercase) are all used in the 'mod page'
     for the environment.
-  * `ConstructionNote` appears at the top of Construction sections in unit pages
-    if it's a string.
+  * `ConstructionNote` appears at the top of Construction sections in unit pages.
+    It can be set to false or removed.
+  * `BalanceNote` appears at the bottom of Balance sections if they exist. It can
+    be set to false or removed. The section will only appear on pages for blueprints
+    that have `bp.WikiBalance` be truthy. The auto generated content of balance
+    requires `bp.WikiBalance.Affects`; expected to contain an array of blueprint
+    sections affected by the script, and optionally `bp.WikiBalance.ReferenceIDs`;
+    expected to be an array containing 1 or 2 unit ID's, with it assuming the result
+    is an average if both are defined.
+
+    The section would be devoid of generated content if `BalanceNote` evaluates
+    false and `bp.WikiBalance` evaluates true, but has none of the expected content.
+    This would allow you to fill it with your own content as detailed in `ExtraData`.
   * `ExtraData` can point to an optional extra document of hand written content
     for specific sections of specific unit pages. It expects said document to be
     formatted as a `UnitData` table, keyed with unit IDs (upper case, or however
