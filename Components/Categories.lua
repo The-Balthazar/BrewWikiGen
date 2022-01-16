@@ -24,11 +24,13 @@ function UnitPageCategories(ModInfo, UnitInfo, bpCatHash)
                 cattext = cattext..' · '
             end
 
-            cattext = cattext..'<a href="_categories.'..cat..'">'..cat..'</a>'
+            cattext = cattext.."\n"..xml:a{href='_categories.'..stringSanitiseFilename(cat)}(cat)
         end
     end
     if cattext ~= '' then
-        cattext = "\n<table align=center>\n<td>Categories : "..cattext
+        cattext = "\n"..xml:table{align='center'}(
+            xml:td{width='1215px'}('Categories : '..cattext),''
+        )
     end
     return cattext
 end
