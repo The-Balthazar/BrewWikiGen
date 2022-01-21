@@ -143,7 +143,7 @@ function GenerateModPages()
             Style = 'main-right',
             Header = {
                 moddata.ModInfo.name,
-                '<img src="'..ImageRepo..'mods/'..(moddata.ModInfo.icon and stringSanitiseFilename(moddata.ModInfo.name, true, true) or 'mod')..'.png" width="256px" />'
+                '<img src="'..ImagesPath..'mods/'..(moddata.ModInfo.icon and stringSanitiseFilename(moddata.ModInfo.name, true, true) or 'mod')..'.png" width="256px" />'
             },
             Data = {
                 { 'Author:', moddata.ModInfo.author },
@@ -187,7 +187,7 @@ function GenerateModPages()
                     mulString = mulString .. xml:a{
                         href=stringSanitiseFilename(unitData.bpid),
                         title=stringSanitiseXMLAttribute(unitData.name or unitData.bpid)
-                    }(xml:img{src=unitIconRepo..stringSanitiseFilename(unitData.bpid).."_icon.png"})
+                    }(xml:img{src=unitIconsPath..stringSanitiseFilename(unitData.bpid).."_icon.png"})
                     .."\n"
                 end
             end
@@ -223,7 +223,7 @@ function GenerateHomePage()
             local ModInfo = NavigationData[j - (NavigationData[0] and 1 or 0)].ModInfo
 
             homeModNav1 = homeModNav1.."\n"..xml:th{align='center'}(xml:a{href=stringSanitiseFilename(ModInfo.name)}(xml:img{
-                src=ImageRepo..'mods/'..(ModInfo.icon and stringSanitiseFilename(ModInfo.name, true, true) or 'mod')..'.png',
+                src=ImagesPath..'mods/'..(ModInfo.icon and stringSanitiseFilename(ModInfo.name, true, true) or 'mod')..'.png',
                 title=stringSanitiseFilename(ModInfo.name)
             }))
 

@@ -54,9 +54,9 @@ function GenerateCategoryPages()
 
                 s = s..
                 '    '..xml:tr(
-                '        '..xml:td(xml:a{href=data.UnitInfo.bpid}(xml:img{src=unitIconRepo..data.UnitInfo.bpid..'_icon.png', width='21px'})),
+                '        '..xml:td(xml:a{href=data.UnitInfo.bpid}(xml:img{src=unitIconsPath..data.UnitInfo.bpid..'_icon.png', width='21px'})),
                 '        '..xml:td(xml:code{}(string.lower(data.UnitInfo.bpid))),
-                '        '..xml:td(xml:a{href=stringSanitiseFilename(data.ModInfo.name)}(xml:img{src=IconRepo..'mods/'..(data.ModInfo.icon and stringSanitiseFilename(data.ModInfo.name, true, true) or 'mod')..'.png', width='21px'})),
+                '        '..xml:td(xml:a{href=stringSanitiseFilename(data.ModInfo.name)}(xml:img{src=IconsPath..'mods/'..(data.ModInfo.icon and stringSanitiseFilename(data.ModInfo.name, true, true) or 'mod')..'.png', width='21px'})),
                 '        '..xml:td(xml:a{href=data.UnitInfo.bpid}(switch[BinaryCounter{data.UnitInfo.name, data.UnitInfo.desc}])),
                 '    ').."\n"
             end

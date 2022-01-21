@@ -69,9 +69,9 @@ BlueprintIdExclusions = { -- Excludes blueprints with any of these IDs (case ins
 }
 
 -- Web path for img src. Could be relative, but would break on edit previews.
-ImageRepo = "/The-Balthazar/BrewLAN/wiki/images/"
-IconRepo = "/The-Balthazar/BrewLAN/wiki/icons/"
-unitIconRepo = IconRepo.."units/" --[unit blueprintID]_icon.png, case sensitive.
+ImagesPath = "images/"
+IconsPath = "icons/"
+unitIconsPath = IconsPath.."units/" --[unit blueprintID]_icon.png, case sensitive.
 
 FooterCategories = { -- In order
     'UEF',          'AEON',         'CYBRAN',       'SERAPHIM',

@@ -21,7 +21,7 @@ local function UnitInfobox(ModInfo, bp)
         Header = {string.format(
             '<img align="left" title="%s unit icon" src="%s_icon.png" />%s<br />%s',
             (LOC(bp.General.UnitName) or 'The'),
-            unitIconRepo..bp.ID,
+            unitIconsPath..bp.ID,
             (LOC(bp.General.UnitName) or '<i>Unnamed</i>'),
             (bp.unitTdesc or [[<i>No description</i>]])
         )},

@@ -205,7 +205,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
                         local Tip = Tooltips[Order.helpText] or {title = 'error:'..Order.helpText..' no title'}
                         returnstring = xml:img{
                             float = 'left',
-                            src = IconRepo..'orders/'..string.lower(Order.bitmapId)..'.png',
+                            src = IconsPath..'orders/'..string.lower(Order.bitmapId)..'.png',
                             title = LOC(Tip.title or '')..(Tip.description and Tip.description ~= '' and "\n"..LOC(Tip.description) or '')
                         }
                     end
@@ -371,11 +371,11 @@ UnitBodytextSectionData = function(ModInfo, bp)
                                 if group[1] then
                                     local trows = math.ceil(#group/maxcols)
                                     for trow = 1, trows do
-                                        local tdtext = "\n"..(trow == 1 and '        '..xml:td{rowspan=trows~=1 and trows or nil}(xml:img{src=IconRepo..'T'..i..'.png', title='T'..i}).."\n" or '')
+                                        local tdtext = "\n"..(trow == 1 and '        '..xml:td{rowspan=trows~=1 and trows or nil}(xml:img{src=IconsPath..'T'..i..'.png', title='T'..i}).."\n" or '')
                                         for coli = 1, maxcols do
                                             local buildbp = group[maxcols*(trow-1)+coli]
                                             if buildbp then
-                                                tdtext = tdtext..'        '..xml:td( pageLink(buildbp.ID, xml:img{src=unitIconRepo..buildbp.ID..'_icon.png', width='64px'}) ).."\n"
+                                                tdtext = tdtext..'        '..xml:td( pageLink(buildbp.ID, xml:img{src=unitIconsPath..buildbp.ID..'_icon.png', width='64px'}) ).."\n"
                                             end
                                         end
                                         trtext = trtext..'    '..xml:tr(tdtext..'    ').."\n"
