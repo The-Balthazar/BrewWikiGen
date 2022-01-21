@@ -8,14 +8,19 @@ local LocalizedStrings = {}
 local function LoadLocalizationFile(FileLocation)
     local good, loc = pcall(GetSandboxedLuaFile, FileLocation)
     if good then
+        if Logging.LocalisationLoaded then print("  Preloading LOC "..FileLocation) end
         for k, v in pairs(loc) do
             LocalizedStrings[k] = v
         end
-    end
+    elseif Logging.LocalisationLoaded then print("  Failed to preload LOC "..FileLocation) end
+end
+
+function LoadLocalization(ModDirectory)
+    LoadLocalizationFile(ModDirectory..'loc/'..Language..'/strings_db.lua')
 end
 
 function LoadModLocalization(ModDirectory)
-    LoadLocalizationFile(ModDirectory..'hook/loc/'..Language..'/strings_db.lua')
+    LoadLocalization(ModDirectory..'hook/')
 end
 
 function SetWikiLocalization(WikiDirectory, lang)

@@ -36,9 +36,9 @@ UnitBodytextSectionData = function(ModInfo, bp)
             '<LOC wiki_sect_abilities>Abilities',
             check = bp.Display and bp.Display.Abilities and #bp.Display.Abilities > 0,
             Data = function(bp)
-                local text = LOC('<LOC wiki_abilities_hover_note>Hover over abilities to see effect descriptions.').."\n"
+                local text = WikiOptions.AbilityDescriptions and LOC('<LOC wiki_abilities_hover_note>Hover over abilities to see effect descriptions.').."\n" or ''
                 for i, ability in ipairs(bp.Display.Abilities) do
-                    text = text.."\n*"..abilityTitle(ability)
+                    text = text.."\n*"..(WikiOptions.AbilityDescriptions and abilityTitle(ability) or ' '..LOC(ability))
                 end
                 return text
             end
@@ -97,7 +97,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
             '<LOC wiki_sect_balance>Balance',
             check = bp.WikiBalance,
             Data = function(bp)
-                local text = EnvironmentData.BalanceNote and LOC('<LOC wiki_balance_dynamic_script>A dynamic balance script changes the stats of this unit on game launch based on the stats of other units.') or ''
+                local text = WikiOptions.BalanceNote and LOC('<LOC wiki_balance_dynamic_script>A dynamic balance script changes the stats of this unit on game launch based on the stats of other units.') or ''
 
                 if bp.WikiBalance.Affects then
                     text = (text ~= '' and text..' ' or '')..string.format(LOC((#bp.WikiBalance.Affects == 1) and
@@ -117,7 +117,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
                     text = text..".\n\n"
                 end
 
-                return text..(EnvironmentData.BalanceNote and LOC(EnvironmentData.BalanceNote) or '')
+                return text..(WikiOptions.BalanceNote and LOC(WikiOptions.BalanceNote) or '')
             end
         },
         {
@@ -190,7 +190,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
                     return bilst
                 end
 
-                return (EnvironmentData.ConstructionNote and LOC(EnvironmentData.ConstructionNote) or '')..BuilderList(bp)
+                return (WikiOptions.ConstructionNote and LOC(WikiOptions.ConstructionNote) or '')..BuilderList(bp)
             end
         },
         {

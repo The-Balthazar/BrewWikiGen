@@ -112,19 +112,22 @@ defaultOrdersTable = {
 Description = {}
 
 Tooltips = {
+    -- These two don't have entries on the default table
+    mode                        = { title = "Fire State",                                           description = "" },
+    call_transport              = { title = "Call Transport",                                       description = "Load into or onto another unit" },
+
+    -- These could be deleted if you're importing env tooltips.
     move                        = { title = "<LOC tooltipui0000>Move",                              description = "" },
     attack                      = { title = "<LOC tooltipui0002>Attack",                            description = "" },
     patrol                      = { title = "<LOC tooltipui0004>Patrol",                            description = "" },
     stop                        = { title = "<LOC tooltipui0006>Stop",                              description = "" },
     assist                      = { title = "<LOC tooltipui0008>Assist",                            description = "" },
-    mode                        = { title = "Fire State",                                           description = "" },
     build_tactical              = { title = "<LOC tooltipui0012>Build Missile",                     description = "<LOC tooltipui0013>Right-click to toggle Auto-Build" },
     build_tactical_auto         = { title = "<LOC tooltipui0335>Build Missile (Auto)",              description = "<LOC tooltipui0336>Auto-Build Enabled" },
     build_nuke                  = { title = "<LOC tooltipui0014>Build Strategic Missile",           description = "<LOC tooltipui0015>Right-click to toggle Auto-Build" },
     build_nuke_auto             = { title = "<LOC tooltipui0337>Build Strategic Missile (Auto)",    description = "<LOC tooltipui0338>Auto-Build Enabled" },
     overcharge                  = { title = "<LOC tooltipui0016>Overcharge",                        description = "" },
     transport                   = { title = "<LOC tooltipui0018>Transport",                         description = "" },
-    call_transport              = { title = "Call Transport",                                       description = "Load into or onto another unit" },
     fire_nuke                   = { title = "<LOC tooltipui0020>Launch Strategic Missile",          description = "" },
     fire_billy                  = { title = "<LOC tooltipui0664>Launch Advanced Tactical Missile",  description = "" },
     build_billy                 = { title = "<LOC tooltipui0665>Build Advanced Tactical Missile",   description = "<LOC tooltipui0013>" },

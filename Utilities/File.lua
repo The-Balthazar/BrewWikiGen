@@ -2,9 +2,10 @@
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
 -- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
 --------------------------------------------------------------------------------
-function GetSandboxedLuaFile(file)
-    local env = {}
-    loadfile(file, 'bt', env)()
+function GetSandboxedLuaFile(file, env)
+    local env = env or {}
+    local chunk = loadfile(file, 'bt', env)
+    if chunk then chunk() end
     return env
 end
 
@@ -40,8 +41,7 @@ function GetExecutableSandboxedLuaFile(file)
         type = type,
     }
     env.table.find = arrayFind
-    local chunk = loadfile(file, 'bt', env)
-    if chunk then chunk() end
+    GetSandboxedLuaFile(file, env)
     return env
 end
 
@@ -55,17 +55,21 @@ function GetModInfo(dir)
     return assert(modinfo, LogEmoji('⚠️').." Failed to load "..dir.."mod_info.lua")
 end
 
-function LoadModHooks(ModDirectory)
+function LoadHelpStrings(dir)
     local log = '  Preloading: '
-    for name, fileDir in pairs({
-        ['Build descriptions'] = 'hook/lua/ui/help/unitdescription.lua',
-        ['Tooltips']           = 'hook/lua/ui/help/tooltips.lua',
-    }) do
-        log = log..' '..name..' '..(pcall(dofile, ModDirectory..fileDir) and LogEmoji('🆗') or LogEmoji('❌'))
+    for name, data in pairs{
+        ['Build descriptions'] = {Path = 'lua/ui/help/unitdescription.lua', Output = 'Description'},
+        ['Tooltips']           = {Path = 'lua/ui/help/tooltips.lua',        Output = 'Tooltips'   },
+    } do
+        local env = GetSandboxedLuaFile(dir..data.Path, {[data.Output]={}})
+        tableMergeCopy(_G[data.Output], env[data.Output])
+        log = log..' '..name..' '..(next(env[data.Output]) and LogEmoji('🆗') or LogEmoji('❌'))
     end
-    if Logging.ModHooksLoaded then
-        print(log)
-    end
+    if Logging.HelpStringsLoaded then print(log) end
+end
+
+function LoadModHelpStrings(ModDirectory)
+    LoadHelpStrings(ModDirectory..'hook/')
 end
 
 function GetDirFromShellLnk(lnk)

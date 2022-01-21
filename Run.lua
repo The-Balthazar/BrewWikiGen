@@ -14,15 +14,21 @@ local WikiGeneratorDirectory = "C:/BrewWikiGen/"
 EnvironmentData = {
     Blueprints = true, --Search env for blueprints
     GenerateWikiPages = false, --Generate pages for env blueprints
-    --Extra information
-    ConstructionNote = '<LOC wiki_builders_note_steam>Build times from the Steam/retail version of the game:',
-    BalanceNote = '<LOC wiki_balance_stats_steam>Displayed stats are from when launched on the steam/retail version of the game.',
+
+    Lua = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
+    LOC = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
     ExtraData = 'C:/BrewLAN/mods/BrewLAN/documentation/Wiki Data.lua',
-    --Psuedo mod-info for env.
+    -- Psuedo mod-info for env.
     name = 'Forged Alliance',
     author = 'Gas Powered Games',
     version = '1.6.6',
     icon = false,
+}
+
+WikiOptions = {
+    ConstructionNote = '<LOC wiki_builders_note_steam>Build times from the Steam/retail version of the game:',
+    BalanceNote = '<LOC wiki_balance_stats_steam>Displayed stats are from when launched on the steam/retail version of the game.',
+    AbilityDescriptions = true,
 }
 
 local ModDirectories = { -- In order
@@ -88,7 +94,8 @@ FooterCategories = { -- In order
 
 Logging = {
     LogEmojiSupported  = false,
-    ModHooksLoaded     = false,
+    LocalisationLoaded = false,
+    HelpStringsLoaded  = false,
     LuaFileLoadIssues  = true,
     SCMLoadIssues      = false,
     ExcludedBlueprints = false,
@@ -103,7 +110,6 @@ Sanity = {
 --[[ ---------------------------------------------------------------------- ]]--
 --[[ Run                                                                    ]]--
 --[[ ---------------------------------------------------------------------- ]]--
-
 local function safecall(...)
     local pass, msg = pcall(...)
     if not pass then print(msg) end
@@ -111,6 +117,9 @@ end
 
 print("Starting BrewWikiGen")
 
+--[[ ---------------------------------------------------------------------- ]]--
+--[[ Load generator                                                         ]]--
+--[[ ---------------------------------------------------------------------- ]]--
 for i, file in ipairs{
     'Environment/Localization.lua',
     'Environment/Game.lua',
@@ -130,23 +139,36 @@ for i, file in ipairs{
 } do
     safecall(dofile, WikiGeneratorDirectory..file)
 end
-if EnvironmentData.ExtraData then
-    safecall(dofile, EnvironmentData.ExtraData)
-end
-safecall(SetWikiLocalization, WikiGeneratorDirectory, Language)
 
+--[[ ---------------------------------------------------------------------- ]]--
+--[[ Load data                                                              ]]--
+--[[ ---------------------------------------------------------------------- ]]--
+-- Wiki data
+safecall(SetWikiLocalization, WikiGeneratorDirectory, Language)
+if EnvironmentData.ExtraData  then safecall(dofile,           EnvironmentData.ExtraData) end
+
+-- Env data
+if EnvironmentData.LOC        then safecall(LoadLocalization, EnvironmentData.LOC) end
+if EnvironmentData.Lua        then safecall(LoadHelpStrings,  EnvironmentData.Lua) end
+if EnvironmentData.Blueprints then safecall(LoadEnvUnitBlueprints, WikiGeneratorDirectory) end
+
+-- Mod data
 for i, dir in ipairs(ModDirectories) do
     safecall(LoadModLocalization, dir) -- Load all localisation first.
-    safecall(LoadModHooks, dir)
+    safecall(LoadModHelpStrings, dir)
     safecall(LoadModUnitBlueprints, dir, i)
 end
-if EnvironmentData.Blueprints then
-    safecall(LoadEnvUnitBlueprints, WikiGeneratorDirectory)
-end
+
+--[[ ---------------------------------------------------------------------- ]]--
+--[[ Pre-compute data                                                       ]]--
+--[[ ---------------------------------------------------------------------- ]]--
 for i, dir in ipairs(ModDirectories) do
     safecall(LoadModSystemBlueprintsFile, dir)
 end
 
+--[[ ---------------------------------------------------------------------- ]]--
+--[[ Generate wiki                                                          ]]--
+--[[ ---------------------------------------------------------------------- ]]--
 safecall(GenerateUnitPages)
 safecall(GenerateSidebar)
 safecall(GenerateModPages)
