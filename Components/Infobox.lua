@@ -7,7 +7,7 @@ GetUnitInfoboxData = function(ModInfo, bp)
     return {
         {bp.WikiInfoboxNote and '', bp.WikiInfoboxNote and LOC(bp.WikiInfoboxNote)..(bp.WikiBalance and detailsLink('<LOC wiki_sect_balance>Balance') or '')},
         ----
-        {'<LOC wiki_infobox_mod_source>'..'Source:',    xml:a{href=stringSanitiseFilename(ModInfo.name)}(ModInfo.name)},
+        {'<LOC wiki_infobox_mod_source>'..'Source:',    xml:a{href=(stringSanitiseFilename(ModInfo.name))}(stringHTMLWrap(ModInfo.name, 20))},
         {'<LOC wiki_infobox_unitid>'    ..'Unit ID:',   xml:code(bp.id)},
         {'<LOC wiki_infobox_faction>'   ..'Faction:',   (bp.General and bp.General.FactionName)},
         {'<LOC wiki_infobox_tech>'      ..'Tech level:', iconText(bp.unitTIndex, bp.unitTIndex and bp.unitTIndex..(bp.unitTIndex == 4 and ' (Experimental)' or '')) },

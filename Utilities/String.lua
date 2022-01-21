@@ -52,6 +52,26 @@ end
 
 function sectionLink(section, text) return xml:a{href='#'..stringSanitiseFilename(section,1,1)}(text or section) end
 
+function stringHTMLWrap(s, limit)
+    if not (s and limit) then return s end
+    local l = string.len(s)
+
+    if l > limit then
+        local len = string.match(s, "(%S+)"):len()
+        -- not just returning gsub because we don't want it to return the number of replacements.
+        s = string.gsub(s, "(%s+)(%S+)", function(space, word)
+            len = len+1+(word):len()
+            if len > limit then
+                len = 0
+                return '<br />'..word
+            else
+                return space..word
+            end
+        end)
+    end
+    return s
+end
+
 --------------------------------------------------------------------------------
 
 function iconText(icon, text, text2)
