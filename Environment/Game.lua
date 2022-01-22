@@ -27,6 +27,8 @@ FactionCategoryIndexes = {
     OTHER = 5,
 }
 
+function FactionFromFactionCategory(cat) return FactionsByIndex[ FactionCategoryIndexes[cat or 'OTHER'] ] end
+
 LayerBits = {
     Land   = 1,
     Seabed = 2,

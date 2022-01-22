@@ -6,9 +6,11 @@ local function Binary2bit(a,b) return (a and 2 or 0) + (b and 1 or 0) end
 
 UnitBodytextLeadText = function(ModInfo, bp)
 
+    local faction = FactionFromFactionCategory(bp.FactionCategory)
+
     local bodytext = (bp.General.UnitName and '"'..LOC(bp.General.UnitName)..'" is a' or 'This unamed unit is a')
-    ..(bp.General and bp.General.FactionName and string.upper(string.sub(bp.General.FactionName, 1, 1)) == 'A' and 'n ' or ' ')
-    ..(bp.General and bp.General.FactionName and bp.General.FactionName..' ' or 'factionless ')
+    ..(faction and string.upper(string.sub(faction, 1, 1)) == 'A' and 'n ' or ' ')
+    ..(faction and faction..' ' or 'factionless ')
     ..(bp.Physics.MotionType and motionTypes[bp.Physics.MotionType][1] or 'structure')..' unit included in *'..ModInfo.name.."*.\n"
 
     local BuildIntroTDesc = {
@@ -165,7 +167,15 @@ UnitBodytextSectionData = function(ModInfo, bp)
                     for tech, group in ipairs(MenuSortUnitsByTech(builderunits)) do
                         for i, builderbp in ipairs(group) do
                             if builderbp.id ~= 'ssl0403' or bp.Wreckage or bp.CategoriesHash.RECLAIMABLE then
-                                bilst = bilst..BuildByBulletPoint(bp, pageLink(builderbp.ID, builderbp.unitTdesc), builderbp.Economy.BuildRate, UpgradesFrom(bp, builderbp))
+                                bilst = bilst..BuildByBulletPoint(bp,
+                                    pageLink(
+                                        builderbp.ID,
+                                        -- For more context, it will include the name if it exists when no page will be linked to.
+                                        (builderbp.General.UnitName and not builderbp.WikiPage and ('"'..LOC(builderbp.General.UnitName)..'": ') or '')..builderbp.unitTdesc
+                                    ),
+                                    builderbp.Economy.BuildRate,
+                                    UpgradesFrom(bp, builderbp)
+                                )
                             end
                             builderunits[builderbp.id] = nil
                         end
