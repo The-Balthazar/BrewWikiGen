@@ -81,16 +81,28 @@ function InsertInNavigationData(bp)
     table.insert(NavigationData[index].Factions[factioni], UnitInfo)
 end
 
+local function printif(check, ...) if check then print(...) end end
+
 local function UpdateGeneratedPartOfPage(page, tag, content)
     local md = io.open(OutputDirectory..page, "r")
     local mdstring = md and md:read('a')
     pcall(io.close,md)
 
+    if mdstring and string.find( mdstring, '<'..tag..' />' ) then
+        return printif(Logging.ChangeDiscarded, "Found empty tag <"..tag.." /> discarding generation for section in "..page)
+    end
+
+    local openTagFound = mdstring and string.find( mdstring, '<'..tag..'>' )
+
+    if openTagFound then printif(Logging.FileUpdateWrites, "Found existing tag <"..tag.."> updating in "..page)
+    elseif mdstring then printif(Logging.FileAppendWrites, "No <"..tag.."> tags found, appending content to "..page)
+    else                 printif(Logging.NewFileWrites, "Generating fresh "..page)
+    end
+
     content = '<'..tag..">\n"..content..'</'..tag..'>'
 
     io.open(OutputDirectory..page, "w"):write(
-        mdstring and string.find( mdstring, '<'..tag..'>' )
-        and string.gsub( mdstring, '<'..tag..'>.*</'..tag..'>', content )
+        openTagFound and string.gsub( mdstring, '<'..tag..'>.*</'..tag..'>', content )
         or mdstring and mdstring.."\n"..content.."\n"
         or content
     ):close()
@@ -143,20 +155,22 @@ function GenerateModPages()
             Style = 'main-right',
             Header = {
                 moddata.ModInfo.name,
-                '<img src="'..ImagesPath..'mods/'..(moddata.ModInfo.icon and stringSanitiseFilename(moddata.ModInfo.name, true, true) or 'mod')..'.png" width="256px" />'
+                xml:img{src=ImagesPath..'mods/'..(moddata.ModInfo.icon and stringSanitiseFilename(moddata.ModInfo.name, true, true) or 'mod')..'.png', width='256px'}
             },
             Data = {
                 { 'Author:', moddata.ModInfo.author },
                 { 'Version:', moddata.ModInfo.version },
                 {''},
-                {'', "<strong>Unit counts:</strong>" }
+                {'', xml:strong('Unit counts:') }
             }
         }
 
-        local mulString = '***'..moddata.ModInfo.name..'*** is'..(modindex ~= 0 and' a mod' or '')..' by '..(moddata.ModInfo.author or 'an unknown author')..'.'
+        local leadString = "\n***"..moddata.ModInfo.name..'*** is'..(modindex ~= 0 and' a mod' or '')..' by '..(moddata.ModInfo.author or 'an unknown author')..'.'
         ..(moddata.ModInfo.description and " Its mod menu description is:\n"
-        .."<blockquote>"..(moddata.ModInfo.description or 'No description.').."</blockquote>\n" or ' ')..(moddata.ModInfo.version and "Version "
+        ..xml:blockquote(moddata.ModInfo.description).."\n" or ' ')..(moddata.ModInfo.version and "Version "
         ..moddata.ModInfo.version or 'It').." contains the following units:\n"
+
+        local unitsSection = ''
 
         for i = 1, #FactionsByIndex do
             local faction = FactionsByIndex[i]
@@ -175,16 +189,16 @@ function GenerateModPages()
                     'Other',
                 }
 
-                mulString = mulString .. MDHead(faction,2)
+                unitsSection = unitsSection .. MDHead(faction,2)
 
                 for unitI, unitData in ipairs(unitarray) do
                     local tech = unitData.tech or 5
                     if tech > curtechi then
                         curtechi = tech
-                        mulString = mulString ..MDHead(TechNames[tech])
+                        unitsSection = unitsSection ..MDHead(TechNames[tech])
                     end
 
-                    mulString = mulString .. xml:a{
+                    unitsSection = unitsSection .. xml:a{
                         href=stringSanitiseFilename(unitData.bpid),
                         title=stringSanitiseXMLAttribute(unitData.name or unitData.bpid)
                     }(xml:img{src=unitIconsPath..stringSanitiseFilename(unitData.bpid).."_icon.png"})
@@ -195,8 +209,11 @@ function GenerateModPages()
 
         table.insert(ModInfobox.Data, { 'Total:', tableSubcount(moddata.Factions) })
 
-        md = io.open(OutputDirectory..stringSanitiseFilename(moddata.ModInfo.name)..'.md', "w"):write(tostring(ModInfobox)..mulString):close()
+        local MDPageName = stringSanitiseFilename(moddata.ModInfo.name)..'.md'
 
+        UpdateGeneratedPartOfPage(MDPageName, 'brewwikimodinfobox', tostring(ModInfobox))
+        UpdateGeneratedPartOfPage(MDPageName, 'brewwikileadtext', leadString)
+        UpdateGeneratedPartOfPage(MDPageName, 'brewwikimodunits', unitsSection)
     end
 
     print("Generated "..#NavigationData.." mod pages")

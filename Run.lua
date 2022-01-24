@@ -94,13 +94,20 @@ FooterCategories = { -- In order
 
 Logging = {
     LogEmojiSupported  = false,
+
     LocalisationLoaded = false,
     HelpStringsLoaded  = false,
     LuaFileLoadIssues  = true,
     SCMLoadIssues      = false,
+    SandboxedFileLogs  = false,
+
     ExcludedBlueprints = false,
     BlueprintTotals    = true,
-    SandboxedFileLogs  = true,
+
+    ChangeDiscarded    = true,
+    NewFileWrites      = true,
+    FileAppendWrites   = true,
+    FileUpdateWrites   = false,
 }
 Sanity = {
     BlueprintChecks         = false,
