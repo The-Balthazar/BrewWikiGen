@@ -143,14 +143,22 @@ which can be interesting or helpful in the case of any issues.
 that I consider anomalous or unnecessary. Exercise discretion when taking its advice.
 
 ## Usage notes:
-### Home and sidebar:
-If you have a pre-existing `Home.md` or `_Sidebar.md` page in your wiki, you can
-specify where within those pages you want the generator to output by using the
-xml tags `<brewwikihome></brewwikihome>` and `<brewwikisidebar></brewwikisidebar>`
-respectively, otherwise it will append said content, tags included to the end.
-If you do not wish it to generate one or both of those pages at all, comment out
-or remove the lines `safecall(GenerateHomePage)` and/or `safecall(GenerateSidebar)`
-from your updated `Run.lua`.
+If you have pre-existing pages for `Home.md`, `_Sidebar.md` or mods in your wiki
+you can specify where and if the generator outputs in those pages. This is done
+through specific xml tags read by the generator.
+
+Behaviours on these pages are; if matching opening and closing tags exist (`<tag>`
+and `</tag>`) it will replace the contents with the new generation, if an empty
+tag exists (`<tag />` with the space) it will specifically not write that section,
+otherwise it appends the content to the end surrounded by matching opening and
+closing tags.
+
+Tags are:
+* `<brewwikihome>` for the mod navigation for `Home.md`.
+* `<brewwikisidebar>` for the mod drop downs for `_Sidebar.md`.
+* `<brewwikimodinfobox>` for the infobox on mod pages.
+* `<brewwikileadtext>` for the lead text on mod pages.
+* `<brewwikimodunits>` for the unit navigation images on mod pages.
 
 ### Blueprints.lua:
 If you have content generated in `Blueprints.lua` that would be important to the

@@ -92,9 +92,9 @@ local function UpdateGeneratedPartOfPage(page, tag, content)
         return printif(Logging.ChangeDiscarded, "Found empty tag <"..tag.." /> discarding generation for section in "..page)
     end
 
-    local openTagFound = mdstring and string.find( mdstring, '<'..tag..'>' )
+    local tagsFound = mdstring and string.find( mdstring, '<'..tag..'>.*</'..tag..'>' )
 
-    if openTagFound then printif(Logging.FileUpdateWrites, "Found existing tag <"..tag.."> updating in "..page)
+    if tagsFound then    printif(Logging.FileUpdateWrites, "Found existing tag <"..tag.."> updating in "..page)
     elseif mdstring then printif(Logging.FileAppendWrites, "No <"..tag.."> tags found, appending content to "..page)
     else                 printif(Logging.NewFileWrites, "Generating fresh "..page)
     end
@@ -102,7 +102,7 @@ local function UpdateGeneratedPartOfPage(page, tag, content)
     content = '<'..tag..">\n"..content..'</'..tag..'>'
 
     io.open(OutputDirectory..page, "w"):write(
-        openTagFound and string.gsub( mdstring, '<'..tag..'>.*</'..tag..'>', content )
+        tagsFound and string.gsub( mdstring, '<'..tag..'>.*</'..tag..'>', content )
         or mdstring and mdstring.."\n"..content.."\n"
         or content
     ):close()
