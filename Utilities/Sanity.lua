@@ -100,6 +100,20 @@ function BlueprintSanityChecks(bp)
                 end
             end
         end
+        if bp.Display.Tarmacs then
+            local tarmacmap = {
+                x_01 = 'UEF',
+                x_aeon_01 = 'AEON',
+                x_cybran_01 = 'CYBRAN',
+                x_seraphim_01 = 'SERAPHIM',
+            }
+            for i, v in ipairs(bp.Display.Tarmacs) do
+                local tar = (v.Albedo):match'x.*01'
+                if tarmacmap[tar] and tarmacmap[tar] ~= bp.FactionCategory then
+                    table.insert(issues, bp.FactionCategory.." unit has "..(tarmacmap[tar]).." tarmac" )
+                end
+            end
+        end
     end
 
     do -- Defence
