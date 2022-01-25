@@ -349,11 +349,16 @@ UnitBodytextSectionData = function(ModInfo, bp)
                     if NumBuildable > 0 and NumBuildable <= limit then
                         do
                             local _,unitbp = next(BuildableUnits)
-                            local bitcheck = {
+                            local bitcheck = WikiOptions.BuildListSaysModUnits and {
                                 [0] = string.format(LOC('This build category allows it to build the mod unit %s.'), pageLink(unitbp.ID, unitbp.unitTdesc) ).."\n",
                                 [1] = "\n<details>\n<summary>"..LOC('This build category allows it to build the following mod units:').."\n\n".."</summary>\n\n",
                                 [2] = string.format(LOC('These build categories allow it to build the mod unit %s.'), pageLink(unitbp.ID, unitbp.unitTdesc) ).."\n",
                                 [3] = "\n<details>\n<summary>"..LOC('These build categories allow it to build the following mod units:').."\n\n".."</summary>\n\n",
+                            } or {
+                                [0] = string.format(LOC('This build category allows it to build the unit %s.'), pageLink(unitbp.ID, unitbp.unitTdesc) ).."\n",
+                                [1] = "\n<details>\n<summary>"..LOC('This build category allows it to build the following units:').."\n\n".."</summary>\n\n",
+                                [2] = string.format(LOC('These build categories allow it to build the unit %s.'), pageLink(unitbp.ID, unitbp.unitTdesc) ).."\n",
+                                [3] = "\n<details>\n<summary>"..LOC('These build categories allow it to build the following units:').."\n\n".."</summary>\n\n",
                             }
                             text = text..bitcheck[Binary2bit(#TempBuildableCategory ~= 1, NumBuildable ~= 1)]
                         end
@@ -367,11 +372,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
                             local colsneeded = 0
 
                             for i, group in ipairs(SortedUnits) do
-                                if #group > maxcols then
-                                    colsneeded = math.max(colsneeded, math.ceil(#group/ math.ceil(#group/maxcols) ))
-                                else
-                                    colsneeded = math.max(colsneeded, #group)
-                                end
+                                colsneeded = math.max(colsneeded, #group > maxcols and math.ceil(#group/ math.ceil(#group/maxcols)) or #group )
                             end
 
                             maxcols = math.min(maxcols, colsneeded)

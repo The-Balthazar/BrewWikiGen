@@ -2,13 +2,11 @@
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
 -- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
 --------------------------------------------------------------------------------
-local Language = 'US'-- These are not ISO_639-1. As an Englishman I am offended.
+
 --[{ ---------------------------------------------------------------------- ]]--
 --[[ Inputs -- NOTE: Mod input files must be valid lua                      ]]--
 --[[ ---------------------------------------------------------------------- ]]--
-
-OutputDirectory = "C:/BrewLAN.wiki/"
-
+local OutputDirectory = "C:/BrewLAN.wiki/"
 local WikiGeneratorDirectory = "C:/BrewWikiGen/"
 
 EnvironmentData = {
@@ -26,9 +24,19 @@ EnvironmentData = {
 }
 
 WikiOptions = {
-    ConstructionNote = '<LOC wiki_builders_note_steam>Build times from the Steam/retail version of the game:',
-    BalanceNote = '<LOC wiki_balance_stats_steam>Displayed stats are from when launched on the steam/retail version of the game.',
+    Language = 'US', -- These are not ISO_639-1. As an Englishman I am offended.
+
+    GenerateHomePage = true,
+    GenerateSidebar = true,
+    GenerateModPages = true,
+    GenerateUnitPages = true,
+    GenerateCategoryPages = true,
+
+    -- Unit page options
     AbilityDescriptions = true,
+    BalanceNote = '<LOC wiki_balance_stats_steam>Displayed stats are from when launched on the steam/retail version of the game.',
+    ConstructionNote = '<LOC wiki_builders_note_steam>Build times from the Steam/retail version of the game:',
+    BuildListSaysModUnits = true,
 }
 
 local ModDirectories = { -- In order
@@ -66,6 +74,8 @@ BlueprintIdExclusions = { -- Excludes blueprints with any of these IDs (case ins
     'srl0006',
     'ssb2380',
     'ura0001', --Cybran build effect
+    'uea0001', -- UEF ACU drone
+    'uea0003', -- UEF ACU drone
 }
 
 -- Web path for img src. Could be relative, but would break on edit previews.
@@ -114,73 +124,6 @@ Sanity = {
     BlueprintPedanticChecks = false,
 }
 
---[[ ---------------------------------------------------------------------- ]]--
---[[ Run                                                                    ]]--
---[[ ---------------------------------------------------------------------- ]]--
-local function safecall(...)
-    local pass, msg = pcall(...)
-    if not pass then print(msg) end
-end
-
-print("Starting BrewWikiGen")
-
---[[ ---------------------------------------------------------------------- ]]--
---[[ Load generator                                                         ]]--
---[[ ---------------------------------------------------------------------- ]]--
-for i, file in ipairs{
-    'Environment/Localization.lua',
-    'Environment/Game.lua',
-    'Utilities/Blueprint.lua',
-    'Utilities/Builders.lua',
-    'Utilities/File.lua',
-    'Utilities/Mesh.lua',
-    'Utilities/Sanity.lua',
-    'Utilities/String.lua',
-    'Utilities/Table.lua',
-    'Components/Bodytext.lua',
-    'Components/Categories.lua',
-    'Components/Infobox.lua',
-    'Components/Navigation.lua',
-    'Components/Unit.lua',
-    'Components/Weapon.lua',
-} do
-    safecall(dofile, WikiGeneratorDirectory..file)
-end
-
---[[ ---------------------------------------------------------------------- ]]--
---[[ Load data                                                              ]]--
---[[ ---------------------------------------------------------------------- ]]--
--- Wiki data
-safecall(SetWikiLocalization, WikiGeneratorDirectory, Language)
-if EnvironmentData.ExtraData  then safecall(dofile,           EnvironmentData.ExtraData) end
-
--- Env data
-if EnvironmentData.LOC        then safecall(LoadLocalization, EnvironmentData.LOC) end
-if EnvironmentData.Lua        then safecall(LoadHelpStrings,  EnvironmentData.Lua) end
-if EnvironmentData.Blueprints then safecall(LoadEnvUnitBlueprints, WikiGeneratorDirectory) end
-
--- Mod data
-for i, dir in ipairs(ModDirectories) do
-    safecall(LoadModLocalization, dir) -- Load all localisation first.
-    safecall(LoadModHelpStrings, dir)
-    safecall(LoadModUnitBlueprints, dir, i)
-end
-
---[[ ---------------------------------------------------------------------- ]]--
---[[ Pre-compute data                                                       ]]--
---[[ ---------------------------------------------------------------------- ]]--
-for i, dir in ipairs(ModDirectories) do
-    safecall(LoadModSystemBlueprintsFile, dir)
-end
-
---[[ ---------------------------------------------------------------------- ]]--
---[[ Generate wiki                                                          ]]--
---[[ ---------------------------------------------------------------------- ]]--
-safecall(GenerateUnitPages)
-safecall(GenerateSidebar)
-safecall(GenerateModPages)
-safecall(GenerateCategoryPages)
-safecall(GenerateHomePage)
-
-safecall(printTotalBlueprintValues)
+dofile(WikiGeneratorDirectory.."Main.lua")
+GeneratorMain(OutputDirectory)
 
