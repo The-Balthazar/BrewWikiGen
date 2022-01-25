@@ -77,6 +77,53 @@ function BlueprintSanityChecks(bp)
         end
     end
 
+    if bp.FactionCategory then
+        if bp.General.FactionName ~= FactionsByIndex[ FactionCategoryIndexes[bp.FactionCategory] ] then
+            table.insert(issues,
+                FactionsByIndex[ FactionCategoryIndexes[bp.FactionCategory] ]..
+                ' unit has bp.General.FactionName value '..tostring(bp.General.FactionName)
+            )
+        end
+        if tableSafe(bp.Display.Mesh,'LODs') then
+            local Shaders = {
+                Seraphim = 'SERAPHIM',
+                Aeon = 'AEON',
+                AeonCZAR = 'AEON',
+                Insect = 'CYBRAN',
+                Unit = 'UEF',
+            }
+            for i, lod in ipairs(bp.Display.Mesh.LODs) do
+                if Shaders[lod.ShaderName] and bp.FactionCategory ~= Shaders[lod.ShaderName] then
+                    table.insert(issues, "LOD"..(i-1).." has non-standard faction shader "..lod.ShaderName)
+                elseif not Shaders[lod.ShaderName] and Sanity.BlueprintPedanticChecks then
+                    table.insert(issues, "LOD"..(i-1).." has unknown shader "..lod.ShaderName)
+                end
+            end
+        end
+    end
+
+    do -- Defence
+        local armourMap = {
+            RULEUMT_Air = 'Light',
+            RULEUMT_None = 'Structure',
+        }
+        if armourMap[bp.Physics.MotionType] then
+            if armourMap[bp.Physics.MotionType] ~= bp.Defense.ArmorType then
+                table.insert(issues, "Armour type is "..tostring(bp.Defense.ArmorType).." when it should probably be "..armourMap[bp.Physics.MotionType])
+            end
+        elseif (bp.CategoriesHash.COMMAND or bp.CategoriesHash.SUBCOMMANDER) then
+            if bp.Defense.ArmorType ~= 'Commander' then
+                table.insert(issues, "Armour type is "..tostring(bp.Defense.ArmorType).." when it should probably be Commander")
+            end
+        elseif bp.CategoriesHash.EXPERIMENTAL then
+            if bp.Defense.ArmorType ~= 'Experimental' then
+                table.insert(issues, "Armour type is "..tostring(bp.Defense.ArmorType).." when it should probably be Experimental")
+            end
+        elseif bp.Defense.ArmorType ~= 'Normal' then
+            table.insert(issues, "Armour type is "..tostring(bp.Defense.ArmorType).." when it should probably be Normal")
+        end
+    end
+
     do -- bp.General.Icon sanitisation
         local currenticon = (bp.General.Icon or 'land')
         local factoryicon
