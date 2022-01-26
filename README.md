@@ -29,8 +29,8 @@ your setup:
 * `OutputDirectory` needs to point to a real directory. I'd go for wherever you
 check out your mods wiki repository, but what you do with the output is up to you.
 
-* `WikiGeneratorDirectory` should point to the folder this readme and `Run.lua`
-are located in. Include a slash at the end.
+* `WikiGeneratorDirectory` should point to the folder `Main.lua` is located in.
+Include a slash at the end.
 
 * `EnvironmentData` contains the following environmental values:
 
@@ -92,9 +92,9 @@ are located in. Include a slash at the end.
     I guess you could turn them all off and use the script for the blueprint sanity
     checks if that's what you wanted.
 
-  * `AbilityDescriptions`, `true` or `false`: If `false` it lists the abilities of
+  * `AbilityDescriptions`; `true` or `false`: If `false` it lists the abilities of
     the units verbatim in the abilities section. If true it will try to map them
-    to tooltips in `/Environment/Game.lua.abilityDesc`.
+    to tooltips in the `abilityDesc` table in `/Environment/Game.lua`.
 
   * `BalanceNote` appears at the bottom of Balance sections if they exist. It can
     be set to false or removed. The section will only appear on pages for blueprints
@@ -117,7 +117,7 @@ are located in. Include a slash at the end.
 * `ModDirectories` should point to your local copies of the mod(s) you wish to
 generate wiki pages for. It assumes, but doesn't require, multiple mods. It
 expects a `mod_info.lua` file directly in each item on the list. The order listed
-is used in the sidebar navigation ordering.
+is used for navigation ordering on the sidebar and home page generations.
 
 * `UnitBlueprintsFolder` is where within the mod folders it should start looking
 for blueprints. Standard convention is `units`. This value can be removed, but
@@ -125,7 +125,7 @@ execution can take double the time to complete.
 
 * `BlueprintFolderExclusions` and `BlueprintFileExclusions` are arrays of regex
 matches for what to exclude from the blueprint search. The first is used against
-anything without a . in it, assumed to be folders, the second is used against
+anything without a `.` in it, assumed to be folders, the second is used against
 anything that ends in `_unit.bp`. It won't look in any folder that matches, or
 open any file that matches.
 
@@ -136,20 +136,46 @@ you maintain my directory structure but don't care about the images working on
 the Github edit preview pages specifically, you could use just `"images/"`. If
 you have your images on some other web server, that's fine too. As long as the
 filenames match what the script is after. It is used currently just for the mod
-page large images.
+page large images. If the `mod_info.lua` `icon` field is truthy it tries to load
+a `.png` image that matches the `name` field, but lower case, with no special
+characters, and with dashes replacing spaces. It doesn't read the actual value
+because it could potentially be a non-web-safe file format, and potentially cause
+clashes.
 
 * `IconsPath`, like `ImagesPath`, but for icons; `"icons/"` could work here, with
-the same caveats as above. Used directly for helper icons, and mod icons. Mod icons
-don't respect the location listed in the `mod_info.lua` icon field, although have
-a fall-back if nothing is defined there. This is to prevent mess and potentially
-overlapping icon file paths.
+the same caveats as above. Used directly for helper icons, and mod icons.
 
 * `unitIconsPath` is like the two previous. It expects to find images that match
 the pattern `[BlueprintId]_icon.png`. It is case sensitive, and they must match
-the case that the blueprint file used.
+the case that the blueprint file used, unless the file was entirely lowercase, in
+which case the ID should be upper case.
+
+If you have mixed case files that don't match, this script can be used to rename them:
+```lua
+local folderdir = string.match(debug.getinfo(1, 'S').short_src, '.*\\')
+print(folderdir)
+
+local folder = io.popen(string.format('dir "%s" /b', folderdir))
+
+for name in folder:lines() do
+    if string.lower(string.sub(name, -8)) == 'icon.png' then
+        local newname = string.upper(string.match(name, '(.+)_[iI][cC][oO][nN]'))..'_icon.png'
+        local file = io.open(folderdir..name, 'rb'):read('all')
+
+        io.open(folderdir..'test\\'..newname, 'wb'):write(file):close()
+        file:close()
+    end
+end
+
+print("end")
+```
+To use it save it as `.lua` in the images folder and run it. Powershell or a batch
+script would probably be more convenient, but I don't know those, and you need to
+run Lua files for the generator anyway. It creates renamed copies in a `\test\`
+sub folder. That folder may or may not need to exist before hand. I've not tested.
 
 * `FooterCategories` is a list of unit categories that the generator should create
-category pages for, and link to at the bottom of the relevant units. The appear
+category pages for, and link to at the bottom of the relevant units. They appear
 on unit pages in the order written, so I tried to order them in a natural language
 order, or as close to as possible. If you have no units in a given category, no
 page will be generated. Add or remove as seems appropriate for your mods needs.
@@ -163,14 +189,18 @@ that I consider anomalous or unnecessary. Exercise discretion when taking its ad
 
 ## Usage notes:
 If you have pre-existing pages for `Home.md`, `_Sidebar.md` or mods in your wiki
-you can specify where and if the generator outputs in those pages. This is done
-through specific xml tags read by the generator.
+you can specify where and if the generator outputs in those pages specifically.
+This can be done through specific xml tags read by the generator.
 
 Behaviours on these pages are; if matching opening and closing tags exist (`<tag>`
 and `</tag>`) it will replace the contents with the new generation, if an empty
 tag exists (`<tag />` with the space) it will specifically not write that section,
 otherwise it appends the content to the end surrounded by matching opening and
 closing tags.
+
+If you want it to not output on an entire class of page, that can be done via the
+relevant `WikiOptions` flags. Yes this makes `<brewwikihome />` and `<brewwikisidebar />`
+redundant, but it's the same code for all of them, so it's free.
 
 Tags are:
 * `<brewwikihome>` for the mod navigation for `Home.md`.
@@ -181,17 +211,18 @@ Tags are:
 
 ### Blueprints.lua:
 If you have content modified or generated in `Blueprints.lua` that would be
-important to the wiki, you can have the wiki run it by adding a `WikiBlueprints`
+important to the wiki, you can have the generator run it by adding a `WikiBlueprints`
 function to that file. That function is called in much the same way as
-`ModBlueprints`, except by the wiki instead of the game. Input argument is the
+`ModBlueprints`, except by the generator instead of the game. Input argument is the
 same, except only `.Unit` is populated currently. This is easier to achieve if
 your `Blueprints.lua` is formatted such that your `ModBlueprints` hook is
 populated with function calls rather than with code ran directly within that hook.
+However, as outlined below, it needs to be valid Lua.
 
 ### Lua validation:
-Since this generator runs mod files directly for data, any referenced files must
-be valid for Lua 5.4. This notably means **not** using `#` instead of `--`, not
-using `!=` instead of `~=`, and probably several other things.
+Since this generator runs mod files directly for data, any referenced `.lua` file
+must be valid for Lua 5.4. This notably means **not** using `#` instead of `--`,
+not using `!=` instead of `~=`, and probably several other things.
 
 Code in required files that validates as Lua, but wouldn't run, ie: because it
 runs a loop without defining an iterator like `pairs` or `ipairs`, or wouldn't
