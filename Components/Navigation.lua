@@ -167,10 +167,10 @@ function GenerateModPages()
 
         local leadString = "\n***"..moddata.ModInfo.name..'*** is'..(modindex ~= 0 and' a mod' or '')..' by '..(moddata.ModInfo.author or 'an unknown author')..'.'
         ..(moddata.ModInfo.description and " Its mod menu description is:\n"
-        ..xml:blockquote(moddata.ModInfo.description).."\n" or ' ')..(moddata.ModInfo.version and "Version "
-        ..moddata.ModInfo.version or 'It').." contains the following units:\n"
+        ..xml:blockquote(moddata.ModInfo.description).."\n" or ' ')
 
-        local unitsSection = ''
+        local unitsSection = (moddata.ModInfo.version and "Version "
+        ..moddata.ModInfo.version or 'It').." contains the following units:\n"
 
         for i = 1, #FactionsByIndex do
             local faction = FactionsByIndex[i]
@@ -246,8 +246,15 @@ function GenerateHomePage()
 
             homeModNav2 = homeModNav2.."\n"..xml:th{align='center'}(xml:a{href=stringSanitiseFilename(ModInfo.name)}(ModInfo.name))
         end
-        homestring = homestring.. xml:table{align='center'}(xml:tr(homeModNav1),xml:tr(homeModNav2),'').."\n"
+        if extra ~= rows then
+            homestring = homestring.. xml:table{align='center'}(xml:tr(homeModNav1),xml:tr(homeModNav2),'').."\n"
+        else
+            homestring = homestring.. "\n"..xml:tr(homeModNav1).."\n"..xml:tr(homeModNav2)
+        end
         modindex = cols[i]
+    end
+    if extra == rows then
+        homestring = xml:table{align='center'}(homestring.."\n").."\n"
     end
 
     homestring = homestring..xml:dl(

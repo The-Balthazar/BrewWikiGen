@@ -104,8 +104,38 @@ GetUnitInfoboxData = function(ModInfo, bp)
             )
         )},
         {''},
-        {'<LOC wiki_infobox_miscrad>'..'Misc radius:', bp.CategoriesHash.OVERLAYMISC and bp.AI and bp.AI.StagingPlatformScanRadius, 'Defined by the air staging radius value. Often used to indicate things without a dedicated range ring.' },
-        {'<LOC wiki_infobox_weapons>'..'Weapons:',     bp.Weapon and #bp.Weapon..detailsLink('<LOC wiki_sect_weapons>Weapons')},
+        {'<LOC wiki_infobox_miscrad>' ..'Misc radius:', bp.CategoriesHash.OVERLAYMISC and bp.AI and bp.AI.StagingPlatformScanRadius, 'Defined by the air staging radius value. Often used to indicate things without a dedicated range ring.' },
+        {'<LOC wiki_infobox_weapons>' ..'Weapons:',     bp.Weapon and #bp.Weapon..detailsLink('<LOC wiki_sect_weapons>Weapons')},
+        {'<LOC wiki_infobox_wreckage>'..'Wreckage:',   tableSafe(bp.Wreckage,'WreckageLayers') and
+            (bp.Wreckage.WreckageLayers.Land or
+            bp.Wreckage.WreckageLayers.Seabed or
+            bp.Wreckage.WreckageLayers.Water) and
+            InfoboxFlagsList{
+                (bp.Wreckage.HealthMult or 1) ~= 0 and (iconText(
+                    'Health',
+                    numberFormatNoTrailingZeros(
+                        bp.Defense.Health *
+                        (bp.Wreckage.HealthMult or 1)
+                    )
+                ) or ''),
+                (bp.Wreckage.MassMult or 0) ~= 0 and (iconText(
+                    'Mass',
+                    numberFormatNoTrailingZeros(
+                        bp.Economy.BuildCostMass *
+                        (bp.Wreckage.MassMult or 0) *
+                        (bp.Wreckage.HealthMult or 1)
+                    )
+                ) or ''),
+                (bp.Wreckage.EnergyMult or 0) ~= 0 and (iconText(
+                    'Energy',
+                    numberFormatNoTrailingZeros(
+                        bp.Economy.BuildCostEnergy *
+                        (bp.Wreckage.EnergyMult or 0) *
+                        (bp.Wreckage.HealthMult or 1)
+                    )
+                ) or '')
+            }
+        },
     }
 end
 

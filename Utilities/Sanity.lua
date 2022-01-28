@@ -33,7 +33,9 @@ function BlueprintSanityChecks(bp)
             end
 
         else -- Tech 1-3
-            local t = t1 and 1 or t2 and 2 or t3 and 3
+            local t=t1 and 1 or
+                    t2 and 2 or
+                    t3 and 3
 
             if t and bp.StrategicIconName and not string.find(bp.StrategicIconName, tostring(t)) and not arraySubFind(bp.Categories, 'WALL') then
                 table.insert(issues, 'Tech '..t..' with strategic icon '..bp.StrategicIconName)
@@ -94,9 +96,9 @@ function BlueprintSanityChecks(bp)
             }
             for i, lod in ipairs(bp.Display.Mesh.LODs) do
                 if Shaders[lod.ShaderName] and bp.FactionCategory ~= Shaders[lod.ShaderName] then
-                    table.insert(issues, "LOD"..(i-1).." has non-standard faction shader "..lod.ShaderName)
+                    table.insert(issues, bp.FactionCategory.." LOD"..(i-1).." has non-standard faction shader "..lod.ShaderName)
                 elseif not Shaders[lod.ShaderName] and Sanity.BlueprintPedanticChecks then
-                    table.insert(issues, "LOD"..(i-1).." has unknown shader "..lod.ShaderName)
+                    table.insert(issues, bp.FactionCategory.." LOD"..(i-1).." has unknown shader "..lod.ShaderName)
                 end
             end
         end
