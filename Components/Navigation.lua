@@ -98,7 +98,7 @@ function TechTable(units, maxcols)
             end
         end
     end
-    return text..xml:table(trtext).."\n\n</details>\n"
+    return text..xml:table(trtext).."\n"
 end
 
 function InsertInNavigationData(bp)

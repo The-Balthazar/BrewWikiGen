@@ -347,7 +347,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
                         end
 
                         if NumBuildable > 1 then
-                            text = text..TechTable(BuildableUnits, 8)
+                            text = text..TechTable(BuildableUnits, 8).."\n</details>\n"
                         end
                     elseif NumBuildable >= limit then
                         --text = text.."\nThis boi can build a lot of things.\n"
