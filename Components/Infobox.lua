@@ -118,7 +118,7 @@ GetUnitInfoboxData = function(ModInfo, bp)
                         (bp.Wreckage.HealthMult or 1)
                     )
                 ) or ''),
-                (bp.Wreckage.MassMult or 0) ~= 0 and (iconText(
+                bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0) ~= 0 and (iconText(
                     'Mass',
                     numberFormatNoTrailingZeros(
                         bp.Economy.BuildCostMass *
@@ -126,7 +126,7 @@ GetUnitInfoboxData = function(ModInfo, bp)
                         (bp.Wreckage.HealthMult or 1)
                     )
                 ) or ''),
-                (bp.Wreckage.EnergyMult or 0) ~= 0 and (iconText(
+                bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0) ~= 0 and (iconText(
                     'Energy',
                     numberFormatNoTrailingZeros(
                         bp.Economy.BuildCostEnergy *

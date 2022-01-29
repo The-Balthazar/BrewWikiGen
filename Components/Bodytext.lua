@@ -166,7 +166,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
 
                     for tech, group in ipairs(MenuSortUnitsByTech(builderunits)) do
                         for i, builderbp in ipairs(group) do
-                            if builderbp.id ~= 'ssl0403' or bp.Wreckage or bp.CategoriesHash.RECLAIMABLE then
+                            if (builderbp.id ~= 'ssl0403' and builderbp.id ~= 'ssa0001') or bp.Wreckage or bp.CategoriesHash.RECLAIMABLE then
                                 bilst = bilst..BuildByBulletPoint(bp,
                                     pageLink(
                                         builderbp.ID,
@@ -176,23 +176,6 @@ UnitBodytextSectionData = function(ModInfo, bp)
                                     builderbp.Economy.BuildRate,
                                     UpgradesFrom(bp, builderbp)
                                 )
-                            end
-                            builderunits[builderbp.id] = nil
-                        end
-                    end
-
-                    local remaining = {}
-
-                    for id, bp in pairs(builderunits) do
-                        table.insert(remaining, {id, bp})
-                    end
-
-                    if remaining[1] then
-                        table.sort(remaining, function(a, b) return a[1]<b[1] end)
-                        for i, dat in ipairs(remaining) do
-                            local builderbp = dat[2]
-                            if builderbp.id ~= 'ssa0001' or bp.Wreckage or bp.CategoriesHash.RECLAIMABLE then
-                                bilst = bilst..BuildByBulletPoint(bp, pageLink(builderbp.ID, builderbp.unitTdesc), builderbp.Economy.BuildRate, UpgradesFrom(bp, builderbp))
                             end
                         end
                     end
@@ -363,37 +346,8 @@ UnitBodytextSectionData = function(ModInfo, bp)
                             text = text..bitcheck[Binary2bit(#TempBuildableCategory ~= 1, NumBuildable ~= 1)]
                         end
 
-                        local SortedUnits = MenuSortUnitsByTech(BuildableUnits)
-
-                        local maxcols = 8
-
                         if NumBuildable > 1 then
-
-                            local colsneeded = 0
-
-                            for i, group in ipairs(SortedUnits) do
-                                colsneeded = math.max(colsneeded, #group > maxcols and math.ceil(#group/ math.ceil(#group/maxcols)) or #group )
-                            end
-
-                            maxcols = math.min(maxcols, colsneeded)
-
-                            local trtext = "\n"
-                            for i, group in ipairs(SortedUnits) do
-                                if group[1] then
-                                    local trows = math.ceil(#group/maxcols)
-                                    for trow = 1, trows do
-                                        local tdtext = "\n"..(trow == 1 and '        '..xml:td{rowspan=trows~=1 and trows or nil}(xml:img{src=IconsPath..'T'..i..'.png', title='T'..i}).."\n" or '')
-                                        for coli = 1, maxcols do
-                                            local buildbp = group[maxcols*(trow-1)+coli]
-                                            if buildbp then
-                                                tdtext = tdtext..'        '..xml:td( pageLink(buildbp.ID, xml:img{src=unitIconsPath..buildbp.ID..'_icon.png', width='64px'}) ).."\n"
-                                            end
-                                        end
-                                        trtext = trtext..'    '..xml:tr(tdtext..'    ').."\n"
-                                    end
-                                end
-                            end
-                            text = text..xml:table(trtext).."\n\n</details>\n"
+                            text = text..TechTable(BuildableUnits, 8)
                         end
                     elseif NumBuildable >= limit then
                         --text = text.."\nThis boi can build a lot of things.\n"

@@ -33,10 +33,11 @@ function MenuSortUnitsByTech(units)
         'TECH3',
         'EXPERIMENTAL',
     }
-    local groups = {{},{},{},{}}
+    local groups = {{},{},{},{},{}}
     for id, bp in pairs(units) do
-        for i = 1, 4 do
-            if bp.CategoriesHash[techs[i] ] then
+        local bp = bp.bp or bp -- Convert from concise to bp
+        for i = 1, 5 do
+            if i == 5 or bp.CategoriesHash[techs[i] ] then
                 table.insert(groups[i], bp)
                 break
             end
@@ -44,28 +45,66 @@ function MenuSortUnitsByTech(units)
     end
     local MenuSortCats = {
         SORTCONSTRUCTION = 1000,
-        SORTECONOMY = 2000,
-        SORTDEFENSE = 3000,
-        SORTSTRATEGIC = 4000,
-        SORTINTEL = 5000,
-        SORTOTHER = 6000,
+        SORTECONOMY      = 2000,
+        SORTDEFENSE      = 3000,
+        SORTSTRATEGIC    = 4000,
+        SORTINTEL        = 5000,
+        SORTOTHER        = 6000,
+    }
+    local FactionSort = {
+        UEF      =  6000,
+        AEON     =  7000,
+        CYBRAN   =  8000,
+        SERAPHIM =  9000,
+        OTHER    = 10000,
     }
     local function sortKey(bp)
-        return MenuSortCats[bp.SortCategory] + (bp.BuildIconSortPriority or bp.StrategicIconSortPriority or 0) + tonumber('0.0'..tonumber(string.gsub(bp.id, '%W', ''), 36))
+        return FactionSort[bp.FactionCategory or 'OTHER'] + MenuSortCats[bp.SortCategory] + (bp.BuildIconSortPriority or bp.StrategicIconSortPriority or 0) + tonumber('0.'..tonumber(string.gsub(bp.id, '%W', ''), 36))
     end
     local function MenuSort(a, b)
         return sortKey(a) < sortKey(b)
     end
 
-    for i = 1, 4 do
+    for i = 1, 5 do
         table.sort(groups[i], MenuSort)
     end
     return groups
 end
 
+function TechTable(units, maxcols)
+    local SortedUnits = MenuSortUnitsByTech(units)
+    local text = ''
+    local colsneeded = 0
+
+    for i, group in ipairs(SortedUnits) do
+        colsneeded = math.max(colsneeded, #group > maxcols and math.ceil(#group/ math.ceil(#group/maxcols)) or #group )
+    end
+
+    maxcols = math.min(maxcols, colsneeded)
+
+    local trtext = "\n"
+    for i, group in ipairs(SortedUnits) do
+        if group[1] then
+            local trows = math.ceil(#group/maxcols)
+            for trow = 1, trows do
+                local tdtext = "\n"..(trow == 1 and '        '..xml:td{rowspan=trows~=1 and trows or nil}(i~=5 and xml:img{src=IconsPath..'T'..i..'.png', title='T'..i} or '').."\n" or '')
+                for coli = 1, maxcols do
+                    local buildbp = group[maxcols*(trow-1)+coli]
+                    if buildbp then
+                        tdtext = tdtext..'        '..xml:td( pageLink(buildbp.ID, xml:img{src=unitIconsPath..buildbp.ID..'_icon.png', width='64px', title=buildbp.unitTdesc}) ).."\n"
+                    end
+                end
+                trtext = trtext..'    '..xml:tr(tdtext..'    ').."\n"
+            end
+        end
+    end
+    return text..xml:table(trtext).."\n\n</details>\n"
+end
+
 function InsertInNavigationData(bp)
     if not bp.WikiPage then return end
     local UnitInfo = UnitConciseInfo(bp)
+    UnitInfo.bp = bp
     local index = bp.ModInfo.ModIndex
 
     if not NavigationData[index] then
@@ -147,8 +186,6 @@ function GenerateSidebar()
 end
 
 function GenerateModPages()
-    sortData(NavigationData, 'TechAscending-IDAscending')
-
     for modindex, moddata in pairs(NavigationData) do
 
         local ModInfobox = Infobox{
@@ -170,40 +207,14 @@ function GenerateModPages()
         ..xml:blockquote(moddata.ModInfo.description).."\n" or ' ')
 
         local unitsSection = (moddata.ModInfo.version and "Version "
-        ..moddata.ModInfo.version or 'It').." contains the following units:\n"
+        ..moddata.ModInfo.version or '*'..moddata.ModInfo.name..'*').." contains the following units:\n"
 
         for i = 1, #FactionsByIndex do
             local faction = FactionsByIndex[i]
             local unitarray = moddata.Factions[i]
             if unitarray then
-
                 table.insert(ModInfobox.Data, { faction..':', #moddata.Factions[i] })
-
-                local curtechi = 0
-
-                local TechNames = {
-                    'Tech 1',
-                    'Tech 2',
-                    'Tech 3',
-                    'Experimental',
-                    'Other',
-                }
-
-                unitsSection = unitsSection .. MDHead(faction,2)
-
-                for unitI, unitData in ipairs(unitarray) do
-                    local tech = unitData.tech or 5
-                    if tech > curtechi then
-                        curtechi = tech
-                        unitsSection = unitsSection ..MDHead(TechNames[tech])
-                    end
-
-                    unitsSection = unitsSection .. xml:a{
-                        href=stringSanitiseFilename(unitData.bpid),
-                        title=stringSanitiseXMLAttribute(unitData.name or unitData.bpid)
-                    }(xml:img{src=unitIconsPath..stringSanitiseFilename(unitData.bpid).."_icon.png"})
-                    .."\n"
-                end
+                unitsSection = unitsSection .. MDHead(faction) .. TechTable(unitarray, 8)
             end
         end
 
