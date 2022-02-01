@@ -18,7 +18,7 @@ GetUnitInfoboxData = function(ModInfo, bp)
                 and iconText(
                     'Health',
                     bp.Defense and bp.Defense.MaxHealth,
-                    (bp.Defense and bp.Defense.RegenRate and ' (+'..bp.Defense.RegenRate ..'/s)')
+                    (bp.Defense and bp.Defense.RegenRate and bp.Defense.RegenRate ~= 0 and ' (+'..bp.Defense.RegenRate ..'/s)')
                 )
                 or 'Invulnerable'
             )
@@ -43,14 +43,14 @@ GetUnitInfoboxData = function(ModInfo, bp)
         },
         {''},
         {'<LOC wiki_infobox_cost_e>'    ..'Energy cost:',       iconText('Energy', bp.Economy and bp.Economy.BuildCostEnergy)},
-        {'<LOC wiki_infobox_cost_m>'    ..'Mass cost:',         iconText('Mass', bp.Economy and bp.Economy.BuildCostMass)},
-        {'<LOC wiki_infobox_cost_t>'    ..'Build time:',        iconText('Time-but-not', bp.Economy and bp.Economy.BuildTime, arraySubFind(bp.Categories, 'BUILTBY') and detailsLink('<LOC wiki_sect_construction>Construction') or '' )}, --I don't like the time icon for this, it looks too much and it's also not in real units
+        {'<LOC wiki_infobox_cost_m>'    ..'Mass cost:',         iconText('Mass',   bp.Economy and bp.Economy.BuildCostMass)},
+        {'<LOC wiki_infobox_cost_t>'    ..'Build time:',        iconText('',       bp.Economy and bp.Economy.BuildTime, arraySubFind(bp.Categories, 'BUILTBY') and detailsLink('<LOC wiki_sect_construction>Construction') or '' )},
         {'<LOC wiki_infobox_maint_e>'   ..'Maintenance cost:',  iconText('Energy', bp.Economy and bp.Economy.MaintenanceConsumptionPerSecondEnergy,'/s')},
-        {'<LOC wiki_infobox_buildrate>' ..'Build rate:',        iconText('Build', bp.Economy and bp.Economy.BuildRate)},
+        {'<LOC wiki_infobox_buildrate>' ..'Build rate:',        iconText('Build',  bp.Economy and bp.Economy.BuildRate)},
         {'<LOC wiki_infobox_prod_e>'    ..'Energy production:', iconText('Energy', bp.Economy and bp.Economy.ProductionPerSecondEnergy, '/s')},
-        {'<LOC wiki_infobox_prod_m>'    ..'Mass production:',   iconText('Mass', bp.Economy and bp.Economy.ProductionPerSecondMass, '/s')},
+        {'<LOC wiki_infobox_prod_m>'    ..'Mass production:',   iconText('Mass',   bp.Economy and bp.Economy.ProductionPerSecondMass, '/s')},
         {'<LOC wiki_infobox_store_e>'   ..'Energy storage:',    iconText('Energy', bp.Economy and bp.Economy.StorageEnergy)},
-        {'<LOC wiki_infobox_store_m>'   ..'Mass storage:',      iconText('Mass', bp.Economy and bp.Economy.StorageMass)},
+        {'<LOC wiki_infobox_store_m>'   ..'Mass storage:',      iconText('Mass',   bp.Economy and bp.Economy.StorageMass)},
         {''},
         {'<LOC wiki_infobox_vision_r>'    ..'Vision radius:',       (bp.Intel and bp.Intel.VisionRadius or 10)},
         {'<LOC wiki_infobox_w_vision_r>'  ..'Water vision radius:', (bp.Intel and bp.Intel.WaterVisionRadius or 10)},
@@ -107,9 +107,11 @@ GetUnitInfoboxData = function(ModInfo, bp)
         {'<LOC wiki_infobox_miscrad>' ..'Misc radius:', bp.CategoriesHash.OVERLAYMISC and bp.AI and bp.AI.StagingPlatformScanRadius, 'Defined by the air staging radius value. Often used to indicate things without a dedicated range ring.' },
         {'<LOC wiki_infobox_weapons>' ..'Weapons:',     bp.Weapon and #bp.Weapon..detailsLink('<LOC wiki_sect_weapons>Weapons')},
         {'<LOC wiki_infobox_wreckage>'..'Wreckage:',   tableSafe(bp.Wreckage,'WreckageLayers') and
-            (bp.Wreckage.WreckageLayers.Land or
-            bp.Wreckage.WreckageLayers.Seabed or
-            bp.Wreckage.WreckageLayers.Water) and
+            (
+                bp.Wreckage.WreckageLayers.Land or
+                bp.Wreckage.WreckageLayers.Seabed or
+                bp.Wreckage.WreckageLayers.Water
+            ) and
             InfoboxFlagsList{
                 (bp.Wreckage.HealthMult or 1) ~= 0 and (iconText(
                     'Health',

@@ -150,26 +150,26 @@ the pattern `[BlueprintId]_icon.png`. It is case sensitive, and they must match
 the case that the blueprint file used, unless the file was entirely lowercase, in
 which case the ID should be upper case.
 
-If you have mixed case files that don't match, this script can be used to rename them:
-```lua
-local folderdir = string.match(debug.getinfo(1, 'S').short_src, '.*\\')
-print(folderdir)
+  If you have mixed case files that don't match, this script can be used to rename them:
+  ```lua
+  local folderdir = string.match(debug.getinfo(1, 'S').short_src, '.*\\')
+  print(folderdir)
 
-local folder = io.popen(string.format('dir "%s" /b', folderdir))
+  local folder = io.popen(string.format('dir "%s" /b', folderdir))
 
-for name in folder:lines() do
-    if string.lower(string.sub(name, -8)) == 'icon.png' then
-        local newname = string.upper(string.match(name, '(.+)_[iI][cC][oO][nN]'))..'_icon.png'
-        local file = io.open(folderdir..name, 'rb'):read('all')
+  for name in folder:lines() do
+      if string.lower(string.sub(name, -8)) == 'icon.png' then
+          local newname = string.upper(string.match(name, '(.+)_[iI][cC][oO][nN]'))..'_icon.png'
+          local file = io.open(folderdir..name, 'rb'):read('all')
 
-        io.open(folderdir..'test\\'..newname, 'wb'):write(file):close()
-        file:close()
-    end
-end
+          io.open(folderdir..'test\\'..newname, 'wb'):write(file):close()
+          file:close()
+      end
+  end
 
-print("end")
-```
-To use it save it as `.lua` in the images folder and run it. Powershell or a batch
+  print("end")
+  ```
+  To use it save it as `.lua` in the images folder and run it. Powershell or a batch
 script would probably be more convenient, but I don't know those, and you need to
 run Lua files for the generator anyway. It creates renamed copies in a `\test\`
 sub folder. That folder may or may not need to exist before hand. I've not tested.

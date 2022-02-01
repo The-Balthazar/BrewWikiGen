@@ -651,7 +651,11 @@ UnitBodytextSectionData = function(ModInfo, bp)
             local bodytext = ''
             for i, section in ipairs(self) do
                 if section.check then
-                    bodytext = bodytext..MDHead(section[1])..GetModUnitData(bp.ID, noLOC(section[1])..'Prefix')..section.Data(bp).."\n"..GetModUnitData(bp.ID, noLOC(section[1])..'Suffix')
+                    bodytext = bodytext
+                    ..MDHead(section[1])
+                    ..GetModUnitData(bp.ID, noLOC(section[1])..'Prefix')
+                    ..section.Data(bp).."\n"
+                    ..GetModUnitData(bp.ID, noLOC(section[1])..'Suffix')
                 end
             end
             return bodytext
