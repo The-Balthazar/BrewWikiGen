@@ -89,12 +89,12 @@ local function BlueprintHashCategories(bp)
         bp.SortCategory = bp.SortCategory or MenuSortCats[cat]
 
         if FactionCategoryIndexes[cat] then
-            bp.FactionCategoryHash[cat] = cat
             if bp.FactionCategory == nil then
                 bp.FactionCategory = cat
-            else
+            elseif not bp.FactionCategoryHash[cat] then -- Make sure it's not a dupe of the same
                 bp.FactionCategory = false -- has multiple faction categories
             end
+            bp.FactionCategoryHash[cat] = cat
         end
     end
     bp.SortCategory = bp.SortCategory or 'SORTOTHER'

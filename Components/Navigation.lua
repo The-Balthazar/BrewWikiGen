@@ -26,6 +26,16 @@ local function sortData(sorttable, sort)
     end
 end
 
+local FactionSort
+local MenuSortCats = {
+    SORTCONSTRUCTION = 1000,
+    SORTECONOMY      = 2000,
+    SORTDEFENSE      = 3000,
+    SORTSTRATEGIC    = 4000,
+    SORTINTEL        = 5000,
+    SORTOTHER        = 6000,
+}
+
 function MenuSortUnitsByTech(units)
     local techs = {
         'TECH1',
@@ -43,23 +53,19 @@ function MenuSortUnitsByTech(units)
             end
         end
     end
-    local MenuSortCats = {
-        SORTCONSTRUCTION = 1000,
-        SORTECONOMY      = 2000,
-        SORTDEFENSE      = 3000,
-        SORTSTRATEGIC    = 4000,
-        SORTINTEL        = 5000,
-        SORTOTHER        = 6000,
-    }
-    local FactionSort = {
-        UEF      =  6000,
-        AEON     =  7000,
-        CYBRAN   =  8000,
-        SERAPHIM =  9000,
-        OTHER    = 10000,
-    }
+    if not FactionSort then
+        FactionSort = {}
+        for faction, index in pairs(FactionCategoryIndexes) do
+            FactionSort[faction] = index*10000
+        end
+    end
+
     local function sortKey(bp)
-        return FactionSort[bp.FactionCategory or 'OTHER'] + MenuSortCats[bp.SortCategory] + (bp.BuildIconSortPriority or bp.StrategicIconSortPriority or 0) + tonumber('0.'..tonumber(string.gsub(bp.id, '%W', ''), 36))
+        return
+        FactionSort[bp.FactionCategory or 'OTHER'] +
+        MenuSortCats[bp.SortCategory or 'SORTOTHER'] +
+        (bp.BuildIconSortPriority or bp.StrategicIconSortPriority or 0) +
+        tonumber('0.'..(tonumber(string.gsub(bp.id, '%W', ''), 36) or 0))
     end
     local function MenuSort(a, b)
         return sortKey(a) < sortKey(b)
