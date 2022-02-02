@@ -12,6 +12,12 @@ local WikiGeneratorDirectory = "C:/BrewWikiGen/"
 EnvironmentData = {
     Blueprints = true, --Search env for blueprints
     GenerateWikiPages = false, --Generate pages for env blueprints
+    
+    Factions = {
+        {'NOMADS', 'Nomads'},
+        {'ARM', 'Arm'},
+        {'CORE', 'Core'},
+    },
 
     Lua = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
     LOC = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',

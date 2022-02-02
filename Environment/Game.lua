@@ -8,7 +8,6 @@ FactionIndexes = {
     Aeon = 2,
     Cybran = 3,
     Seraphim = 4,
-    Other = 5,
 }
 
 FactionsByIndex = {
@@ -16,7 +15,6 @@ FactionsByIndex = {
     'Aeon',
     'Cybran',
     'Seraphim',
-    'Other',
 }
 
 FactionCategoryIndexes = {
@@ -24,8 +22,17 @@ FactionCategoryIndexes = {
     AEON = 2,
     CYBRAN = 3,
     SERAPHIM = 4,
-    OTHER = 5,
 }
+
+do
+    local envF = EnvironmentData and EnvironmentData.Factions or {}
+    table.insert(envF, {'OTHER', 'Other'})
+    for i, factionData in ipairs(envF) do
+        FactionsByIndex[i+4] = factionData[2]
+        FactionIndexes[factionData[2]] = i+4
+        FactionCategoryIndexes[factionData[1]] = i+4
+    end
+end
 
 function FactionFromFactionCategory(cat) return FactionsByIndex[ FactionCategoryIndexes[cat] ] end
 function FactionsFromFactionCatHash(hash)

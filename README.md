@@ -44,6 +44,19 @@ Include a slash at the end.
     be used for built-by lists and upgrades to/from information, and won't include
     them in navigation/category pages or include them in engineering build lists.
 
+  * `Factions`, optionally, is a an array of custom factions formatted as sub-arrays
+    containing the faction category then the faction name. For example:
+    ```lua
+    Factions = {
+        {'NOMADS', 'Nomads'},
+        {'ARM', 'Arm'},
+        {'CORE', 'Core'},
+    },
+    ```
+    The order is used for navigation sections and doesn't need to match the faction
+    index in game. They are appended to the vanilla factions followed by 'Other',
+    which is used for anything else and anything with multiple faction categories.
+
   * `Lua`, optional, defines the location that *contains* the lua folder to try
     to load `lua/ui/help/unitdescription.lua` and `lua/ui/help/tooltips.lua` from.
     They are expected to be valid Lua, and are sandboxed with no access to functions.
