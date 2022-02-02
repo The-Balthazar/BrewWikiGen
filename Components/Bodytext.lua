@@ -8,10 +8,25 @@ UnitBodytextLeadText = function(ModInfo, bp)
 
     local faction = FactionFromFactionCategory(bp.FactionCategory)
 
-    local bodytext = (bp.General.UnitName and '"'..LOC(bp.General.UnitName)..'" is a' or 'This unamed unit is a')
-    ..(faction and string.upper(string.sub(faction, 1, 1)) == 'A' and 'n ' or ' ')
-    ..(faction and faction..' ' or 'factionless ')
-    ..(bp.Physics.MotionType and motionTypes[bp.Physics.MotionType][1] or 'structure')..' unit included in *'..ModInfo.name.."*.\n"
+    local bodytext = bp.General.UnitName and
+        string.format(
+        LOC("<LOC wiki_intro_name>\"%s\""), LOC(bp.General.UnitName)) or
+        LOC('<LOC wiki_intro_nameless>This unnamed unit')
+
+    local FactionText = {
+        [0] = LOC('<LOC wiki_intro_factionless> is a factionless'),
+        [1] = LOC('<LOC wiki_intro_faction_'..string.lower(faction or 'other')..'> is a'..(string.match(faction or '', '^[aeiouAEIOU]')and'n'or'')..' '..(faction or '')),
+        [2] = LOC('<LOC wiki_intro_multifaction>, which has multiple factions, is a'),
+    }
+    FactionText[3]=FactionText[1]
+
+    bodytext = bodytext..
+    FactionText[Binary2bit(next(bp.FactionCategoryHash), bp.FactionCategory)]..
+    string.format(
+        LOC('<LOC wiki_intro_motion_type> %s included in *%s*.'),
+        LOC('<LOC wiki_intro_'..string.lower(bp.Physics.MotionType or 'RULEUMT_None')..'>'),
+        ModInfo.name
+    ).."\n"
 
     local BuildIntroTDesc = {
         [0] = LOC('<LOC wiki_intro_tdesc_a>It is an unclassified unit with no defined tech level.'),
@@ -27,7 +42,7 @@ UnitBodytextLeadText = function(ModInfo, bp)
         [2] = "\n"..LOC('<LOC wiki_intro_build_c>This unit has no categories to define common builders, however the build description for it is:').."\n\n<blockquote>"..LOC(Description[bp.id] or '').."</blockquote>\n",
         [3] = "\n"..LOC('<LOC wiki_intro_build_d>The build description for this unit is:').."\n\n<blockquote>"..LOC(Description[bp.id] or '').."</blockquote>\n",
     }
-    BuildIntroBuild = BuildIntroBuild[Binary2bit(Description[bp.id], --[[bp.BuiltByCategories or]] arraySubFind(bp.Categories, 'BUILTBY'))]
+    BuildIntroBuild = BuildIntroBuild[Binary2bit(Description[bp.id], arraySubFind(bp.Categories, 'BUILTBY'))]
 
     return bodytext..BuildIntroTDesc..BuildIntroBuild..GetModUnitData(bp.ID, 'LeadSuffix')
 end

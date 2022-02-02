@@ -6,6 +6,7 @@ wiki_infobox_stats_note="Note: This unit has some of its stats<br />redefined at
 wiki_infobox_mod_source="Source:"
 wiki_infobox_unitid="Unit ID:"
 wiki_infobox_faction="Faction:"
+wiki_infobox_factions="Factions:"
 wiki_infobox_tech="Tech level:"
 --Infobox defence
 wiki_infobox_health="Health:"
@@ -59,8 +60,33 @@ wiki_infobox_details="Details"
 --'%s' is for formatting in a string, '/s' is shortform for 'per second'
 wiki_per_second="%s/s"
 
--- in tdesc b tech level is inserted (ie 'tech 1'), in c&d tech level and short description is inserted (ie 'tech 1 assault bot')
---Body lead text
+--Body lead text part 1
+wiki_intro_name="\"%s\""
+wiki_intro_nameless="This unnamed unit"
+--Body lead text part 2
+wiki_intro_factionless=" is a factionless"
+wiki_intro_faction_other=" is an other faction"
+wiki_intro_faction_aeon=" is an Aeon"
+wiki_intro_faction_cybran=" is a Cybran"
+wiki_intro_faction_uef=" is a UEF"
+wiki_intro_faction_seraphim=" is a Seraphim"
+wiki_intro_faction_nomads=" is a Nomads"
+wiki_intro_faction_arm=" is an Arm"
+wiki_intro_faction_core=" is a Core"
+wiki_intro_multifaction=", which has multiple factions, is a"
+--Body lead text part 3
+wiki_intro_motion_type=" %s included in *%s*."
+wiki_intro_ruleumt_air="aircraft unit"
+wiki_intro_ruleumt_amphibious="seabed amphibious unit"
+wiki_intro_ruleumt_amphibiousfloating="floating amphibious unit"
+wiki_intro_ruleumt_biped="land unit"
+wiki_intro_ruleumt_land="land unit"
+wiki_intro_ruleumt_hover="hover unit"
+wiki_intro_ruleumt_water="naval unit"
+wiki_intro_ruleumt_surfacingsub="submarine unit"
+wiki_intro_ruleumt_none="structure unit"
+-- Body lead text part 4
+-- in 'tdesc_b' tech level is inserted (ie 'tech 1'), in c&d tech level and short description is inserted (ie 'tech 1 assault bot')
 wiki_intro_tdesc_a="It is an unclassified unit with no defined tech level."
 wiki_intro_tdesc_b="It is an unclassified %s unit."
 wiki_intro_tdesc_c="It is classified as a %s unit with no defined tech level."

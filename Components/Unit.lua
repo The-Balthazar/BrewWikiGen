@@ -35,7 +35,7 @@ function UnitConciseInfo(bp)
         name = LOC(bp.General.UnitName),
         desc = bp.unitTdesc,
         tech = bp.unitTIndex,
-        faction = FactionFromFactionCategory(bp.FactionCategory),
+        faction = FactionFromFactionCategory(bp.FactionCategory) or 'Other',
     }
 end
 

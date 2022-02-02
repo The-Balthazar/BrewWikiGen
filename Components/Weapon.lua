@@ -4,7 +4,7 @@
 --------------------------------------------------------------------------------
 
 local GetWeaponTargetLayers = function(weapon, unit)
-    local fromLayers = motionTypes[unit.Physics.MotionType or 'RULEUMT_None'][2]
+    local fromLayers = motionTypes[unit.Physics.MotionType or 'RULEUMT_None']
     local targetLayers = {}
     if weapon.FireTargetLayerCapsTable then
         for layer, targetstring in pairs(weapon.FireTargetLayerCapsTable) do

@@ -27,7 +27,15 @@ FactionCategoryIndexes = {
     OTHER = 5,
 }
 
-function FactionFromFactionCategory(cat) return FactionsByIndex[ FactionCategoryIndexes[cat or 'OTHER'] ] end
+function FactionFromFactionCategory(cat) return FactionsByIndex[ FactionCategoryIndexes[cat] ] end
+function FactionsFromFactionCatHash(hash)
+    local array = {}
+    for cat, _ in pairs(hash) do
+        table.insert(array, FactionFromFactionCategory(cat))
+    end
+    table.sort(array)
+    return array
+end
 
 LayerBits = {
     Land   = 1,
@@ -55,18 +63,18 @@ LayersByIndex = {
     --'LAYER_Orbit',
 }
 
--- Motion types mapped to plain text string descriptions, and layers they relevantly be firing from.
+-- Motion types mapped to layers they relevantly be firing from.
 motionTypes = {
-    RULEUMT_Air                = {'aircraft',   {Air = 16}},
-    RULEUMT_Amphibious         = {'seabed amphibious',   {Land = 1, Seabed = 2           }},
-    RULEUMT_AmphibiousFloating = {'floating amphibious', {Land = 1,             Water = 8}},
-    RULEUMT_Biped              = {'land',                {Land = 1                       }},
-    RULEUMT_Land               = {'land',                {Land = 1                       }},
-    RULEUMT_Hover              = {'hover',               {Land = 1,             Water = 8}},
-    RULEUMT_Water              = {'naval',               {                      Water = 8}},
-    RULEUMT_SurfacingSub       = {'submarine',  {Sub = 4,                       Water = 8}},
-    RULEUMT_None               = {'structure',  {Sub = 4, Land = 1, Seabed = 2, Water = 8}},
-    --RULEUMT_Special            = {'',{}}, -- Defined in the engine, but reports malformed if you try to use it
+    RULEUMT_Air                = {Air = 16},
+    RULEUMT_Amphibious         = {         Land = 1, Seabed = 2           },
+    RULEUMT_AmphibiousFloating = {         Land = 1,             Water = 8},
+    RULEUMT_Biped              = {         Land = 1                       },
+    RULEUMT_Land               = {         Land = 1                       },
+    RULEUMT_Hover              = {         Land = 1,             Water = 8},
+    RULEUMT_Water              = {                               Water = 8},
+    RULEUMT_SurfacingSub       = {Sub = 4,                       Water = 8},
+    RULEUMT_None               = {Sub = 4, Land = 1, Seabed = 2, Water = 8},
+    --RULEUMT_Special            = {'',{}}, -- Mentioned in the engine, but reports malformed if you try to use it
 }
 
 defaultOrdersTable = {
