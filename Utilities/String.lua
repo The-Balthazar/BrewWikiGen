@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
@@ -224,9 +224,10 @@ print(
 ''))
 ]]
 
+function LOCBrackets(s) return string.format(LOC'<LOC wiki_bracket_text> (%s)', s) end
+
 function detailsLink(section)
-    return string.format(
-        LOC'<LOC wiki_bracket_text> (%s)',
+    return LOCBrackets(
         xml:a{href='#'..stringSanitiseFilename(LOC(section), true, true)}
         (LOC'<LOC wiki_infobox_details>Details')
     )

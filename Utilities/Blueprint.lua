@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 
 --[[ ---------------------------------------------------------------------- ]]--
@@ -109,11 +109,11 @@ local function GetUnitTechAndDescStrings(bp)
     -- Experimental *generally* do. This unified it so we don't have to check again.
     for i = 1, 3 do
         if bp.CategoriesHash['TECH'..i] then
-            return i, 'Tech '..i, bp.Description and 'Tech '..i..' '..LOC(bp.Description)
+            return i, LOC('<LOC wiki_tech_'..i..'>Tech '..i), bp.Description and LOC('<LOC wiki_tech_'..i..'>Tech '..i)..' '..LOC(bp.Description)
         end
     end
     if bp.CategoriesHash.EXPERIMENTAL then
-        return 4, 'Experimental', LOC(bp.Description)
+        return 4, LOC'<LOC wiki_tech_4>Experimental', LOC(bp.Description)
     end
     return nil, nil, LOC(bp.Description)
 end

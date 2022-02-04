@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 
 GetUnitInfoboxData = function(ModInfo, bp)
@@ -11,7 +11,7 @@ GetUnitInfoboxData = function(ModInfo, bp)
         {'<LOC wiki_infobox_unitid>'    ..'Unit ID:',   xml:code(bp.id)},
         {'<LOC wiki_infobox_faction>'   ..'Faction:',   FactionFromFactionCategory(bp.FactionCategory)},
         {'<LOC wiki_infobox_factions>'  ..'Factions:',  not bp.FactionCategory and InfoboxFlagsList(FactionsFromFactionCatHash(bp.FactionCategoryHash)) },
-        {'<LOC wiki_infobox_tech>'      ..'Tech level:', iconText(bp.unitTIndex, bp.unitTIndex and bp.unitTIndex..(bp.unitTIndex == 4 and ' (Experimental)' or '')) },
+        {'<LOC wiki_infobox_tech>'      ..'Tech level:', iconText(bp.unitTIndex, bp.unitTIndex and bp.unitTIndex..(bp.unitTIndex == 4 and LOCBrackets(LOC'<LOC wiki_tech_4>Experimental') or '')) },
         {''},
         {'<LOC wiki_infobox_health>'    ..'Health:',
             (
@@ -35,11 +35,11 @@ GetUnitInfoboxData = function(ModInfo, bp)
         {'<LOC wiki_infobox_shieldr>'   ..'Shield radius:', (tableSafe(bp.Defense, 'Shield', 'ShieldSize') and numberFormatNoTrailingZeros(bp.Defense.Shield.ShieldSize / 2))}, --Shield size is a scale multiplier, and so is effectively diameter
         {'<LOC wiki_infobox_defflags>'  ..'Flags:',
             InfoboxFlagsList{
-                 bp.CategoriesHash.UNTARGETABLE and 'Untargetable' or '',
-                (bp.CategoriesHash.UNSELECTABLE or not bp.CategoriesHash.SELECTABLE) and 'Unselectable' or '',
-                (bp.Display and bp.Display.HideLifebars or bp.LifeBarRender == false) and 'Lifebars hidden' or '',
-                tableSafe(bp.Defense,'Shield','AntiArtilleryShield') and 'Artillery shield' or '',
-                tableSafe(bp.Defense,'Shield','PersonalShield') and 'Personal shield' or '',
+                 bp.CategoriesHash.UNTARGETABLE and LOC'<LOC wiki_flag_untargetable>Untargetable' or '',
+                (bp.CategoriesHash.UNSELECTABLE or not bp.CategoriesHash.SELECTABLE) and LOC'<LOC wiki_flag_unselectable>Unselectable' or '',
+                (bp.Display and bp.Display.HideLifebars or bp.LifeBarRender == false) and LOC'<LOC wiki_flag_nolife>Lifebars hidden' or '',
+                tableSafe(bp.Defense,'Shield','AntiArtilleryShield') and LOC'<LOC wiki_flag_artilleryshield>Artillery shield' or '',
+                tableSafe(bp.Defense,'Shield','PersonalShield') and LOC'<LOC wiki_flag_personalshield>Personal shield' or '',
             }
         },
         {''},
@@ -70,9 +70,9 @@ GetUnitInfoboxData = function(ModInfo, bp)
         {'<LOC wiki_infobox_steath_sonar_r>'..'Sonar stealth radius:', (bp.Intel and bp.Intel.SonarStealthFieldRadius)},
         {'<LOC wiki_infobox_intelflags>'    ..'Flags:',
             bp.Intel and InfoboxFlagsList{
-                (bp.Intel.Cloak and 'Cloak' or ''),
-                (bp.Intel.RadarStealth and 'Radar stealth' or ''),
-                (bp.Intel.SonarStealth and 'Sonar stealth' or ''),
+                (bp.Intel.Cloak and LOC'<LOC wiki_ability_cloak>Cloak' or ''),
+                (bp.Intel.RadarStealth and LOC'<LOC wiki_ability_radar_stealth>Radar stealth' or ''),
+                (bp.Intel.SonarStealth and LOC'<LOC wiki_ability_sonar_stealth>Sonar stealth' or ''),
             }
         },
         {''},
@@ -105,7 +105,7 @@ GetUnitInfoboxData = function(ModInfo, bp)
             )
         )},
         {''},
-        {'<LOC wiki_infobox_miscrad>' ..'Misc radius:', bp.CategoriesHash.OVERLAYMISC and bp.AI and bp.AI.StagingPlatformScanRadius, 'Defined by the air staging radius value. Often used to indicate things without a dedicated range ring.' },
+        {'<LOC wiki_infobox_miscrad>' ..'Misc radius:', bp.CategoriesHash.OVERLAYMISC and bp.AI and bp.AI.StagingPlatformScanRadius, LOC'<LOC wiki_misc_radius_note>Defined by the air staging radius value. Often used to indicate things without a dedicated range ring.' },
         {'<LOC wiki_infobox_weapons>' ..'Weapons:',     bp.Weapon and #bp.Weapon..detailsLink('<LOC wiki_sect_weapons>Weapons')},
         {'<LOC wiki_infobox_wreckage>'..'Wreckage:',   tableSafe(bp.Wreckage,'WreckageLayers') and
             (
