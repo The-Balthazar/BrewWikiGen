@@ -110,17 +110,17 @@ function CalculateUnitThreatValues(bp)
     --Wepins
     if bp.Weapon then
         for i, weapon in ipairs(bp.Weapon) do
-            if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or string.find(weapon.WeaponCategory or 'nope', 'Anti Air') then
+            if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or string.find(weapon.WeaponCategory or '', 'Anti Air') then
                 ThreatData.AirThreatLevel = ThreatData.AirThreatLevel + DPSEstimate(weapon) / 10
-            elseif weapon.RangeCategory == 'UWRC_AntiNavy' or string.find(weapon.WeaponCategory or 'nope', 'Anti Navy') then
-                if string.find(weapon.WeaponCategory or 'nope', 'Bomb') or string.find(weapon.Label or 'nope', 'Bomb') or weapon.NeedToComputeBombDrop or (bp.Air and bp.Air.Winged) then
+            elseif weapon.RangeCategory == 'UWRC_AntiNavy' or string.find(weapon.WeaponCategory or '', 'Anti Navy') then
+                if string.find(weapon.WeaponCategory or '', 'Bomb') or string.find(weapon.Label or '', 'Bomb') or weapon.NeedToComputeBombDrop or (bp.Air and bp.Air.Winged) then
                     --print("Bomb drop damage value " .. CalculatedDamage(weapon))
                     ThreatData.SubThreatLevel = ThreatData.SubThreatLevel + CalculatedDamage(weapon) / 100
                 else
                     ThreatData.SubThreatLevel = ThreatData.SubThreatLevel + DPSEstimate(weapon) / 10
                 end
-            elseif weapon.RangeCategory == 'UWRC_DirectFire' or string.find(weapon.WeaponCategory or 'nope', 'Direct Fire')
-            or weapon.RangeCategory == 'UWRC_IndirectFire' or string.find(weapon.WeaponCategory or 'nope', 'Artillery') then
+            elseif weapon.RangeCategory == 'UWRC_DirectFire' or string.find(weapon.WeaponCategory or '', 'Direct Fire')
+            or weapon.RangeCategory == 'UWRC_IndirectFire' or string.find(weapon.WeaponCategory or '', 'Artillery') then
                 --Range cutoff for artillery being considered eco and surface threat is 100
                 local wepDPS = DPSEstimate(weapon) or CalculatedDamage(weapon)
                 local rangeCutoff = 50
@@ -175,26 +175,11 @@ function CalculateUnitThreatValues(bp)
         end
     end
 
-    --Sanitise the table
-    checkthreat = 0
+    -- Only return different numbers.
     for i, v in pairs(ThreatData) do
-        --Round appropriately
-        if v < 1 then
-            ThreatData[i] = 0
-        else
-            ThreatData[i] = math.floor(v + 0.5)
-        end
-        --Only report numbers if they aren't the same as on file.
-        if ThreatData[i] == (bp.Defense[i] or 0) then
-            ThreatData[i] = nil
-        end
-        if ThreatData[i] then
-            checkthreat = checkthreat + ThreatData[i]
-        end
+        v = math.floor(v+0.5)
+        ThreatData[i] = (bp.Defense[i] or 0) ~= v and v or nil
     end
-    -- If we have nothing to tell, tell nothing.
-    if checkthreat == 0 then
-        ThreatData = nil
-    end
+
     return ThreatData
 end
