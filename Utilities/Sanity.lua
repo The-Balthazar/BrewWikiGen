@@ -221,7 +221,7 @@ function BlueprintSanityChecks(bp)
                     bp.Physics.BuildOnLayerCaps.LAYER_Water == false
                 ),                                              'Redundant false bp.Physics.BuildOnLayerCaps value'
             },
-            { bp.Display.SpawnRandomRotation,                   'Redundant bp.Display.SpawnRandomRotation value' },
+            { bp.Display.SpawnRandomRotation ~= nil,            'Redundant bp.Display.SpawnRandomRotation value' },
             { bp.Display.PlaceholderMeshName,                   'Redundant bp.Display.PlaceholderMeshName value' },
             { bp.CategoriesHash.OVERLAYANTIAIR,                 'Redundant cat OVERLAYANTIAIR' },
             { bp.CategoriesHash.OVERLAYANTINAVY,                'Redundant cat OVERLAYANTINAVY' },
