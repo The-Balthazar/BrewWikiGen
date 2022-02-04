@@ -202,7 +202,7 @@ function GetPairedModUnitBlueprints(modDir)
 
     for i, fileDir in ipairs(BlueprintPathsArray) do
         for _, bp in GetPairedBlueprintsFromFile(fileDir[1],fileDir[2]) do
-            assert(not ModUnitBlueprints[bp.id], "⚠️ Found blueprints within mod with clashing ID "..bp.id)
+            assert(not ModUnitBlueprints[bp.id], LogEmoji('⚠️').." Found blueprints within mod with clashing ID "..bp.id)
             ModUnitBlueprints[bp.id] = bp
             numValidBlueprints = numValidBlueprints + 1
         end

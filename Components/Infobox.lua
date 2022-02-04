@@ -19,9 +19,9 @@ GetUnitInfoboxData = function(ModInfo, bp)
                 and iconText(
                     'Health',
                     bp.Defense and bp.Defense.MaxHealth,
-                    (bp.Defense and bp.Defense.RegenRate and bp.Defense.RegenRate ~= 0 and ' (+'..bp.Defense.RegenRate ..'/s)')
+                    (bp.Defense and bp.Defense.RegenRate and bp.Defense.RegenRate ~= 0 and LOCBrackets(LOCPlusPerSec(bp.Defense.RegenRate)))
                 )
-                or 'Invulnerable'
+                or LOC'<LOC wiki_flag_invulnerable>Invulnerable'
             )
         },
         {'<LOC wiki_infobox_armor>'     ..'Armour:', (bp.Defense and not bp.CategoriesHash.INVULNERABLE and bp.Defense.ArmorType and '<code>'..bp.Defense.ArmorType..'</code>')},
@@ -29,7 +29,7 @@ GetUnitInfoboxData = function(ModInfo, bp)
             iconText(
                 'Shield',
                  tableSafe(bp.Defense, 'Shield', 'ShieldMaxHealth'),
-                (tableSafe(bp.Defense, 'Shield', 'ShieldRegenRate') and ' (+'..bp.Defense.Shield.ShieldRegenRate..'/s)')
+                (tableSafe(bp.Defense, 'Shield', 'ShieldRegenRate') and LOCBrackets(LOCPlusPerSec(bp.Defense.Shield.ShieldRegenRate)) )
             )
         },
         {'<LOC wiki_infobox_shieldr>'   ..'Shield radius:', (tableSafe(bp.Defense, 'Shield', 'ShieldSize') and numberFormatNoTrailingZeros(bp.Defense.Shield.ShieldSize / 2))}, --Shield size is a scale multiplier, and so is effectively diameter
@@ -46,10 +46,10 @@ GetUnitInfoboxData = function(ModInfo, bp)
         {'<LOC wiki_infobox_cost_e>'    ..'Energy cost:',       iconText('Energy', bp.Economy and bp.Economy.BuildCostEnergy)},
         {'<LOC wiki_infobox_cost_m>'    ..'Mass cost:',         iconText('Mass',   bp.Economy and bp.Economy.BuildCostMass)},
         {'<LOC wiki_infobox_cost_t>'    ..'Build time:',        iconText('',       bp.Economy and bp.Economy.BuildTime, arraySubFind(bp.Categories, 'BUILTBY') and detailsLink('<LOC wiki_sect_construction>Construction') or '' )},
-        {'<LOC wiki_infobox_maint_e>'   ..'Maintenance cost:',  iconText('Energy', bp.Economy and bp.Economy.MaintenanceConsumptionPerSecondEnergy,'/s')},
+        {'<LOC wiki_infobox_maint_e>'   ..'Maintenance cost:',  iconText('Energy', bp.Economy and LOCPerSec(bp.Economy.MaintenanceConsumptionPerSecondEnergy))},
         {'<LOC wiki_infobox_buildrate>' ..'Build rate:',        iconText('Build',  bp.Economy and bp.Economy.BuildRate)},
-        {'<LOC wiki_infobox_prod_e>'    ..'Energy production:', iconText('Energy', bp.Economy and bp.Economy.ProductionPerSecondEnergy, '/s')},
-        {'<LOC wiki_infobox_prod_m>'    ..'Mass production:',   iconText('Mass',   bp.Economy and bp.Economy.ProductionPerSecondMass, '/s')},
+        {'<LOC wiki_infobox_prod_e>'    ..'Energy production:', iconText('Energy', bp.Economy and LOCPerSec(bp.Economy.ProductionPerSecondEnergy))},
+        {'<LOC wiki_infobox_prod_m>'    ..'Mass production:',   iconText('Mass',   bp.Economy and LOCPerSec(bp.Economy.ProductionPerSecondMass))},
         {'<LOC wiki_infobox_store_e>'   ..'Energy storage:',    iconText('Energy', bp.Economy and bp.Economy.StorageEnergy)},
         {'<LOC wiki_infobox_store_m>'   ..'Mass storage:',      iconText('Mass',   bp.Economy and bp.Economy.StorageMass)},
         {''},

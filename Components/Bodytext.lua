@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 local function Binary2bit(a,b) return (a and 2 or 0) + (b and 1 or 0) end
 
@@ -160,8 +160,8 @@ UnitBodytextSectionData = function(ModInfo, bp)
                             local costminusM = upgrade and bp.Economy.DifferentialUpgradeCostCalculation and upgrade.Economy.BuildCostMass or 0
 
                             return "\n* "..iconText('Time', formatTime(secs) )
-                            ..' ‒ '..iconText('Energy', math.floor((bp.Economy.BuildCostEnergy * costmult - costminusE) / secs + 0.5), '/s')
-                            ..' ‒ '..iconText('Mass', math.floor((bp.Economy.BuildCostMass * costmult - costminusM) / secs + 0.5), '/s')
+                            ..' ‒ '..iconText('Energy', LOCPerSec(math.floor((bp.Economy.BuildCostEnergy * costmult - costminusE) / secs + 0.5)))
+                            ..' ‒ '..iconText('Mass', LOCPerSec(math.floor((bp.Economy.BuildCostMass * costmult - costminusM) / secs + 0.5)))
                             ..' — '..string.format(LOC(upgrade and 'Upgrade from %s' or 'Built by %s'), buildername)
                         elseif buildername then
                             return "\n* "..

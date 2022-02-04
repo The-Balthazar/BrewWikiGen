@@ -224,8 +224,6 @@ print(
 ''))
 ]]
 
-function LOCBrackets(s) return string.format(LOC'<LOC wiki_bracket_text> (%s)', s) end
-
 function detailsLink(section)
     return LOCBrackets(
         xml:a{href='#'..stringSanitiseFilename(LOC(section), true, true)}

@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 
 local GetWeaponTargetLayers = function(weapon, unit)
@@ -261,7 +261,7 @@ GetWeaponInfoboxData = function(wep, bp)
                 wep.EnergyRequired and wep.EnergyRequired ~= 0 and
                 (
                     wep.EnergyRequired ..
-                    (wep.EnergyDrainPerSecond and ' ('..wep.EnergyDrainPerSecond..'/s for '..(math.ceil((wep.EnergyRequired/wep.EnergyDrainPerSecond)*10)/10)..'s)' or '')
+                    (wep.EnergyDrainPerSecond and LOCBrackets(LOCPerSec(wep.EnergyDrainPerSecond)..' for '..(math.ceil((wep.EnergyRequired/wep.EnergyDrainPerSecond)*10)/10)..'s') or '')
                 )
             )
         },

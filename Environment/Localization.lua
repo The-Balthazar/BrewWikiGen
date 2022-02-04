@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 local Language
 local LocalizedStrings = {}
@@ -30,3 +30,7 @@ end
 
 function LOC(s) return s and (LocalizedStrings[string.match(s, '<LOC ([^>.]*)>')] or noLOC(s)) end
 function noLOC(s) return string.gsub(s, '<LOC [^>.]*>', '') end
+
+function LOCBrackets(s) return s and string.format(LOC'<LOC wiki_bracket_text> (%s)', s) end
+function LOCPerSec(s) return s and string.format(LOC'<LOC wiki_per_second>%s/s', numberFormatNoTrailingZeros(s)) end
+function LOCPlusPerSec(s) return s and string.format(LOC'<LOC wiki_plus_per_second>+%s/s', numberFormatNoTrailingZeros(s)) end
