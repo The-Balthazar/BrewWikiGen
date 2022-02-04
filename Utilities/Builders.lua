@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 --[[
 -- Once pupulated, contents looks like:
@@ -18,7 +18,7 @@ BuildableCategories = {
 local BuildableCategories = {}
 
 function GetBuildableCategoriesFromBp(bp)
-    if not tableSafe(bp.Economy,'BuildableCategory') then return end
+    if not bp.Economy.BuildableCategory then return end
 
     for i, buildcat in ipairs(bp.Economy.BuildableCategory) do
         if not BuildableCategories[buildcat] then

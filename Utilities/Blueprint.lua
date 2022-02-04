@@ -11,7 +11,7 @@ local TotalValidBlueprints = 0
 local TotalIgnoredBlueprints = 0
 
 function printTotalBlueprintValues()
-    if _G.Logging and _G.Logging.BlueprintTotals then
+    if Logging.BlueprintTotals then
         print(TotalBlueprintFiles..' opened .bp file'..pluralS(TotalBlueprintFiles))
         print(TotalValidBlueprints..' processed blueprint'..pluralS(TotalValidBlueprints))
         print(TotalIgnoredBlueprints..' ignored blueprint'..pluralS(TotalIgnoredBlueprints))

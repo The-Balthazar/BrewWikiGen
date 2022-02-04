@@ -139,7 +139,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
         },
         {
             '<LOC wiki_sect_construction>Construction',
-            check = bp.Economy and (bp.BuiltByCategories or arraySubFind(bp.Categories, 'BUILTBY')),
+            check = bp.Economy and bp.BuiltByCategories,
             Data = function(bp)
                 local function BuilderList(bp)
                     local bilst = ''

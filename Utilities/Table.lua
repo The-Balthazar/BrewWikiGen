@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 
 -- returns the index of the first matching value in array
@@ -135,17 +135,4 @@ function BinaryCounter(t)
         n = n + (v and 1 or 0)
     end
     return n
-end
-
--- deep table navigation without risk of nil index error
--- input resembles : `bp.Defense, 'Shield', 'ShieldRegenRate'`
--- returns : bp.Defense.Shield.ShieldRegenRate if it exists, else false
-function tableSafe(target, ...)
-    if not target then return end
-    for i, t in ipairs{...} do
-        if target[t] then
-            target = target[t]
-        else return end
-    end
-    return target
 end

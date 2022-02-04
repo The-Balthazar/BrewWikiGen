@@ -1,7 +1,9 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
+debug.setmetatable(nil, {__index={}})
+
 OutputDirectory = nil
 
 function printif(check, ...) if check then print(...) end end

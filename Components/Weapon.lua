@@ -358,7 +358,7 @@ local function BeamCollisionsPerSecond(weapon)
         return 1 / (weapon.BeamCollisionDelay + 0.1)
     end
 local function BeamMaxTheoreticalDPS(weapon)
-        return weaponDamage(weapon) * BeamCollisionsPerSecond(weapon) * #(tableSafe(weapon,1,Rackbones,1,MuzzleBones) or {true})
+        return weaponDamage(weapon) * BeamCollisionsPerSecond(weapon) * #(weapon[1].Rackbones[1].MuzzleBones or {true})
     end
 --------------------------------------------------------------------------------
 function NewDPSEstimate(weapon)

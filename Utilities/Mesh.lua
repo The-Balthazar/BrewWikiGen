@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 
 local function GetSCMFileString(filename)
@@ -36,10 +36,10 @@ local function GetSCMBoneNames(filename)
 end
 
 local function GetLOD0SCMFilename(bp)
-    if tableSafe(bp,'Display','MeshBlueprint') then
+    if bp.Display.MeshBlueprint then
         error("Mesh defined as blueprint that I've not implemented parsing of yet")
 
-    elseif tableSafe(bp,'Display','Mesh','LODs',1) then
+    elseif bp.Display.Mesh.LODs[1] then
         local path = string.lower(bp.Display.Mesh.LODs[1].MeshName or (bp.ID..'_lod0.scm'))
 
         if string.sub(path,1,1) == '/' then

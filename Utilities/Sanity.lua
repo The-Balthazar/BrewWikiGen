@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 
 local IconMotionTypes = {
@@ -86,7 +86,7 @@ function BlueprintSanityChecks(bp)
                 ' unit has bp.General.FactionName value '..tostring(bp.General.FactionName)
             )
         end
-        if tableSafe(bp.Display.Mesh,'LODs') then
+        if bp.Display.Mesh.LODs then
             local Shaders = {
                 Seraphim = 'SERAPHIM',
                 Aeon = 'AEON',
@@ -173,7 +173,7 @@ function BlueprintSanityChecks(bp)
     end
 
     do -- Veteran stuff
-        if tableSafe(bp.Buffs,'Regen','Level1') and tableSafe(bp.Veteran,'Level1') then
+        if bp.Buffs.Regen.Level1 and bp.Veteran.Level1 then
             local regen1 = bp.Buffs.Regen.Level1
             local kills1 = bp.Veteran.Level1
             local regenOdd = false

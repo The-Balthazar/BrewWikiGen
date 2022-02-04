@@ -5,20 +5,15 @@
 -- Note this is largely unchanged from https://github.com/The-Balthazar/BrewLAN/blob/806a689792fa14e071ed679ee37b3e34d55ecbbf/mods/BrewLAN_Plenae/Logger/hook/lua/system/Blueprints.lua#L345
 
 local function CalculatedDamage(weapon)
-    local ProjectileCount = math.max(1, #( tableSafe(weapon.RackBones,1,'MuzzleBones') or {} ), weapon.MuzzleSalvoSize or 1 )
+    local ProjectileCount = math.max(1, #(weapon.RackBones[1].MuzzleBones or {}), weapon.MuzzleSalvoSize or 1 )
     if weapon.RackFireTogether then
-        ProjectileCount = ProjectileCount * math.max(1, #(weapon.RackBones or {} ) )
+        ProjectileCount = ProjectileCount * math.max(1, #(weapon.RackBones or {}) )
     end
     return ((weapon.Damage or 0) + (weapon.NukeInnerRingDamage or 0)) * ProjectileCount * (weapon.DoTPulses or 1)
 end
 
 local function ShouldWeCalculateBuildRate(bp)
-    if not (bp.Economy and bp.Economy.BuildRate) then
-        return false
-    end
-    if arrayFind(bp.Categories, 'WALL') then
-        return false
-    end
+    if not bp.Economy.BuildRate or arrayFind(bp.Categories, 'WALL') then return end
     local TrueCats = {
         'FACTORY',
         'ENGINEER',
@@ -47,10 +42,10 @@ function CalculateUnitThreatValues(bp)
         UnknownWeaponThreat = 0,
     }
     local Warnings
-    if bp.Defense and bp.Defense.MaxHealth then
+    if bp.Defense.MaxHealth then
         ThreatData.HealthThreat = bp.Defense.MaxHealth * 0.01
     end
-    if bp.Defense and bp.Defense.Shield then
+    if bp.Defense.Shield then
         local shield = bp.Defense.Shield                                               --ShieldProjectionRadius entirely only for the Pillar of Prominence
         local shieldarea = (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * math.pi
         local skirtarea = (bp.Physics.SkirtSizeX or 3) * (bp.Physics.SkirtSizeY or 3)                                                              -- Added so that transport shields dont count as personal shields.
@@ -62,16 +57,16 @@ function CalculateUnitThreatValues(bp)
     end
 
     --Define eco production values
-    if bp.Economy and bp.Economy.ProductionPerSecondMass then
+    if bp.Economy.ProductionPerSecondMass then
         --Mass prod + 5% of health
         ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + bp.Economy.ProductionPerSecondMass * 10 + (ThreatData.HealthThreat + ThreatData.PersonalShieldThreat) * 5
     end
-    if bp.Economy and bp.Economy.ProductionPerSecondEnergy then
+    if bp.Economy.ProductionPerSecondEnergy then
         --Energy prod + 1% of health
         ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + bp.Economy.ProductionPerSecondEnergy * 0.1 + ThreatData.HealthThreat + ThreatData.PersonalShieldThreat
     end
     --0 off the personal health values if we alreaady used them
-    if bp.Economy and (bp.Economy.ProductionPerSecondMass or bp.Economy.ProductionPerSecondEnergy) then
+    if bp.Economy.ProductionPerSecondMass or bp.Economy.ProductionPerSecondEnergy then
         ThreatData.HealthThreat = 0
         ThreatData.PersonalShieldThreat = 0
     end
@@ -90,14 +85,14 @@ function CalculateUnitThreatValues(bp)
     end
 
     --Calculate for storage values.
-    if bp.Economy and bp.Economy.StorageMass then
+    if bp.Economy.StorageMass then
         ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + bp.Economy.StorageMass * 0.001 + ThreatData.HealthThreat + ThreatData.PersonalShieldThreat
     end
-    if bp.Economy and bp.Economy.StorageEnergy then
+    if bp.Economy.StorageEnergy then
         ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + bp.Economy.StorageEnergy * 0.001 + ThreatData.HealthThreat + ThreatData.PersonalShieldThreat
     end
     --0 off the personal health values if we alreaady used them
-    if bp.Economy and (bp.Economy.StorageMass or bp.Economy.StorageEnergy) then
+    if bp.Economy.StorageMass or bp.Economy.StorageEnergy then
         ThreatData.HealthThreat = 0
         ThreatData.PersonalShieldThreat = 0
     end
@@ -108,7 +103,7 @@ function CalculateUnitThreatValues(bp)
     end
 
     --No one really cares about air staging, well maybe a little bit.
-    if bp.Transport and bp.Transport.DockingSlots then
+    if bp.Transport.DockingSlots then
         ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + bp.Transport.DockingSlots
     end
 
