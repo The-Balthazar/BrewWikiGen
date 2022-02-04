@@ -63,7 +63,7 @@ function stringHTMLWrap(s, limit)
             len = len+1+(word):len()
             if len > limit then
                 len = 0
-                return '<br />'..word
+                return xml:br()..word
             else
                 return space..word
             end
@@ -226,9 +226,9 @@ print(
 
 function detailsLink(section)
     return string.format(
-        LOC('<LOC wiki_bracket_text> (%s)'),
+        LOC'<LOC wiki_bracket_text> (%s)',
         xml:a{href='#'..stringSanitiseFilename(LOC(section), true, true)}
-        (LOC('<LOC wiki_infobox_details>Details'))
+        (LOC'<LOC wiki_infobox_details>Details')
     )
 end
 

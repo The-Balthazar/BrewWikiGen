@@ -165,7 +165,7 @@ local GetWeaponBuffs = function(wep)
     end
 end
 
-local DPSEstimate = function(weapon)
+function DPSEstimate(weapon)
     -- Dont do death weapons, or weapons without RoF
     if IsDeathWeapon(weapon)
     or not weapon.RateOfFire

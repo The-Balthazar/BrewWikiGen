@@ -53,11 +53,11 @@ LayerBits = {
 }
 
 LayerHash = {
-    LAYER_Land   = LOC('<LOC wiki_layer_land>Land'),
-    LAYER_Seabed = LOC('<LOC wiki_layer_seabed>Seabed'),
-    LAYER_Sub    = LOC('<LOC wiki_layer_sub>Sub'),
-    LAYER_Water  = LOC('<LOC wiki_later_water>water'),
-    LAYER_Air    = LOC('<LOC wiki_layer_air>Air'),
+    LAYER_Land   = LOC'<LOC wiki_layer_land>Land',
+    LAYER_Seabed = LOC'<LOC wiki_layer_seabed>Seabed',
+    LAYER_Sub    = LOC'<LOC wiki_layer_sub>Sub',
+    LAYER_Water  = LOC'<LOC wiki_later_water>water',
+    LAYER_Air    = LOC'<LOC wiki_layer_air>Air',
     --LAYER_Orbit  = LOC('<LOC wiki_layer_orbit>Orbit'),
 }
 

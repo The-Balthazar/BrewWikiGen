@@ -38,6 +38,14 @@ WikiOptions = {
     GenerateUnitPages = true,
     GenerateCategoryPages = true,
 
+    CleanBlueprintFiles = true,
+    CleanBlueprintGeneral = true,
+    CleanBlueprintDisplay = true,
+    CleanBlueprintInterface = true,
+    CleanBlueprintUseOOBTestZoom = true,
+
+    CleanBlueprintThreat = true,
+
     -- Unit page options
     AbilityDescriptions = true,
     BalanceNote = '<LOC wiki_balance_stats_steam>Displayed stats are from when launched on the steam/retail version of the game.',
@@ -124,6 +132,8 @@ Logging = {
     NewFileWrites      = true,
     FileAppendWrites   = true,
     FileUpdateWrites   = false,
+
+    ThreatCalculationWarnings = false
 }
 Sanity = {
     BlueprintChecks         = false,

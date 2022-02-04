@@ -22,8 +22,8 @@ local function UnitInfobox(ModInfo, bp)
             '<img align="left" title="%s unit icon" src="%s_icon.png" />%s<br />%s',
             (LOC(bp.General.UnitName) or 'The'),
             unitIconsPath..bp.ID,
-            (LOC(bp.General.UnitName) or '<i>Unnamed</i>'),
-            (bp.unitTdesc or [[<i>No description</i>]])
+            (LOC(bp.General.UnitName) or xml:i'Unnamed'),
+            (bp.unitTdesc or xml:i'No description')
         )},
         Data = GetUnitInfoboxData(ModInfo, bp),
     }
@@ -63,6 +63,18 @@ function LoadEnvUnitBlueprints(GeneratorDir)
             end
             bp.WikiPage = EnvironmentData.GenerateWikiPages
         end
+    end
+end
+
+function CheckUnitBlueprintSanity()
+    for id, bp in pairs(all_units) do
+        BlueprintSanityChecks(bp)
+    end
+end
+
+function CleanupBlueprintsFiles()
+    for id, bp in pairs(all_units) do
+        BlueprintCleanup(bp)
     end
 end
 

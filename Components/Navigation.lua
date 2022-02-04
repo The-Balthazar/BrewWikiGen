@@ -126,8 +126,6 @@ function InsertInNavigationData(bp)
     table.insert(NavigationData[index].Factions[factioni], UnitInfo)
 end
 
-local function printif(check, ...) if check then print(...) end end
-
 local function UpdateGeneratedPartOfPage(page, tag, content)
     local md = io.open(OutputDirectory..page, "r")
     local mdstring = md and md:read('a')

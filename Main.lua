@@ -4,6 +4,8 @@
 --------------------------------------------------------------------------------
 OutputDirectory = nil
 
+function printif(check, ...) if check then print(...) end end
+
 function GeneratorMain(Output)
     OutputDirectory = Output
 
@@ -24,11 +26,13 @@ function GeneratorMain(Output)
         'Environment/Game.lua',
         'Utilities/Blueprint.lua',
         'Utilities/Builders.lua',
+        'Utilities/Cleanup.lua',
         'Utilities/File.lua',
         'Utilities/Mesh.lua',
         'Utilities/Sanity.lua',
         'Utilities/String.lua',
         'Utilities/Table.lua',
+        "Utilities/Threat.lua",
         'Components/Bodytext.lua',
         'Components/Categories.lua',
         'Components/Infobox.lua',
@@ -68,6 +72,8 @@ function GeneratorMain(Output)
     --[[ ------------------------------------------------------------------ ]]--
     --[[ Generate wiki                                                      ]]--
     --[[ ------------------------------------------------------------------ ]]--
+    if Logging.BlueprintChecks           then safecall(CheckUnitBlueprintSanity) end
+    if WikiOptions.CleanBlueprintFiles   then safecall(CleanupBlueprintsFiles) end
     if WikiOptions.GenerateUnitPages     then safecall(GenerateUnitPages) end
     if WikiOptions.GenerateSidebar       then safecall(GenerateSidebar) end
     if WikiOptions.GenerateModPages      then safecall(GenerateModPages) end

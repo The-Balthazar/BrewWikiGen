@@ -101,9 +101,22 @@ Include a slash at the end.
     be loaded. They are not ISO_639-1. Non-`'US'` is only partially supported.
 
   * `GenerateHomePage`, `GenerateSidebar`, `GenerateModPages`, `GenerateUnitPages`,
-    and `GenerateCategoryPages`; `true` or `false`. Generate those parts or not.
-    I guess you could turn them all off and use the script for the blueprint sanity
-    checks if that's what you wanted.
+    and `GenerateCategoryPages`; `true` or `false`: Generate those parts or not.
+
+  * `CleanBlueprintFiles`; `true` or `false`: Enables or disables all `.bp` file
+    modifying scripts. Note it only applies to loaded `.bp` files that would be
+    given a wiki page.
+
+  * `CleanBlueprintGeneral`, `CleanBlueprintDisplay`, `CleanBlueprintInterface`,
+    and `CleanBlueprintUseOOBTestZoom`; `true` or `false`: Removes obsolete vales.
+    Specifically:
+    * From `General`: `Category`, `Classification`, `TechLevel`, and `UnitWeight`.
+    * From `Display`: `PlaceholderMeshName`, and `SpawnRandomRotation`.
+    * The whole of `Interface`.
+    * The value `UseOOBTestZoom`.
+
+  * `CleanBlueprintThreat`; `true` or `false`: Updates the threat values based on
+    an extensive formula.
 
   * `AbilityDescriptions`; `true` or `false`: If `false` it lists the abilities of
     the units verbatim in the abilities section. If true it will try to map them

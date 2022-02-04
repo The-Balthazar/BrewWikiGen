@@ -163,6 +163,8 @@ local function GetPairedBlueprintsFromFile(dir, file)
 
     for i, bp in ipairs(bps) do
         bp.SourceFolder = dir
+        bp.Source = dir..'/'..file
+        bp.SourceBlueprints = #bps
         BlueprintSetShortId(bp, file)
         if not bp.Merge and isValidBlueprint(bp) and not isExcludedId(bp.id) then
             table.insert(validbps, bp)
@@ -184,7 +186,6 @@ function ProcessBlueprint(bp)
     BlueprintHashCategories(bp)
     BlueprintSetUnitTechAndDescStrings(bp)
     BlueprintMeshBones(bp)
-    BlueprintSanityChecks(bp)
 
     InsertInNavigationData(bp)
     GetBuildableCategoriesFromBp(bp)
