@@ -137,27 +137,35 @@ end
 local function GetPairedBlueprintsFromFile(dir, file)
     local bpfile = io.open(dir..'/'..file, 'r')
     local bpstring = bpfile:read('a')
-
     bpfile:close()
 
+    local bps = {}
+
+    local env = {
+        Sound                    = function(t) return setmetatable(t, {__name = 'Sound'}) end,
+        BeamBlueprint            = function(t) return setmetatable(t, {__name = 'BeamBlueprint'}) end,
+        MeshBlueprint            = function(t) return setmetatable(t, {__name = 'MeshBlueprint'}) end,
+        PropBlueprint            = function(t) return setmetatable(t, {__name = 'PropBlueprint'}) end,
+        EmitterBlueprint         = function(t) return setmetatable(t, {__name = 'EmitterBlueprint'}) end,
+        ProjectileBlueprint      = function(t) return setmetatable(t, {__name = 'ProjectileBlueprint'}) end,
+        TrailEmitterBlueprint    = function(t) return setmetatable(t, {__name = 'TrailEmitterBlueprint'}) end,
+        UnitBlueprint = function(t) table.insert(bps, setmetatable(t, {__name = 'UnitBlueprint'})) end,
+    }
+
     local sanitiseSteps = {
-        {'#',                 '--',       },
-        {'\\[^"^\']',         '/',        },
-        {'Sound%s*{',         '{',        },
-        {'%a+Blueprint%s*{', 'return {', 1},
-        {'%a+Blueprint%s*{', '{',         },
-        {'}%s*{',             '}, {',     },
+        {'#',         '--'},
+        {'\\[^"^\']', '/' },
     }
 
     for i, v in ipairs(sanitiseSteps) do
         bpstring = string.gsub(bpstring, v[1], v[2], v[3])
     end
 
-    local chunk, msg = load(bpstring)
-    assert(chunk, LogEmoji('⚠️').." Failed to load "..file..(msg or ''))
+    local chunk, msg = load(bpstring, file, 't', env)
+    assert(chunk, msg)
 
-    local bps = {chunk()}
-    assert(bps[1], LogEmoji('⚠️').." Failed to load "..file)
+    chunk()
+    printif(not bps[1], '    No blueprints found in '..file)
 
     local validbps = {}
 
