@@ -1,8 +1,9 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 
+-- Factions
 FactionIndexes = {
     UEF = 1,
     Aeon = 2,
@@ -44,6 +45,15 @@ function FactionsFromFactionCatHash(hash)
     return array
 end
 
+-- Tech levels
+TechLevelCategoryIndexes = {
+    TECH1 = 1,
+    TECH2 = 2,
+    TECH3 = 3,
+    EXPERIMENTAL = 4,
+}
+
+-- Layers
 LayerBits = {
     Land   = 1,
     Seabed = 2,

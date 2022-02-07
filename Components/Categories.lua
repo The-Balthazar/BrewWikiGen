@@ -1,24 +1,70 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 local categoryData = {}
 
-function UnitPageCategories(ModInfo, UnitInfo, bpCatHash)
-    if not (_G.FooterCategories and FooterCategories[1]) then return '' end
+local MenuSortCats = {
+    SORTCONSTRUCTION = 'SORTCONSTRUCTION',
+    SORTECONOMY = 'SORTECONOMY',
+    SORTDEFENSE = 'SORTDEFENSE',
+    SORTSTRATEGIC = 'SORTSTRATEGIC',
+    SORTINTEL = 'SORTINTEL',
+}
+
+local function HashFactionCat(bp, cat)
+    if FactionCategoryIndexes[cat] then
+        if bp.FactionCategory == nil then
+            bp.FactionCategory = cat
+        elseif not bp.FactionCategoryHash[cat] then -- Make sure it's not a dupe of the same
+            bp.FactionCategory = false -- has multiple faction categories
+        end
+        bp.FactionCategoryHash[cat] = cat
+    elseif not cat then
+        if bp.FactionCategory == nil then
+            bp.FactionCategory = 'OTHER'
+        end
+    end
+end
+
+local function HashTechCat(bp, cat)
+    local TCatI = TechLevelCategoryIndexes[cat]
+    if TCatI then
+        bp.TechIndex = bp.TechIndex and math.min(bp.TechIndex, TCatI) or TCatI
+    end
+    HashFactionCat(bp, cat)
+end
+
+function HashUnitCategories(bp)
+    bp.CategoriesHash = {
+        -- Implicit categories
+        [bp.id] = bp.id, -- lower case ID
+        ALLUNITS = 'ALLUNITS',
+    }
+    bp.FactionCategoryHash = {}
+    if not bp.Categories then return end
+    for i, cat in ipairs(bp.Categories) do
+        cat = string.upper(cat)
+        bp.CategoriesHash[cat] = cat
+        bp.SortCategory = bp.SortCategory or MenuSortCats[cat]
+        HashTechCat(bp, cat)
+    end
+    bp.SortCategory = bp.SortCategory or 'SORTOTHER'
+    HashFactionCat(bp)
+end
+
+function UnitPageCategories(bp)
+    if not FooterCategories[1] then return '' end
 
     local cattext = ''
     for i, cat in ipairs(FooterCategories) do
-        if bpCatHash[cat] then
+        if bp.CategoriesHash[cat] then
 
             if not categoryData[cat] then
                 categoryData[cat] = {}
             end
 
-            table.insert(categoryData[cat], {
-                UnitInfo = UnitInfo,
-                ModInfo = ModInfo
-            })
+            table.insert(categoryData[cat], bp)
 
             if cattext ~= '' then
                 cattext = cattext..' · '
@@ -36,28 +82,29 @@ function UnitPageCategories(ModInfo, UnitInfo, bpCatHash)
 end
 
 function GenerateCategoryPages()
-    if not (_G.FooterCategories and FooterCategories[1]) then
+    if not FooterCategories[1] then
         return
     end
     local num = 0
     for cat, datum in pairs(categoryData) do
-        table.sort(datum, function(a,b) return (a.UnitInfo.tech or 5)..a.UnitInfo.bpid < (b.UnitInfo.tech or 5)..b.UnitInfo.bpid end)
+        local function sortkey(bp) return (bp.TechIndex or 5)..bp.ID end
+        table.sort(datum, function(a,b) return sortkey(a) < sortkey(b) end)
 
         local function catRow(datum)
             local s = "\n"
-            for i, data in ipairs(datum) do
+            for i, bp in ipairs(datum) do
                 local switch = {
-                    [0] = (data.UnitInfo.bpid),
-                    [1] = (data.UnitInfo.name or '')..(data.UnitInfo.desc or ''),
-                    [2] = (data.UnitInfo.name or '')..': '..(data.UnitInfo.desc or ''),
+                    [0] = bp.ID,
+                    [1] = (bp.General.UnitName or '')..(bp.TechDescription or ''),
+                    [2] = (bp.General.UnitName or '')..': '..(bp.TechDescription or ''),
                 }
 
                 s = s..
                 '    '..xml:tr(
-                '        '..xml:td(xml:a{href=data.UnitInfo.bpid}(xml:img{src=unitIconsPath..data.UnitInfo.bpid..'_icon.png', width='21px'})),
-                '        '..xml:td(xml:code{}(string.lower(data.UnitInfo.bpid))),
-                '        '..xml:td(xml:a{href=stringSanitiseFilename(data.ModInfo.name)}(xml:img{src=IconsPath..'mods/'..(data.ModInfo.icon and stringSanitiseFilename(data.ModInfo.name, true, true) or 'mod')..'.png', width='21px'})),
-                '        '..xml:td(xml:a{href=data.UnitInfo.bpid}(switch[BinaryCounter{data.UnitInfo.name, data.UnitInfo.desc}])),
+                '        '..xml:td(xml:a{href=bp.ID}(xml:img{src=unitIconsPath..bp.ID..'_icon.png', width='21px'})),
+                '        '..xml:td(xml:code{}(bp.id)),
+                '        '..xml:td(xml:a{href=stringSanitiseFilename(bp.ModInfo.name)}(xml:img{src=IconsPath..'mods/'..(bp.ModInfo.icon and stringSanitiseFilename(bp.ModInfo.name, true, true) or 'mod')..'.png', width='21px'})),
+                '        '..xml:td(xml:a{href=bp.ID}(switch[BinaryCounter{bp.General.UnitName, bp.TechDescription}])),
                 '    ').."\n"
             end
             return s

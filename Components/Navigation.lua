@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 local NavigationData = {}
 
@@ -12,11 +12,11 @@ local function sortData(sorttable, sort)
                 table.sort(unitarray, function(a,b)
 
                     if sort == 'TechDescending-DescriptionAscending' then
-                        local function sortkey(c) return (5-(c.tech or 0))..(c.desc or 'z error')..c.bpid end
+                        local function sortkey(c) return (5-(c.TechIndex or 0))..(c.TechDescription or 'z error')..c.ID end
                         return sortkey(a) < sortkey(b)
 
                     elseif sort == 'TechAscending-IDAscending' then
-                        local function sortkey(c) return (c.tech or 5)..c.bpid end
+                        local function sortkey(c) return (c.TechIndex or 5)..c.ID end
                         return sortkey(a) < sortkey(b)
 
                     end
@@ -45,7 +45,6 @@ function MenuSortUnitsByTech(units)
     }
     local groups = {{},{},{},{},{}}
     for id, bp in pairs(units) do
-        local bp = bp.bp or bp -- Convert from concise to bp
         for i = 1, 5 do
             if i == 5 or bp.CategoriesHash[techs[i] ] then
                 table.insert(groups[i], bp)
@@ -97,7 +96,7 @@ function TechTable(units, maxcols)
                 for coli = 1, maxcols do
                     local buildbp = group[maxcols*(trow-1)+coli]
                     if buildbp then
-                        tdtext = tdtext..'        '..xml:td( pageLink(buildbp.ID, xml:img{src=unitIconsPath..buildbp.ID..'_icon.png', width='64px', title=buildbp.unitTdesc}) ).."\n"
+                        tdtext = tdtext..'        '..xml:td( pageLink(buildbp.ID, xml:img{src=unitIconsPath..buildbp.ID..'_icon.png', width='64px', title=buildbp.TechDescription}) ).."\n"
                     end
                 end
                 trtext = trtext..'    '..xml:tr(tdtext..'    ').."\n"
@@ -109,21 +108,19 @@ end
 
 function InsertInNavigationData(bp)
     if not bp.WikiPage then return end
-    local UnitInfo = UnitConciseInfo(bp)
-    UnitInfo.bp = bp
     local index = bp.ModInfo.ModIndex
 
     if not NavigationData[index] then
         NavigationData[index] = {ModInfo = bp.ModInfo, Factions = {} }
     end
 
-    local factioni = FactionIndexes[UnitInfo.faction] or #FactionsByIndex
+    local factioni = FactionCategoryIndexes[bp.FactionCategory or 'OTHER']
 
     if not NavigationData[index].Factions[factioni] then
         NavigationData[index].Factions[factioni] = {}
     end
 
-    table.insert(NavigationData[index].Factions[factioni], UnitInfo)
+    table.insert(NavigationData[index].Factions[factioni], bp)
 end
 
 local function UpdateGeneratedPartOfPage(page, tag, content)
@@ -170,12 +167,12 @@ function GenerateSidebar()
             local unitarray = moddata.Factions[i]
             if unitarray then
                 sidebarstring = sidebarstring .. "<details>\n<summary>"..faction.."</summary>\n<p>\n\n"
-                for unitI, unitData in ipairs(unitarray) do
+                for unitI, bp in ipairs(unitarray) do
 
                     sidebarstring = sidebarstring .. '* '..xml:a{
-                        title=(unitData.name or unitData.bpid),
-                        href=stringSanitiseFilename(unitData.bpid)
-                    }(unitData.desc or unitData.bpid).."\n"
+                        title=(bp.General.UnitName or bp.ID),
+                        href=stringSanitiseFilename(bp.ID)
+                    }(bp.TechDescription or bp.ID).."\n"
 
                 end
                 sidebarstring = sidebarstring .. "</p>\n</details>\n"

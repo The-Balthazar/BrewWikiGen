@@ -43,9 +43,9 @@ end
 function unitDescLink(id)
     local bp = getBP(id)
     if bp and not bp.WikiPage then
-        return bp.unitTdesc
+        return bp.TechDescription
     elseif bp and bp.WikiPage then
-        return xml:a{href=stringSanitiseFilename(id)} (bp.unitTdesc or id)
+        return xml:a{href=stringSanitiseFilename(id)} (bp.TechDescription or id)
     end
     return id and xml:code(id) or nil
 end

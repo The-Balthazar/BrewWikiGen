@@ -1,16 +1,9 @@
 --------------------------------------------------------------------------------
 -- Supreme Commander mod automatic unit wiki generation script for Github wikis
--- Copyright 2021 Sean 'Balthazar' Wheeldon                           Lua 5.4.2
+-- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
-function GetSandboxedLuaFile(file, env)
-    local env = env or {}
-    local chunk = loadfile(file, 'bt', env)
-    if chunk then chunk() end
-    return env
-end
 
 local FileMessages = {}
-
 local function SandboxedPrint(file, logtype)
     return function(...)
         if Logging.SandboxedFileLogs then
@@ -23,47 +16,69 @@ local function SandboxedPrint(file, logtype)
     end
 end
 
-function GetExecutableSandboxedLuaFile(file)
-    local env = {
-        pairs = pairs,
-        ipairs = ipairs,
+local Sandboxes = {
+    HelpStrings = function()
+        return {
+            Description = {},
+            Tooltips = {},
+        }
+    end,
+    MohoLua = function(file)
+        local env = {
+            __active_mods = __active_mods,
 
-        print = SandboxedPrint(file, 'Print: '),
-        LOG = SandboxedPrint(file, 'Log: '),
-        SPEW = SandboxedPrint(file, 'Debug: '),
-        _ALERT = SandboxedPrint(file, 'Log: '),
-        WARN = SandboxedPrint(file, 'Warn: '),
+            pairs = pairs,
+            ipairs = ipairs,
 
-        table = table,
-        string = string,
-        math = math,
+            print = SandboxedPrint(file, 'Print: '),
+            LOG = SandboxedPrint(file, 'Log: '),
+            SPEW = SandboxedPrint(file, 'Debug: '),
+            _ALERT = SandboxedPrint(file, 'Log: '),
+            WARN = SandboxedPrint(file, 'Warn: '),
 
-        type = type,
-    }
-    env.table.find = arrayFind
-    GetSandboxedLuaFile(file, env)
-    return env
+            table = table,
+            string = string,
+            math = math,
+
+            type = type,
+        }
+        env.table.find = arrayFind
+        return env
+    end
+}
+
+function GetSandboxedLuaFile(file, env)
+    local env = env and Sandboxes[env](file) or {}
+    local chunk, msg = loadfile(file, 'bt', env)
+    if chunk then
+        chunk()
+        return env
+    elseif not string.find(msg, 'No such file or directory') then
+        print(msg)
+    end
 end
 
-function SafeGetSandboxedLuaFile(file)
-    local ok, f = pcall(GetSandboxedLuaFile, file)
-    return ok and f or Logging.LuaFileLoadIssues and print("Failed to load "..file)
-end
-
-function GetModInfo(dir)
-    local modinfo = SafeGetSandboxedLuaFile(dir..'mod_info.lua')
-    return assert(modinfo, LogEmoji('⚠️').." Failed to load "..dir.."mod_info.lua")
+function LoadModInfo(dir, i)
+    local ModInfo = assert(
+        GetSandboxedLuaFile(dir..'mod_info.lua'),
+        'Failed to load '..tostring(dir)..'mod_info.lua'
+    )
+    ModInfo.location = dir
+    ModInfo.ModIndex = i
+    return ModInfo
 end
 
 function LoadHelpStrings(dir)
     local log = '  Preloading: '
-    for name, data in pairs{
-        ['Build descriptions'] = {Path = 'lua/ui/help/unitdescription.lua', Output = 'Description'},
-        ['Tooltips']           = {Path = 'lua/ui/help/tooltips.lua',        Output = 'Tooltips'   },
+    for output, path in pairs{
+        Description = 'lua/ui/help/unitdescription.lua',
+        Tooltips    = 'lua/ui/help/tooltips.lua',
     } do
-        local env = GetSandboxedLuaFile(dir..data.Path, {[data.Output]={}})
-        tableMergeCopy(_G[data.Output], env[data.Output])
-        log = log..' '..name..' '..(next(env[data.Output]) and LogEmoji('🆗') or LogEmoji('❌'))
+        local env = GetSandboxedLuaFile(dir..path, 'HelpStrings')
+        if env then
+            tableMergeCopy(_G[output], env[output])
+        end
+        log = log..' '..output..' '..(env and LogEmoji'🆗' or LogEmoji'❌')
     end
     if Logging.HelpStringsLoaded then print(log) end
 end

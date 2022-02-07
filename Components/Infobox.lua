@@ -3,15 +3,15 @@
 -- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 
-GetUnitInfoboxData = function(ModInfo, bp)
+GetUnitInfoboxData = function(bp)
     return {
         {bp.WikiInfoboxNote and '', bp.WikiInfoboxNote and LOC(bp.WikiInfoboxNote)..(bp.WikiBalance and detailsLink('<LOC wiki_sect_balance>Balance') or '')},
         ----
-        {'<LOC wiki_infobox_mod_source>'..'Source:',    xml:a{href=(stringSanitiseFilename(ModInfo.name))}(stringHTMLWrap(ModInfo.name, 20))},
+        {'<LOC wiki_infobox_mod_source>'..'Source:',    xml:a{href=(stringSanitiseFilename(bp.ModInfo.name))}(stringHTMLWrap(bp.ModInfo.name, 20))},
         {'<LOC wiki_infobox_unitid>'    ..'Unit ID:',   xml:code(bp.id)},
         {'<LOC wiki_infobox_faction>'   ..'Faction:',   FactionFromFactionCategory(bp.FactionCategory)},
         {'<LOC wiki_infobox_factions>'  ..'Factions:',  not bp.FactionCategory and InfoboxFlagsList(FactionsFromFactionCatHash(bp.FactionCategoryHash)) },
-        {'<LOC wiki_infobox_tech>'      ..'Tech level:', iconText(bp.unitTIndex, bp.unitTIndex and bp.unitTIndex..(bp.unitTIndex == 4 and LOCBrackets(LOC'<LOC wiki_tech_4>Experimental') or '')) },
+        {'<LOC wiki_infobox_tech>'      ..'Tech level:', iconText(bp.TechIndex, bp.TechIndex and bp.TechIndex..(bp.TechIndex == 4 and LOCBrackets(LOC'<LOC wiki_tech_4>Experimental') or '')) },
         {''},
         {'<LOC wiki_infobox_health>'    ..'Health:',
             (

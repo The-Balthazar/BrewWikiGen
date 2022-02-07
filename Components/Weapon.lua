@@ -3,7 +3,7 @@
 -- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 
-local GetWeaponTargetLayers = function(weapon, unit)
+local function GetWeaponTargetLayers(weapon, unit)
     local fromLayers = motionTypes[unit.Physics.MotionType or 'RULEUMT_None']
     local targetLayers = {}
     if weapon.FireTargetLayerCapsTable then
@@ -25,7 +25,7 @@ local GetWeaponTargetLayers = function(weapon, unit)
     return targetLayers, tableSum(targetLayers)
 end
 
-local GetWeaponTargets = function(weapon, unit)
+local function GetWeaponTargets(weapon, unit)
     if IsDeathWeapon(weapon) then return end
 
     if weapon.TargetType == 'RULEWTT_Projectile' then
@@ -96,7 +96,7 @@ local GetWeaponTargets = function(weapon, unit)
     end
 end
 
-local WepProjectiles = function(weapon)
+local function WepProjectiles(weapon)
     if not weapon.RackBones then return end
     local ProjectileCount
     if weapon.MuzzleSalvoDelay == 0 then
@@ -110,7 +110,7 @@ local WepProjectiles = function(weapon)
     return ProjectileCount
 end
 
-local GetDamageInstances = function(wep)
+local function GetDamageInstances(wep)
     local s = WepProjectiles(wep)
     if s and s > 1 then
         if wep.BeamCollisionDelay then
@@ -138,7 +138,7 @@ local GetDamageInstances = function(wep)
     return s
 end
 
-local GetFiringCycle = function(wep)
+local function GetFiringCycle(wep)
     if IsDeathWeapon(wep) then
         return
     end
@@ -149,7 +149,7 @@ local GetFiringCycle = function(wep)
     end
 end
 
-local GetWeaponBuffs = function(wep)
+local function GetWeaponBuffs(wep)
     if wep.Buffs then
         local buffs = ''
         for i, buff in ipairs(wep.Buffs) do
@@ -202,7 +202,7 @@ function DPSEstimate(weapon)
     return math.floor(damage * rof + 0.5)
 end
 
-local ArcTable = function(spec)
+local function ArcTable(spec)
     return setmetatable(spec, {
 
         __tostring = function(self)
@@ -236,7 +236,7 @@ end
 
 --------------------------------------------------------------------------------
 
-GetWeaponInfoboxData = function(wep, bp)
+function GetWeaponInfoboxData(wep, bp)
     return {
         {'Target type:', GetWeaponTargets(wep, bp)},
         {'DPS estimate:', NewDPSEstimate(wep), "Note: This only counts listed stats."},
@@ -250,7 +250,7 @@ GetWeaponInfoboxData = function(wep, bp)
         {'Outer damage:', wep.NukeOuterRingDamage},
         {'Outer radius:', wep.NukeOuterRingRadius},
         {'Damage instances:', GetDamageInstances(wep)},
-        {'Damage type:', wep.DamageType and '<code>'..wep.DamageType..'</code>'},
+        {'Damage type:', wep.DamageType and xml:code(wep.DamageType)},
         {'Max range:', not IsDeathWeapon(wep) and wep.MaxRadius},
         {'Min range:', wep.MinRadius},
         {'Firing arc:', ArcTable{wep.Turreted and wep.TurretYawRange}},
@@ -261,7 +261,7 @@ GetWeaponInfoboxData = function(wep, bp)
                 wep.EnergyRequired and wep.EnergyRequired ~= 0 and
                 (
                     wep.EnergyRequired ..
-                    (wep.EnergyDrainPerSecond and LOCBrackets(LOCPerSec(wep.EnergyDrainPerSecond)..' for '..(math.ceil((wep.EnergyRequired/wep.EnergyDrainPerSecond)*10)/10)..'s') or '')
+                    (wep.EnergyDrainPerSecond and LOCBrackets(LOCPerSec(wep.EnergyDrainPerSecond)..' for '..numberFormatNoTrailingZeros(math.ceil((wep.EnergyRequired/wep.EnergyDrainPerSecond)*10)/10)..'s') or '')
                 )
             )
         },
@@ -279,7 +279,7 @@ GetWeaponInfoboxData = function(wep, bp)
     }
 end
 
-GetWeaponBodytextSectionString = function(bp)
+function GetWeaponBodytextSectionString(bp)
     local compiledWeaponsTable = {}
 
     for i, wep in ipairs(bp.Weapon) do

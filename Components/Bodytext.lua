@@ -4,13 +4,13 @@
 --------------------------------------------------------------------------------
 local function Binary2bit(a,b) return (a and 2 or 0) + (b and 1 or 0) end
 
-UnitBodytextLeadText = function(ModInfo, bp)
+UnitBodytextLeadText = function(bp)
 
     local faction = FactionFromFactionCategory(bp.FactionCategory)
 
     local bodytext = bp.General.UnitName and
         string.format(
-        LOC("<LOC wiki_intro_name>\"%s\""), LOC(bp.General.UnitName)) or
+        LOC("<LOC wiki_intro_name>\"%s\""), bp.General.UnitName) or
         LOC('<LOC wiki_intro_nameless>This unnamed unit')
 
     local FactionText = {
@@ -25,16 +25,16 @@ UnitBodytextLeadText = function(ModInfo, bp)
     string.format(
         LOC('<LOC wiki_intro_motion_type> %s included in *%s*.'),
         LOC('<LOC wiki_intro_'..string.lower(bp.Physics.MotionType or 'RULEUMT_None')..'>'),
-        ModInfo.name
+        bp.ModInfo.name
     ).."\n"
 
     local BuildIntroTDesc = {
         [0] = LOC('<LOC wiki_intro_tdesc_a>It is an unclassified unit with no defined tech level.'),
-        [1] = string.format(LOC('<LOC wiki_intro_tdesc_b>It is an unclassified %s unit.'), string.lower(bp.unitTlevel or '')),
-        [2] = string.format(LOC('<LOC wiki_intro_tdesc_c>It is classified as a %s unit with no defined tech level.'), string.lower(bp.unitTdesc or '')),
-        [3] = string.format(LOC('<LOC wiki_intro_tdesc_d>It is classified as a %s unit.'), string.lower(bp.unitTdesc or '')),
+        [1] = string.format(LOC('<LOC wiki_intro_tdesc_b>It is an unclassified %s unit.'), string.lower(bp.TechName or '')),
+        [2] = string.format(LOC('<LOC wiki_intro_tdesc_c>It is classified as a %s unit with no defined tech level.'), string.lower(bp.TechDescription or '')),
+        [3] = string.format(LOC('<LOC wiki_intro_tdesc_d>It is classified as a %s unit.'), string.lower(bp.TechDescription or '')),
     }
-    BuildIntroTDesc = BuildIntroTDesc[Binary2bit(bp.unitTdesc,bp.unitTlevel)]
+    BuildIntroTDesc = BuildIntroTDesc[Binary2bit(bp.TechDescription,bp.TechName)]
 
     local BuildIntroBuild = {
         [0] = LOC('<LOC wiki_intro_build_a> It has no defined build description, and no categories to define common builders.').."\n",
@@ -47,7 +47,7 @@ UnitBodytextLeadText = function(ModInfo, bp)
     return bodytext..BuildIntroTDesc..BuildIntroBuild..GetModUnitData(bp.ID, 'LeadSuffix')
 end
 
-UnitBodytextSectionData = function(ModInfo, bp)
+UnitBodytextSectionData = function(bp)
     return setmetatable({
         {
             '<LOC wiki_sect_abilities>Abilities',
@@ -186,7 +186,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
                                     pageLink(
                                         builderbp.ID,
                                         -- For more context, it will include the name if it exists when no page will be linked to.
-                                        (builderbp.General.UnitName and not builderbp.WikiPage and ('"'..LOC(builderbp.General.UnitName)..'": ') or '')..builderbp.unitTdesc
+                                        (builderbp.General.UnitName and not builderbp.WikiPage and ('"'..builderbp.General.UnitName..'": ') or '')..builderbp.TechDescription
                                     ),
                                     builderbp.Economy.BuildRate,
                                     UpgradesFrom(bp, builderbp)
@@ -300,7 +300,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
                     if bp.General.UpgradesTo then
                         if BuildableEnvUnits[bp.General.UpgradesTo] then
                             local upgradeBp = BuildableEnvUnits[bp.General.UpgradesTo]
-                            text = text..'It can be upgraded into the '..pageLink(upgradeBp.ID, upgradeBp.unitTdesc)..".\n"
+                            text = text..'It can be upgraded into the '..pageLink(upgradeBp.ID, upgradeBp.TechDescription)..".\n"
 
                             if BuildableUnits[upgradeBp.id] then
                                 BuildableUnits[upgradeBp.id] = nil
@@ -309,7 +309,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
 
                         elseif getBP(bp.General.UpgradesTo) then
                             local upgradeBp = getBP(bp.General.UpgradesTo)
-                            text = text..'<error:upgrade not verified>It claims to upgradable into the '..pageLink(upgradeBp.ID, upgradeBp.unitTdesc)..", however build categories would indicate otherwise.\n"
+                            text = text..'<error:upgrade not verified>It claims to upgradable into the '..pageLink(upgradeBp.ID, upgradeBp.TechDescription)..", however build categories would indicate otherwise.\n"
 
                         else
                             local cat = arrayFind(TempBuildableCategory, bp.General.UpgradesTo)
@@ -326,7 +326,7 @@ UnitBodytextSectionData = function(ModInfo, bp)
                     if #TempBuildableCategory == 1 then
                         local buildBp = getBP(TempBuildableCategory[1])
                         if buildBp then
-                            text = text..'It can build the '..pageLink(buildBp.ID, buildBp.unitTdesc)..".\n"
+                            text = text..'It can build the '..pageLink(buildBp.ID, buildBp.TechDescription)..".\n"
 
                             BuildableUnits[buildBp.id] = nil
                             NumBuildable = NumBuildable-1
@@ -348,14 +348,14 @@ UnitBodytextSectionData = function(ModInfo, bp)
                         do
                             local _,unitbp = next(BuildableUnits)
                             local bitcheck = WikiOptions.BuildListSaysModUnits and {
-                                [0] = string.format(LOC('This build category allows it to build the mod unit %s.'), pageLink(unitbp.ID, unitbp.unitTdesc) ).."\n",
+                                [0] = string.format(LOC('This build category allows it to build the mod unit %s.'), pageLink(unitbp.ID, unitbp.TechDescription) ).."\n",
                                 [1] = "\n<details>\n<summary>"..LOC('This build category allows it to build the following mod units:').."\n\n".."</summary>\n\n",
-                                [2] = string.format(LOC('These build categories allow it to build the mod unit %s.'), pageLink(unitbp.ID, unitbp.unitTdesc) ).."\n",
+                                [2] = string.format(LOC('These build categories allow it to build the mod unit %s.'), pageLink(unitbp.ID, unitbp.TechDescription) ).."\n",
                                 [3] = "\n<details>\n<summary>"..LOC('These build categories allow it to build the following mod units:').."\n\n".."</summary>\n\n",
                             } or {
-                                [0] = string.format(LOC('This build category allows it to build the unit %s.'), pageLink(unitbp.ID, unitbp.unitTdesc) ).."\n",
+                                [0] = string.format(LOC('This build category allows it to build the unit %s.'), pageLink(unitbp.ID, unitbp.TechDescription) ).."\n",
                                 [1] = "\n<details>\n<summary>"..LOC('This build category allows it to build the following units:').."\n\n".."</summary>\n\n",
-                                [2] = string.format(LOC('These build categories allow it to build the unit %s.'), pageLink(unitbp.ID, unitbp.unitTdesc) ).."\n",
+                                [2] = string.format(LOC('These build categories allow it to build the unit %s.'), pageLink(unitbp.ID, unitbp.TechDescription) ).."\n",
                                 [3] = "\n<details>\n<summary>"..LOC('These build categories allow it to build the following units:').."\n\n".."</summary>\n\n",
                             }
                             text = text..bitcheck[Binary2bit(#TempBuildableCategory ~= 1, NumBuildable ~= 1)]

@@ -15,21 +15,22 @@ local function LoadLocalizationFile(FileLocation)
     elseif Logging.LocalisationLoaded then print("  Failed to preload LOC "..FileLocation) end
 end
 
-function LoadLocalization(ModDirectory)
-    LoadLocalizationFile(ModDirectory..'loc/'..Language..'/strings_db.lua')
+function SetWikiLocalization(WikiDirectory, lang)
+    Language = lang
+    LoadLocalizationFile(WikiDirectory..'Environment/loc/'..Language..'.lua')
+end
+
+function LoadLocalization(Directory)
+    LoadLocalizationFile(Directory..'loc/'..Language..'/strings_db.lua')
 end
 
 function LoadModLocalization(ModDirectory)
     LoadLocalization(ModDirectory..'hook/')
 end
 
-function SetWikiLocalization(WikiDirectory, lang)
-    Language = lang
-    LoadLocalizationFile(WikiDirectory..'Environment/loc/'..Language..'.lua')
-end
-
-function LOC(s) return s and (LocalizedStrings[string.match(s, '<LOC ([^>.]*)>')] or noLOC(s)) end
 function noLOC(s) return string.gsub(s, '<LOC [^>.]*>', '') end
+function LOCtag(s) return string.match(s, '<LOC ([^>.]*)>') end
+function LOC(s) return s and (LocalizedStrings[LOCtag(s)] or noLOC(s)) end
 
 function LOCBrackets(s) return s and string.format(LOC'<LOC wiki_bracket_text> (%s)', s) end
 function LOCPerSec(s) return s and string.format(LOC'<LOC wiki_per_second>%s/s', numberFormatNoTrailingZeros(s)) end

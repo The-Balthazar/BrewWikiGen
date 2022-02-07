@@ -5,6 +5,7 @@
 debug.setmetatable(nil, {__index={}})
 
 OutputDirectory = nil
+__active_mods = {}
 
 function printif(check, ...) if check then print(...) end end
 
@@ -15,7 +16,8 @@ function GeneratorMain(Output)
 
     local function safecall(...)
         local pass, msg = pcall(...)
-        if not pass then print(msg) end
+        printif(not pass, msg)
+        return pass
     end
 
     print("Starting BrewWikiGen")
@@ -57,18 +59,22 @@ function GeneratorMain(Output)
     if EnvironmentData.Lua        then safecall(LoadHelpStrings,  EnvironmentData.Lua) end
     if EnvironmentData.Blueprints then safecall(LoadEnvUnitBlueprints, WikiGeneratorDirectory) end
 
-    -- Mod data
     for i, dir in ipairs(ModDirectories) do
-        safecall(LoadModLocalization, dir) -- Load all localisation first.
-        safecall(LoadModHelpStrings, dir)
-        safecall(LoadModUnitBlueprints, dir, i)
+        __active_mods[i] = LoadModInfo(dir, i)
+    end
+
+    -- Mod data
+    for i, mod in ipairs(__active_mods) do
+        safecall(LoadModLocalization, mod.location)
+        safecall(LoadModHelpStrings, mod.location)
+        safecall(LoadModUnitBlueprints, mod)
     end
 
     --[[ ------------------------------------------------------------------ ]]--
     --[[ Pre-compute data                                                   ]]--
     --[[ ------------------------------------------------------------------ ]]--
-    for i, dir in ipairs(ModDirectories) do
-        safecall(LoadModSystemBlueprintsFile, dir)
+    for i, mod in ipairs(__active_mods) do
+        safecall(LoadModSystemBlueprintsFile, mod.location)
     end
 
     --[[ ------------------------------------------------------------------ ]]--

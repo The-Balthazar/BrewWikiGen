@@ -66,62 +66,6 @@ local function BlueprintSetShortId(bp, file)
     bp.ID = id == bp.id and string.upper(id) or id -- ID used by filenames
 end
 
-local MenuSortCats = {
-    SORTCONSTRUCTION = 'SORTCONSTRUCTION',
-    SORTECONOMY = 'SORTECONOMY',
-    SORTDEFENSE = 'SORTDEFENSE',
-    SORTSTRATEGIC = 'SORTSTRATEGIC',
-    SORTINTEL = 'SORTINTEL',
-}
-
-local function BlueprintHashCategories(bp)
-    bp.CategoriesHash = {
-        -- Implicit categories
-        [bp.id] = bp.id, -- lower case ID
-        ALLUNITS = 'ALLUNITS',
-    }
-    bp.FactionCategoryHash = {}
-    if not bp.Categories then return end
-    for i, cat in ipairs(bp.Categories) do
-        cat = string.upper(cat)
-        bp.CategoriesHash[cat] = cat
-
-        bp.SortCategory = bp.SortCategory or MenuSortCats[cat]
-
-        if FactionCategoryIndexes[cat] then
-            if bp.FactionCategory == nil then
-                bp.FactionCategory = cat
-            elseif not bp.FactionCategoryHash[cat] then -- Make sure it's not a dupe of the same
-                bp.FactionCategory = false -- has multiple faction categories
-            end
-            bp.FactionCategoryHash[cat] = cat
-        end
-    end
-    bp.SortCategory = bp.SortCategory or 'SORTOTHER'
-
-    if bp.FactionCategory == nil then
-        bp.FactionCategory = 'OTHER'
-    end
-end
-
-local function GetUnitTechAndDescStrings(bp)
-    -- Tech 1-3 units don't have the tech level in their desc exclicitly,
-    -- Experimental *generally* do. This unified it so we don't have to check again.
-    for i = 1, 3 do
-        if bp.CategoriesHash['TECH'..i] then
-            return i, LOC('<LOC wiki_tech_'..i..'>Tech '..i), bp.Description and LOC('<LOC wiki_tech_'..i..'>Tech '..i)..' '..LOC(bp.Description)
-        end
-    end
-    if bp.CategoriesHash.EXPERIMENTAL then
-        return 4, LOC'<LOC wiki_tech_4>Experimental', LOC(bp.Description)
-    end
-    return nil, nil, LOC(bp.Description)
-end
-
-local function BlueprintSetUnitTechAndDescStrings(bp)
-    bp.unitTIndex, bp.unitTlevel, bp.unitTdesc = GetUnitTechAndDescStrings(bp)
-end
-
 local function isValidBlueprint(bp)
     return bp.Display and bp.Categories and bp.Defense and bp.Physics and bp.General
 end
@@ -188,15 +132,6 @@ local function GetPairedBlueprintsFromFile(dir, file)
     end
 
     return ipairs(validbps)
-end
-
-function ProcessBlueprint(bp)
-    BlueprintHashCategories(bp)
-    BlueprintSetUnitTechAndDescStrings(bp)
-    BlueprintMeshBones(bp)
-
-    InsertInNavigationData(bp)
-    GetBuildableCategoriesFromBp(bp)
 end
 
 function GetPairedModUnitBlueprints(modDir)

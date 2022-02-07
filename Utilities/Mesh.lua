@@ -56,7 +56,7 @@ local function GetLOD0SCMFilename(bp)
     error("No mesh found")
 end
 
-function BlueprintMeshBones(bp)
+function GetMeshBones(bp)
     local ok, msg = pcall(
         function(bp)
             bp.Bones = GetSCMBoneNames(GetLOD0SCMFilename(bp))
