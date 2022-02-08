@@ -20,10 +20,10 @@ function TechDescendingDescriptionAscending(bp) return (5-(bp.TechIndex or 0))..
 function TechAscendingIDAscending(bp) return (bp.TechIndex or 5)..bp.ID end
 function BuildMenuSort(bp)
     return
-    FactionSort[bp.FactionCategory or 'OTHER'] +
+    (FactionSort[bp.FactionCategory or 'OTHER'] +
     MenuSortCats[bp.SortCategory or 'SORTOTHER'] +
-    (bp.BuildIconSortPriority or bp.StrategicIconSortPriority or 0) +
-    tonumber('0.'..(tonumber(string.gsub(bp.id, '%W', ''), 36) or 0))
+    (bp.BuildIconSortPriority or bp.StrategicIconSortPriority or 0))
+    ..(tonumber(string.gsub(bp.id, '%W', ''), 36) or 0)
 end
 
 function SplitUnitsByTech(units, index)
