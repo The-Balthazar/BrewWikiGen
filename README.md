@@ -103,21 +103,6 @@ Include a slash at the end.
   * `GenerateHomePage`, `GenerateSidebar`, `GenerateModPages`, `GenerateUnitPages`,
     and `GenerateCategoryPages`; `true` or `false`: Generate those parts or not.
 
-  * `CleanBlueprintFiles`; `true` or `false`: Enables or disables all `.bp` file
-    modifying scripts. Note it only applies to loaded `.bp` files that would be
-    given a wiki page.
-
-  * `CleanBlueprintGeneral`, `CleanBlueprintDisplay`, `CleanBlueprintInterface`,
-    and `CleanBlueprintUseOOBTestZoom`; `true` or `false`: Removes obsolete vales.
-    Specifically:
-    * From `General`: `Category`, `Classification`, `TechLevel`, and `UnitWeight`.
-    * From `Display`: `PlaceholderMeshName`, and `SpawnRandomRotation`.
-    * The whole of `Interface`.
-    * The value `UseOOBTestZoom`.
-
-  * `CleanBlueprintThreat`; `true` or `false`: Updates the threat values based on
-    an extensive formula.
-
   * `AbilityDescriptions`; `true` or `false`: If `false` it lists the abilities of
     the units verbatim in the abilities section. If true it will try to map them
     to tooltips in the `abilityDesc` table in `/Environment/Game.lua`.
@@ -139,6 +124,23 @@ Include a slash at the end.
 
   * `BuildListSaysModUnits` if true the build list refers to what can be built as
     "mod unit(s)" instead of "unit(s)".
+
+* `CleanupOptions` contains the following bool options:
+
+  * `CleanUnitBpFiles`; `true` or `false`: Enables or disables all `.bp` file
+    modifying scripts. Note it only applies to loaded `.bp` files that would be
+    given a wiki page.
+
+  * `CleanUnitBpGeneral`, `CleanUnitBpDisplay`, `CleanUnitBpInterface`,
+    and `CleanUnitBpUseOOBTestZoom`; `true` or `false`: Removes obsolete vales.
+    Specifically:
+    * From `General`: `Category`, `Classification`, `TechLevel`, and `UnitWeight`.
+    * From `Display`: `PlaceholderMeshName`, and `SpawnRandomRotation`.
+    * The whole of `Interface`.
+    * The value `UseOOBTestZoom`.
+
+  * `CleanUnitBpThreat`; `true` or `false`: Updates the threat values based on
+    an extensive formula.
 
 * `ModDirectories` should point to your local copies of the mod(s) you wish to
 generate wiki pages for. It assumes, but doesn't require, multiple mods. It

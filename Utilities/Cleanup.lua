@@ -57,7 +57,7 @@ function CleanupUnitBlueprintFile(bp)
                 UseOOBTestZoom = '%d',
             }
             for section, sectionData in pairs(Depracated) do
-                if WikiOptions['CleanBlueprint'..section] then
+                if CleanupOptions['CleanUnitBp'..section] then
                     local sectionString, updatedString, changesMade
                     local msg = 'Removed deprecated '..section..' value'
 
@@ -88,7 +88,7 @@ function CleanupUnitBlueprintFile(bp)
                 end
             end
         end
-        if WikiOptions.CleanBlueprintThreat then
+        if CleanupOptions.CleanUnitBpThreat then
             local pass, threat = pcall(CalculateUnitThreatValues, bp)
             if pass and threat then
                 local sectionString = GetPrintedBlueprintSectionString(bp.Source, 'Defense')

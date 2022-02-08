@@ -38,14 +38,6 @@ WikiOptions = {
     GenerateUnitPages = true,
     GenerateCategoryPages = true,
 
-    CleanBlueprintFiles = true,
-    CleanBlueprintGeneral = true,
-    CleanBlueprintDisplay = true,
-    CleanBlueprintInterface = true,
-    CleanBlueprintUseOOBTestZoom = true,
-
-    CleanBlueprintThreat = true,
-
     -- Unit page options
     AbilityDescriptions = true,
     BalanceNote = '<LOC wiki_balance_stats_steam>Displayed stats are from when launched on the steam/retail version of the game.',
@@ -53,7 +45,18 @@ WikiOptions = {
     BuildListSaysModUnits = true,
 }
 
-local ModDirectories = { -- In order
+CleanupOptions = {
+    CleanUnitBpFiles = true,
+
+    CleanUnitBpGeneral = true,
+    CleanUnitBpDisplay = true,
+    CleanUnitBpInterface = true,
+    CleanUnitBpUseOOBTestZoom = true,
+
+    CleanUnitBpThreat = true,
+}
+
+ModDirectories = { -- In order
     'C:/BrewLAN/mods/BrewLAN/',
     'C:/BrewLAN/mods/BrewLAN_Units/BrewAir/',
     'C:/BrewLAN/mods/BrewLAN_Units/BrewIntel/',

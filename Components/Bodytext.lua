@@ -254,9 +254,9 @@ UnitBodytextSectionData = function(bp)
                 local eng = {}
                 if bp.General and bp.General.CommandCaps then
                     local eng2 = {
-                        {'capture', bp.General.CommandCaps.RULEUCC_Capture},
-                        {'reclaim', bp.General.CommandCaps.RULEUCC_Reclaim},
-                        {'repair', bp.General.CommandCaps.RULEUCC_Repair},
+                        {'capture',   bp.General.CommandCaps.RULEUCC_Capture},
+                        {'reclaim',   bp.General.CommandCaps.RULEUCC_Reclaim},
+                        {'repair',    bp.General.CommandCaps.RULEUCC_Repair},
                         {'sacrifice', bp.General.CommandCaps.RULEUCC_Sacrifice},
                     }
                     for i, v in ipairs(eng2) do

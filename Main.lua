@@ -81,7 +81,7 @@ function GeneratorMain(Output)
     --[[ Generate wiki                                                      ]]--
     --[[ ------------------------------------------------------------------ ]]--
     if Logging.BlueprintChecks           then safecall(CheckUnitBlueprintSanity) end
-    if WikiOptions.CleanBlueprintFiles   then safecall(CleanupBlueprintsFiles) end
+    if CleanupOptions.CleanUnitBpFiles   then safecall(CleanupBlueprintsFiles) end
     if WikiOptions.GenerateUnitPages     then safecall(GenerateUnitPages) end
     if WikiOptions.GenerateSidebar       then safecall(GenerateSidebar) end
     if WikiOptions.GenerateModPages      then safecall(GenerateModPages) end
