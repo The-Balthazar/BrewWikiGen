@@ -24,7 +24,7 @@ local Sandboxes = {
         }
     end,
     MohoLua = function(file)
-        local env = {
+        return {
             __active_mods = __active_mods,
 
             pairs = pairs,
@@ -42,8 +42,6 @@ local Sandboxes = {
 
             type = type,
         }
-        env.table.find = arrayFind
-        return env
     end
 }
 

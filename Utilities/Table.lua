@@ -3,8 +3,29 @@
 -- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 
+function sortby(f, set)
+    return function(a,b)
+        return f(set[a] or a) < f(set[b] or b)
+    end
+end
+
+-- pairs, but sorted
+function sortedpairs(set, sort)
+    local keys = {}
+    for k, v in pairs(set) do
+        table.insert(keys, k)
+    end
+    table.sort(keys, sort and sortby(sort,set))
+
+    local i = 0
+    return function()
+        i = i+1
+        return keys[i], set[ keys[i] ]
+    end
+end
+
 -- returns the index of the first matching value in array
-function arrayFind(array, str)
+function table.find(array, str)
     if not array then return end
     for i, v in ipairs(array) do
         if v == str then
@@ -59,12 +80,10 @@ function arrayAllCellsEqual(t)
     return t[1] or true
 end
 
-function arrayRemoveByValue(t, val)
-    local i = arrayFind(t, val)
+function table.removeByValue(t, val)
+    local i = table.find(t, val)
     return i and table.remove(t, i)
 end
-
-table.removeByValue = arrayRemoveByValue
 
 function tableHasTrueChild(hash)
     if not hash then return end
@@ -73,6 +92,25 @@ function tableHasTrueChild(hash)
             return true
         end
     end
+end
+
+function Unhash(t, t2)
+    local a = {}
+    if t then
+        for v,b in pairs(t) do
+            if b then
+                table.insert(a, v)
+            end
+        end
+    end
+    if t2 then
+        for v,b in pairs(t2) do
+            if b then
+                table.insert(a, v)
+            end
+        end
+    end
+    return a
 end
 
 -- Returns a new table which is a shallow copy of t1 with t2 shallow-copied over it
@@ -102,7 +140,7 @@ function tableMergeCopy(t1, t2)
 end
 
 -- #t for keyed tables
-function tableTcount(t)
+function table.getsize(t)
     local num = 0
     for i, v in pairs(t) do
         num = num+1

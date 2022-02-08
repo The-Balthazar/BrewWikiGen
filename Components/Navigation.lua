@@ -4,29 +4,9 @@
 --------------------------------------------------------------------------------
 local NavigationData = {}
 
-local function sortData(sorttable, sort)
-    for modindex, moddata in pairs(sorttable) do
-        for i, faction in ipairs(FactionsByIndex) do
-            local unitarray = moddata.Factions[i]
-            if unitarray then
-                table.sort(unitarray, function(a,b)
+local FactionSort = {}
+for faction, index in pairs(FactionCategoryIndexes) do FactionSort[faction] = index*10000 end
 
-                    if sort == 'TechDescending-DescriptionAscending' then
-                        local function sortkey(c) return (5-(c.TechIndex or 0))..(c.TechDescription or 'z error')..c.ID end
-                        return sortkey(a) < sortkey(b)
-
-                    elseif sort == 'TechAscending-IDAscending' then
-                        local function sortkey(c) return (c.TechIndex or 5)..c.ID end
-                        return sortkey(a) < sortkey(b)
-
-                    end
-                end)
-            end
-        end
-    end
-end
-
-local FactionSort
 local MenuSortCats = {
     SORTCONSTRUCTION = 1000,
     SORTECONOMY      = 2000,
@@ -36,48 +16,34 @@ local MenuSortCats = {
     SORTOTHER        = 6000,
 }
 
-function MenuSortUnitsByTech(units)
-    local techs = {
-        'TECH1',
-        'TECH2',
-        'TECH3',
-        'EXPERIMENTAL',
-    }
+function TechDescendingDescriptionAscending(bp) return (5-(bp.TechIndex or 0))..(bp.TechDescription or 'z error')..bp.ID end
+function TechAscendingIDAscending(bp) return (bp.TechIndex or 5)..bp.ID end
+function BuildMenuSort(bp)
+    return
+    FactionSort[bp.FactionCategory or 'OTHER'] +
+    MenuSortCats[bp.SortCategory or 'SORTOTHER'] +
+    (bp.BuildIconSortPriority or bp.StrategicIconSortPriority or 0) +
+    tonumber('0.'..(tonumber(string.gsub(bp.id, '%W', ''), 36) or 0))
+end
+
+function SplitUnitsByTech(units, index)
     local groups = {{},{},{},{},{}}
     for id, bp in pairs(units) do
-        for i = 1, 5 do
-            if i == 5 or bp.CategoriesHash[techs[i] ] then
-                table.insert(groups[i], bp)
-                break
-            end
+        if index then
+            table.insert(groups[bp.TechIndex or 5], bp)
+        else
+            groups[bp.TechIndex or 5][id] = bp
         end
-    end
-    if not FactionSort then
-        FactionSort = {}
-        for faction, index in pairs(FactionCategoryIndexes) do
-            FactionSort[faction] = index*10000
-        end
-    end
-
-    local function sortKey(bp)
-        return
-        FactionSort[bp.FactionCategory or 'OTHER'] +
-        MenuSortCats[bp.SortCategory or 'SORTOTHER'] +
-        (bp.BuildIconSortPriority or bp.StrategicIconSortPriority or 0) +
-        tonumber('0.'..(tonumber(string.gsub(bp.id, '%W', ''), 36) or 0))
-    end
-    local function MenuSort(a, b)
-        return sortKey(a) < sortKey(b)
-    end
-
-    for i = 1, 5 do
-        table.sort(groups[i], MenuSort)
     end
     return groups
 end
 
 function TechTable(units, maxcols)
-    local SortedUnits = MenuSortUnitsByTech(units)
+    local SortedUnits = SplitUnitsByTech(units, true)
+    for i = 1, 5 do
+        table.sort(SortedUnits[i], sortby(BuildMenuSort))
+    end
+
     local text = ''
     local colsneeded = 0
 
@@ -155,8 +121,6 @@ function GenerateSidebar()
         SidebarNavigationData[i+(NavigationData[0] and 1 or 0)] = NavigationData[i]
     end
 
-    sortData(SidebarNavigationData, 'TechDescending-DescriptionAscending')
-
     local sidebarstring = ''
 
     for modindex, moddata in ipairs(SidebarNavigationData) do
@@ -167,7 +131,7 @@ function GenerateSidebar()
             local unitarray = moddata.Factions[i]
             if unitarray then
                 sidebarstring = sidebarstring .. "<details>\n<summary>"..faction.."</summary>\n<p>\n\n"
-                for unitI, bp in ipairs(unitarray) do
+                for unitI, bp in sortedpairs(unitarray, TechDescendingDescriptionAscending) do
 
                     sidebarstring = sidebarstring .. '* '..xml:a{
                         title=(bp.General.UnitName or bp.ID),

@@ -177,13 +177,8 @@ xml = setmetatable({},{
 
             local attributes = ''
             if type(data) == 'table' then
-                local sorteddata = {}
-                for key, val in pairs(data) do
-                    table.insert(sorteddata,{key,val})
-                end
-                table.sort(sorteddata, function(a, b) return a[1]<b[1] end)
-                for i, v in ipairs(sorteddata) do
-                    attributes = attributes..' '..v[1]..'="'..stringSanitiseXMLAttribute(v[2])..'"'
+                for key, val in sortedpairs(data) do
+                    attributes = attributes..' '..key..'="'..stringSanitiseXMLAttribute(val)..'"'
                 end
             end
 

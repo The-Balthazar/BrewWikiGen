@@ -200,7 +200,7 @@ function BlueprintSanityChecks(bp)
             if bp.General and bp.General.CommandCaps
             and bp.General.CommandCaps.RULEUCC_CallTransport
             and bp.Physics.MotionType ~= 'RULEUMT_Air'
-            and not arrayFind(bp.Bones, 'AttachPoint')
+            and not table.find(bp.Bones, 'AttachPoint')
             then
                 table.insert(issues, "Mesh has no valid transport attach bone.")
             end

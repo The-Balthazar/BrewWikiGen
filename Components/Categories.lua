@@ -28,7 +28,7 @@ local function HashFactionCat(bp, cat)
 end
 
 local function HashTechCat(bp, cat)
-    local TCatI = TechLevelCategoryIndexes[cat]
+    local TCatI = TechCategoryIndexes[cat]
     if TCatI then
         bp.TechIndex = bp.TechIndex and math.min(bp.TechIndex, TCatI) or TCatI
     end
@@ -87,12 +87,9 @@ function GenerateCategoryPages()
     end
     local num = 0
     for cat, datum in pairs(categoryData) do
-        local function sortkey(bp) return (bp.TechIndex or 5)..bp.ID end
-        table.sort(datum, function(a,b) return sortkey(a) < sortkey(b) end)
-
         local function catRow(datum)
             local s = "\n"
-            for i, bp in ipairs(datum) do
+            for i, bp in sortedpairs(datum, TechAscendingIDAscending) do
                 local switch = {
                     [0] = bp.ID,
                     [1] = (bp.General.UnitName or '')..(bp.TechDescription or ''),

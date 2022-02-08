@@ -179,9 +179,9 @@ UnitBodytextSectionData = function(bp)
                         end
                     end
 
-                    for tech, group in ipairs(MenuSortUnitsByTech(builderunits)) do
-                        for i, builderbp in ipairs(group) do
-                            if (builderbp.id ~= 'ssl0403' and builderbp.id ~= 'ssa0001') or bp.Wreckage or bp.CategoriesHash.RECLAIMABLE then
+                    for tech, group in ipairs(SplitUnitsByTech(builderunits)) do
+                        for builderid, builderbp in sortedpairs(group, BuildMenuSort) do
+                            if (builderid ~= 'ssl0403' and builderid ~= 'ssa0001') or bp.Wreckage or bp.CategoriesHash.RECLAIMABLE then
                                 bilst = bilst..BuildByBulletPoint(bp,
                                     pageLink(
                                         builderbp.ID,
@@ -205,7 +205,7 @@ UnitBodytextSectionData = function(bp)
             '<LOC wiki_sect_orders>Order capabilities',
             check = bp.General and ( tableHasTrueChild(bp.General.CommandCaps) or tableHasTrueChild(bp.General.ToggleCaps) ),
             Data = function(bp)
-                local orderButtonImage = function(orderName, bp)
+                local function orderButtonImage(orderName, bp)
                     local Order = tableOverwrites(defaultOrdersTable[orderName], bp and bp[orderName])
                     local returnstring
 
@@ -220,19 +220,12 @@ UnitBodytextSectionData = function(bp)
                     return returnstring or orderName, Order
                 end
 
-                local ordersarray = {}
-                for i, hash in ipairs({bp.General.CommandCaps or {}, bp.General.ToggleCaps or {}}) do
-                    for order, val in pairs(hash) do
-                        if val then
-                            table.insert(ordersarray, order)
-                        end
-                    end
-                end
-                table.sort(ordersarray, function(a, b) return (defaultOrdersTable[a].preferredSlot or 99) < (defaultOrdersTable[b].preferredSlot or 99) end)
-
                 local text = LOC('<LOC wiki_orders_note>The following orders can be issued to the unit:').."\n<table>\n"
                 local slot = 99
-                for i, v in ipairs(ordersarray) do
+                for i, v in sortedpairs(
+                    Unhash(bp.General.CommandCaps, bp.General.ToggleCaps),
+                    function(a) return defaultOrdersTable[a].preferredSlot or 99 end
+                ) do
                     local orderstring, order = orderButtonImage(v, bp.General.OrderOverrides)
                     if order then
                         if (slot <= 6 and order.preferredSlot >= 7) then
@@ -293,7 +286,7 @@ UnitBodytextSectionData = function(bp)
 
                     local BuildableUnits = GetBuildableModUnits(bp.Economy.BuildableCategory)
                     local BuildableEnvUnits = GetBuildableUnits(bp.Economy.BuildableCategory)
-                    local NumBuildable = tableTcount(BuildableUnits)
+                    local NumBuildable = table.getsize(BuildableUnits)
 
                     local TempBuildableCategory = tableMergeCopy({}, bp.Economy.BuildableCategory)
 
@@ -312,7 +305,7 @@ UnitBodytextSectionData = function(bp)
                             text = text..'<error:upgrade not verified>It claims to upgradable into the '..pageLink(upgradeBp.ID, upgradeBp.TechDescription)..", however build categories would indicate otherwise.\n"
 
                         else
-                            local cat = arrayFind(TempBuildableCategory, bp.General.UpgradesTo)
+                            local cat = table.find(TempBuildableCategory, bp.General.UpgradesTo)
                             if cat then
                                 text = text..'It can be upgraded into <code>'..string.lower(bp.General.UpgradesTo).."</code>.\n"
                             else
@@ -320,7 +313,7 @@ UnitBodytextSectionData = function(bp)
                             end
                         end
 
-                        arrayRemoveByValue(TempBuildableCategory, bp.General.UpgradesTo)
+                        table.removeByValue(TempBuildableCategory, bp.General.UpgradesTo)
                     end
 
                     if #TempBuildableCategory == 1 then

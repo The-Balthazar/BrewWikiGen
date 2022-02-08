@@ -36,7 +36,7 @@ local function RepaceSectionInFile(path, section, replace)
     return FindReplaceInFile(path, '[ ]*'..section..eq..'%b{}', replace)
 end
 
-function BlueprintCleanup(bp)
+function CleanupUnitBlueprintFile(bp)
     if not bp.WikiPage then return end
     if bp.SourceBlueprints ~= 1 then
         return print"Can't cleanup "..bp.Source..", it contains multiple bps. Not implemented."

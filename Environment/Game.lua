@@ -38,21 +38,26 @@ end
 function FactionFromFactionCategory(cat) return FactionsByIndex[ FactionCategoryIndexes[cat] ] end
 function FactionsFromFactionCatHash(hash)
     local array = {}
-    for cat, _ in pairs(hash) do
+    for cat, _ in sortedpairs(hash) do
         table.insert(array, FactionFromFactionCategory(cat))
     end
-    table.sort(array)
     return array
 end
 
 -- Tech levels
-TechLevelCategoryIndexes = {
+TechCategoryIndexes = {
     TECH1 = 1,
     TECH2 = 2,
     TECH3 = 3,
     EXPERIMENTAL = 4,
 }
 
+TechCategoryByIndex = {
+    'TECH1',
+    'TECH2',
+    'TECH3',
+    'EXPERIMENTAL',
+}
 -- Layers
 LayerBits = {
     Land   = 1,

@@ -68,7 +68,7 @@ end
 
 function CleanupBlueprintsFiles()
     for id, bp in pairs(all_units) do
-        BlueprintCleanup(bp)
+        CleanupUnitBlueprintFile(bp)
     end
 end
 

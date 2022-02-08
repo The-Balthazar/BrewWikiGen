@@ -13,7 +13,7 @@ local function CalculatedDamage(weapon)
 end
 
 local function ShouldWeCalculateBuildRate(bp)
-    if not bp.Economy.BuildRate or arrayFind(bp.Categories, 'WALL') then return end
+    if not bp.Economy.BuildRate or table.find(bp.Categories, 'WALL') then return end
     local TrueCats = {
         'FACTORY',
         'ENGINEER',
@@ -22,12 +22,12 @@ local function ShouldWeCalculateBuildRate(bp)
         'ENGINEERSTATION',
     }
     for i, v in ipairs(TrueCats) do
-        if arrayFind(bp.Categories, v) then
+        if table.find(bp.Categories, v) then
             return true
         end
     end
 
-    return not (bp.General.UpgradesTo and arrayFind(bp.Economy.BuildableCategory or {}, bp.General.UpgradesTo)) and not (bp.Economy.BuildableCategory or {})[2]
+    return not (bp.General.UpgradesTo and table.find(bp.Economy.BuildableCategory or {}, bp.General.UpgradesTo)) and not (bp.Economy.BuildableCategory or {})[2]
 end
 
 function CalculateUnitThreatValues(bp)
@@ -49,7 +49,7 @@ function CalculateUnitThreatValues(bp)
         local shield = bp.Defense.Shield                                               --ShieldProjectionRadius entirely only for the Pillar of Prominence
         local shieldarea = (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * math.pi
         local skirtarea = (bp.Physics.SkirtSizeX or 3) * (bp.Physics.SkirtSizeY or 3)                                                              -- Added so that transport shields dont count as personal shields.
-        if (bp.Display.Abilities and arrayFind(bp.Display.Abilities,'<LOC ability_personalshield>Personal Shield') or shieldarea < skirtarea) and not arrayFind(bp.Categories, 'TRANSPORT') then
+        if (bp.Display.Abilities and table.find(bp.Display.Abilities,'<LOC ability_personalshield>Personal Shield') or shieldarea < skirtarea) and not table.find(bp.Categories, 'TRANSPORT') then
             ThreatData.PersonalShieldThreat = (shield.ShieldMaxHealth or 0) * 0.01
         else
             ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + ((shieldarea - skirtarea) * (shield.ShieldMaxHealth or 0) * (shield.ShieldRegenRate or 1)) / 250000000
@@ -98,7 +98,7 @@ function CalculateUnitThreatValues(bp)
     end
 
     --Arbitrary high bonus threat for special high pri
-    if arrayFind(bp.Categories, 'SPECIALHIGHPRI') then
+    if table.find(bp.Categories, 'SPECIALHIGHPRI') then
         ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + 250
     end
 
