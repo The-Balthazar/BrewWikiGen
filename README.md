@@ -66,10 +66,10 @@ Include a slash at the end.
     to load `loc/`Language`/strings_db.lua` from. It is expected to be valid Lua
     and is sandboxed with no access to functions.
 
-  * `name` (lowercase) is how it refers to the environment in navigation.
+  * `name` is how it refers to the environment in navigation.
 
-  * `author`, `version`, and `icon` (all lowercase) are all used in the 'mod page'
-    for generated for the environment if `GenerateWikiPages` is true.
+  * `author`, `version`, and `icon` are all used in the 'mod page' for generated
+    for the environment if `GenerateWikiPages` is true.
 
   * `ExtraData` can point to an optional extra document of hand written content
     for specific sections of specific unit pages. It expects said document to be
@@ -159,49 +159,6 @@ open any file that matches.
 
 * `BlueprintIdExclusions` is an array of exact blueprint IDs to exclude. Case insensitive.
 
-* `ImagesPath` should point to the web directory it will find the image files. If
-you maintain my directory structure but don't care about the images working on
-the Github edit preview pages specifically, you could use just `"images/"`. If
-you have your images on some other web server, that's fine too. As long as the
-filenames match what the script is after. It is used currently just for the mod
-page large images. If the `mod_info.lua` `icon` field is truthy it tries to load
-a `.png` image that matches the `name` field, but lower case, with no special
-characters, and with dashes replacing spaces. It doesn't read the actual value
-because it could potentially be a non-web-safe file format, and potentially cause
-clashes.
-
-* `IconsPath`, like `ImagesPath`, but for icons; `"icons/"` could work here, with
-the same caveats as above. Used directly for helper icons, and mod icons.
-
-* `unitIconsPath` is like the two previous. It expects to find images that match
-the pattern `[BlueprintId]_icon.png`. It is case sensitive, and they must match
-the case that the blueprint file used, unless the file was entirely lowercase, in
-which case the ID should be upper case.
-
-  If you have mixed case files that don't match, this script can be used to rename them:
-  ```lua
-  local folderdir = string.match(debug.getinfo(1, 'S').short_src, '.*\\')
-  print(folderdir)
-
-  local folder = io.popen(string.format('dir "%s" /b', folderdir))
-
-  for name in folder:lines() do
-      if string.lower(string.sub(name, -8)) == 'icon.png' then
-          local newname = string.upper(string.match(name, '(.+)_[iI][cC][oO][nN]'))..'_icon.png'
-          local file = io.open(folderdir..name, 'rb'):read('all')
-
-          io.open(folderdir..'test\\'..newname, 'wb'):write(file):close()
-          file:close()
-      end
-  end
-
-  print("end")
-  ```
-  To use it save it as `.lua` in the images folder and run it. Powershell or a batch
-script would probably be more convenient, but I don't know those, and you need to
-run Lua files for the generator anyway. It creates renamed copies in a `\test\`
-sub folder. That folder may or may not need to exist before hand. I've not tested.
-
 * `FooterCategories` is a list of unit categories that the generator should create
 category pages for, and link to at the bottom of the relevant units. They appear
 on unit pages in the order written, so I tried to order them in a natural language
@@ -277,3 +234,47 @@ warning, but may have missing data on the pages.
 Only blueprint files that end in `_unit.bp` will be included, and only non-Merge
 blueprints in those that contain defined `Display`, `Categories`, `Defense`,
 `Physics`, and `General` tables will be considered 'valid' and included.
+
+### Images
+The Github wiki image loading is case sensitive.
+
+For mod icons if the mod in question has a `mod_info.lua` `icon` field it expects
+a `icons/mods/[mod-name].png` file and a `images/mods/[mod-name].png` file, where
+mod-name matches the mods written name in lowercase with spaces replaced with
+hyphens and non-web-safe characters removed. It ignores the actual value of `icon`,
+because `icon` has a high chance of pointing to something not-web-safe, and could
+cause clashes. I recommend that the icon be 64x64px and the image be 512x512px.
+
+It expects to find unit icons at `icons/units/[ID]_icon.png`, it expects ID to
+match the case of the original `.bp` file, unless it's entirely lowercase, in
+which case uppercase.
+
+If you have files at `images/units/[ID].jpg` in the output directory it will insert
+them in the matching unit infoboxes.
+
+If you have mixed case unit icon files that don't match, this script can be used
+to rename them to `[uppercase ID]_icon.png`:
+```lua
+local folderdir = string.match(debug.getinfo(1, 'S').short_src, '.*\\')
+print(folderdir)
+
+local folder = io.popen(string.format('dir "%s" /b', folderdir))
+
+for name in folder:lines() do
+  if string.lower(string.sub(name, -8)) == 'icon.png' then
+      local newname = string.upper(string.match(name, '(.+)_[iI][cC][oO][nN]'))..'_icon.png'
+      local file = io.open(folderdir..name, 'rb'):read('all')
+
+      io.open(folderdir..'test\\'..newname, 'wb'):write(file):close()
+      file:close()
+  end
+end
+
+print("end")
+```
+To use it save it as `.lua` in the images folder and run it. Powershell or a batch
+script would probably be more convenient, but I don't know those, and you need to
+run Lua files for the generator anyway. It creates renamed copies in a `\test\`
+sub folder. That folder may or may not need to exist before hand. I've not tested.
+
+If your unit blueprints themselves are mixed case then god help you.

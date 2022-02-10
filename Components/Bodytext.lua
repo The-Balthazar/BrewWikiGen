@@ -213,7 +213,7 @@ UnitBodytextSectionData = function(bp)
                         local Tip = Tooltips[Order.helpText] or {title = 'error:'..Order.helpText..' no title'}
                         returnstring = xml:img{
                             float = 'left',
-                            src = IconsPath..'orders/'..string.lower(Order.bitmapId)..'.png',
+                            src = 'icons/orders/'..string.lower(Order.bitmapId)..'.png',
                             title = LOC(Tip.title or '')..(Tip.description and Tip.description ~= '' and "\n"..LOC(Tip.description) or '')
                         }
                     end

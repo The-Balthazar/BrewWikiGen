@@ -18,13 +18,16 @@ end
 local function UnitInfobox(bp)
     return Infobox{
         Style = 'main-right',
-        Header = {string.format(
-            '<img align="left" title="%s unit icon" src="%s_icon.png" />%s<br />%s',
-            (bp.General.UnitName or 'The'),
-            unitIconsPath..bp.ID,
-            (bp.General.UnitName or xml:i'Unnamed'),
-            (bp.TechDescription or xml:i'No description')
-        )},
+        Header = {
+            string.format(
+                '<img align="left" title="%s unit icon" src="%s_icon.png" />%s<br />%s',
+                (bp.General.UnitName or 'The'),
+                'icons/units/'..bp.ID,
+                (bp.General.UnitName or xml:i'Unnamed'),
+                (bp.TechDescription or xml:i'No description')
+            ),
+            FileExists(OutputDirectory..'images/units/'..bp.ID..'.jpg') and xml:a{href='images/units/'..bp.ID..'.jpg'}(xml:img{width='256px', src='images/units/'..bp.ID..'.jpg'}) or nil
+        },
         Data = GetUnitInfoboxData(bp),
     }
 end

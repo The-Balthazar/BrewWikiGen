@@ -58,11 +58,11 @@ function TechTable(units, maxcols)
         if group[1] then
             local trows = math.ceil(#group/maxcols)
             for trow = 1, trows do
-                local tdtext = "\n"..(trow == 1 and '        '..xml:td{rowspan=trows~=1 and trows or nil}(i~=5 and xml:img{src=IconsPath..'T'..i..'.png', title='T'..i} or '').."\n" or '')
+                local tdtext = "\n"..(trow == 1 and '        '..xml:td{rowspan=trows~=1 and trows or nil}(i~=5 and xml:img{src='icons/T'..i..'.png', title='T'..i} or '').."\n" or '')
                 for coli = 1, maxcols do
                     local buildbp = group[maxcols*(trow-1)+coli]
                     if buildbp then
-                        tdtext = tdtext..'        '..xml:td( pageLink(buildbp.ID, xml:img{src=unitIconsPath..buildbp.ID..'_icon.png', width='64px', title=buildbp.TechDescription}) ).."\n"
+                        tdtext = tdtext..'        '..xml:td( pageLink(buildbp.ID, xml:img{src='icons/units/'..buildbp.ID..'_icon.png', width='64px', title=buildbp.TechDescription}) ).."\n"
                     end
                 end
                 trtext = trtext..'    '..xml:tr(tdtext..'    ').."\n"
@@ -157,7 +157,7 @@ function GenerateModPages()
             Style = 'main-right',
             Header = {
                 moddata.ModInfo.name,
-                xml:img{src=ImagesPath..'mods/'..(moddata.ModInfo.icon and stringSanitiseFilename(moddata.ModInfo.name, true, true) or 'mod')..'.png', width='256px'}
+                xml:img{src='images/mods/'..(moddata.ModInfo.icon and stringSanitiseFilename(moddata.ModInfo.name, true, true) or 'mod')..'.png', width='256px'}
             },
             Data = {
                 { 'Author:', moddata.ModInfo.author },
@@ -216,7 +216,7 @@ function GenerateHomePage()
             local ModInfo = NavigationData[j - (NavigationData[0] and 1 or 0)].ModInfo
 
             homeModNav1 = homeModNav1.."\n"..xml:th{align='center'}(xml:a{href=stringSanitiseFilename(ModInfo.name)}(xml:img{
-                src=ImagesPath..'mods/'..(ModInfo.icon and stringSanitiseFilename(ModInfo.name, true, true) or 'mod')..'.png',
+                src='images/mods/'..(ModInfo.icon and stringSanitiseFilename(ModInfo.name, true, true) or 'mod')..'.png',
                 title=stringSanitiseFilename(ModInfo.name)
             }))
 

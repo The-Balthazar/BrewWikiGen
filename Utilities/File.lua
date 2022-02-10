@@ -89,3 +89,8 @@ function GetDirFromShellLnk(lnk)
     local linkfile = io.open(lnk, 'rb'):read('*all')
     return string.gsub(string.match(linkfile, '%a:\\[ \\%w%s%p]+'), '\\', '/')
 end
+
+function FileExists(dir)
+    local file = io.open(dir, 'rb')
+    return file and file:close()
+end

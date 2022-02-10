@@ -98,9 +98,9 @@ function GenerateCategoryPages()
 
                 s = s..
                 '    '..xml:tr(
-                '        '..xml:td(xml:a{href=bp.ID}(xml:img{src=unitIconsPath..bp.ID..'_icon.png', width='21px'})),
+                '        '..xml:td(xml:a{href=bp.ID}(xml:img{src='icons/units/'..bp.ID..'_icon.png', width='21px'})),
                 '        '..xml:td(xml:code{}(bp.id)),
-                '        '..xml:td(xml:a{href=stringSanitiseFilename(bp.ModInfo.name)}(xml:img{src=IconsPath..'mods/'..(bp.ModInfo.icon and stringSanitiseFilename(bp.ModInfo.name, true, true) or 'mod')..'.png', width='21px'})),
+                '        '..xml:td(xml:a{href=stringSanitiseFilename(bp.ModInfo.name)}(xml:img{src='icons/mods/'..(bp.ModInfo.icon and stringSanitiseFilename(bp.ModInfo.name, true, true) or 'mod')..'.png', width='21px'})),
                 '        '..xml:td(xml:a{href=bp.ID}(switch[BinaryCounter{bp.General.UnitName, bp.TechDescription}])),
                 '    ').."\n"
             end

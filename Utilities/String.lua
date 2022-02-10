@@ -79,23 +79,23 @@ function iconText(icon, text, text2)
     text2 = numberFormatNoTrailingZeros(text2)
 
     local icons = {
-        Health = IconsPath..'health.png',
-        Regen = IconsPath..'health.png',
-        Shield = IconsPath..'shield.png',
+        Health = 'icons/health.png',
+        Regen = 'icons/health.png',
+        Shield = 'icons/shield.png',
 
-        Energy = IconsPath..'energy.png',
-        Mass = IconsPath..'mass.png',
-        Time = IconsPath..'time.png',
+        Energy = 'icons/energy.png',
+        Mass = 'icons/mass.png',
+        Time = 'icons/time.png',
 
-        Build = IconsPath..'build.png',
+        Build = 'icons/build.png',
 
-        Fuel = IconsPath..'fuel.png',
-        Attached = IconsPath..'attached.png',
+        Fuel = 'icons/fuel.png',
+        Attached = 'icons/attached.png',
 
-        [1] = IconsPath..'T1.png',
-        [2] = IconsPath..'T2.png',
-        [3] = IconsPath..'T3.png',
-        [4] = IconsPath..'T4.png',
+        [1] = 'icons/T1.png',
+        [2] = 'icons/T2.png',
+        [3] = 'icons/T3.png',
+        [4] = 'icons/T4.png',
     }
     local titles = {
         [1] = 'Tech 1',

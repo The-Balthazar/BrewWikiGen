@@ -95,11 +95,6 @@ BlueprintIdExclusions = { -- Excludes blueprints with any of these IDs (case ins
     'uea0003', -- UEF ACU drone
 }
 
--- Web path for img src. Could be relative, but would break on edit previews.
-ImagesPath = "images/"
-IconsPath = "icons/"
-unitIconsPath = IconsPath.."units/" --[unit blueprintID]_icon.png, case sensitive.
-
 FooterCategories = { -- In order
     'UEF',          'AEON',         'CYBRAN',       'SERAPHIM',
     'TECH1',        'TECH2',        'TECH3',        'EXPERIMENTAL',
