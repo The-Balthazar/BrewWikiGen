@@ -32,7 +32,7 @@ GetUnitInfoboxData = function(bp)
                 (bp.Defense.Shield.ShieldRegenRate and LOCBrackets(LOCPlusPerSec(bp.Defense.Shield.ShieldRegenRate)) )
             )
         },
-        {'<LOC wiki_infobox_shieldr>'   ..'Shield radius:', (bp.Defense.Shield.ShieldSize and numberFormatNoTrailingZeros(bp.Defense.Shield.ShieldSize / 2))}, --Shield size is a scale multiplier, and so is effectively diameter
+        {'<LOC wiki_infobox_shieldr>'   ..'Shield radius:', formatDistance(bp.Defense.Shield.ShieldSize and formatNumber(bp.Defense.Shield.ShieldSize / 2))}, --Shield size is a scale multiplier, and so is effectively diameter
         {'<LOC wiki_infobox_defflags>'  ..'Flags:',
             InfoboxFlagsList{
                 bp.CategoriesHash.UNTARGETABLE and LOC'<LOC wiki_flag_untargetable>Untargetable' or '',
@@ -53,11 +53,11 @@ GetUnitInfoboxData = function(bp)
         {'<LOC wiki_infobox_store_e>'   ..'Energy storage:',    iconText('Energy', bp.Economy.StorageEnergy)},
         {'<LOC wiki_infobox_store_m>'   ..'Mass storage:',      iconText('Mass',   bp.Economy.StorageMass)},
         {''},
-        {'<LOC wiki_infobox_vision_r>'    ..'Vision radius:',       (bp.Intel.VisionRadius or 10)},
-        {'<LOC wiki_infobox_w_vision_r>'  ..'Water vision radius:', (bp.Intel.WaterVisionRadius or 10)},
-        {'<LOC wiki_infobox_radar_r>'     ..'Radar radius:',        (bp.Intel.RadarRadius)},
-        {'<LOC wiki_infobox_sonar_r>'     ..'Sonar radius:',        (bp.Intel.SonarRadius)},
-        {'<LOC wiki_infobox_omni_r>'      ..'Omni radius:',         (bp.Intel.OmniRadius)},
+        {'<LOC wiki_infobox_vision_r>'    ..'Vision radius:',       formatDistance(bp.Intel.VisionRadius or 10)},
+        {'<LOC wiki_infobox_w_vision_r>'  ..'Water vision radius:', formatDistance(bp.Intel.WaterVisionRadius or 10)},
+        {'<LOC wiki_infobox_radar_r>'     ..'Radar radius:',        formatDistance(bp.Intel.RadarRadius)},
+        {'<LOC wiki_infobox_sonar_r>'     ..'Sonar radius:',        formatDistance(bp.Intel.SonarRadius)},
+        {'<LOC wiki_infobox_omni_r>'      ..'Omni radius:',         formatDistance(bp.Intel.OmniRadius)},
         {'<LOC wiki_infobox_jammer_blips>'..'Jammer blips (radii):',
             (bp.Intel.JamRadius)
             and
@@ -65,9 +65,9 @@ GetUnitInfoboxData = function(bp)
             (bp.Intel.JamRadius.Min)..'‒'..
             (bp.Intel.JamRadius.Max)..')'
         },
-        {'<LOC wiki_infobox_cloak_r>'       ..'Cloak radius:',         (bp.Intel.CloakFieldRadius)},
-        {'<LOC wiki_infobox_steath_radar_r>'..'Radar stealth radius:', (bp.Intel.RadarStealthFieldRadius)},
-        {'<LOC wiki_infobox_steath_sonar_r>'..'Sonar stealth radius:', (bp.Intel.SonarStealthFieldRadius)},
+        {'<LOC wiki_infobox_cloak_r>'       ..'Cloak radius:',         formatDistance(bp.Intel.CloakFieldRadius)},
+        {'<LOC wiki_infobox_steath_radar_r>'..'Radar stealth radius:', formatDistance(bp.Intel.RadarStealthFieldRadius)},
+        {'<LOC wiki_infobox_steath_sonar_r>'..'Sonar stealth radius:', formatDistance(bp.Intel.SonarStealthFieldRadius)},
         {'<LOC wiki_infobox_intelflags>'    ..'Flags:',
             InfoboxFlagsList{
                 (bp.Intel.Cloak and LOC'<LOC wiki_ability_cloak>Cloak' or ''),
@@ -78,7 +78,7 @@ GetUnitInfoboxData = function(bp)
         {''},
         {'<LOC wiki_infobox_motion>'         ..'Motion type:',       bp.Physics.MotionType and ('<code>'..bp.Physics.MotionType..'</code>')},
         {'<LOC wiki_infobox_build_layers>'   ..'Buildable layers:', (bp.Physics.MotionType == 'RULEUMT_None') and BuildableLayer(bp.Physics)},
-        {'<LOC wiki_infobox_movement_speed>' ..'Movement speed:',   (bp.Air.MaxAirspeed or bp.Physics.MaxSpeed)},
+        {'<LOC wiki_infobox_movement_speed>' ..'Movement speed:',   formatSpeed(bp.Air.MaxAirspeed or bp.Physics.MaxSpeed, bp.Physics.MotionType == 'RULEUMT_Water' or bp.Physics.MotionType == 'RULEUMT_SurfacingSub')},
         {'<LOC wiki_infobox_fuel>'           ..'Fuel:',             (bp.Physics.FuelUseTime and iconText('Fuel', formatTime(bp.Physics.FuelUseTime), '') )},
         {'<LOC wiki_infobox_elevation>'      ..'Elevation:',        (bp.Air and bp.Physics.Elevation)},
         {'<LOC wiki_infobox_transport_class>'..'Transport class:', (
@@ -98,7 +98,7 @@ GetUnitInfoboxData = function(bp)
             bp.Transport.Class1Capacity..detailsLink('<LOC wiki_sect_transport>Transport capacity')
         )},
         {''},
-        {'<LOC wiki_infobox_miscrad>' ..'Misc radius:', bp.CategoriesHash.OVERLAYMISC and bp.AI.StagingPlatformScanRadius, LOC'<LOC wiki_misc_radius_note>Defined by the air staging radius value. Often used to indicate things without a dedicated range ring.' },
+        {'<LOC wiki_infobox_miscrad>' ..'Misc radius:', formatDistance(bp.CategoriesHash.OVERLAYMISC and bp.AI.StagingPlatformScanRadius), LOC'<LOC wiki_misc_radius_note>Defined by the air staging radius value. Often used to indicate things without a dedicated range ring.' },
         {'<LOC wiki_infobox_weapons>' ..'Weapons:',     bp.Weapon and #bp.Weapon..detailsLink('<LOC wiki_sect_weapons>Weapons')},
         {'<LOC wiki_infobox_wreckage>'..'Wreckage:',
             (
@@ -109,14 +109,14 @@ GetUnitInfoboxData = function(bp)
             InfoboxFlagsList{
                 (bp.Wreckage.HealthMult or 1) ~= 0 and (iconText(
                     'Health',
-                    numberFormatNoTrailingZeros(
+                    formatNumber(
                         bp.Defense.Health *
                         (bp.Wreckage.HealthMult or 1)
                     )
                 ) or ''),
                 bp.Economy.BuildCostMass * (bp.Wreckage.MassMult or 0) ~= 0 and (iconText(
                     'Mass',
-                    numberFormatNoTrailingZeros(
+                    formatNumber(
                         bp.Economy.BuildCostMass *
                         (bp.Wreckage.MassMult or 0) *
                         (bp.Wreckage.HealthMult or 1)
@@ -124,7 +124,7 @@ GetUnitInfoboxData = function(bp)
                 ) or ''),
                 bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0) ~= 0 and (iconText(
                     'Energy',
-                    numberFormatNoTrailingZeros(
+                    formatNumber(
                         bp.Economy.BuildCostEnergy *
                         (bp.Wreckage.EnergyMult or 0) *
                         (bp.Wreckage.HealthMult or 1)

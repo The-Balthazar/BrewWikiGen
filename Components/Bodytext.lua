@@ -600,7 +600,7 @@ UnitBodytextSectionData = function(bp)
                 for i = 1, 5 do
                     local lev = 'Level'..i
                     if bp.Veteran[lev] then
-                        text = text .. "\n"..i..'. '..bp.Veteran[lev]..' kills gives: '..(bp.Defense and bp.Defense.MaxHealth and iconText('Health', '+'..numberFormatNoTrailingZeros(bp.Defense.MaxHealth / 10 * i) ) or 'error:vet defined and no defense defined' )
+                        text = text .. "\n"..i..'. '..bp.Veteran[lev]..' kills gives: '..(bp.Defense and bp.Defense.MaxHealth and iconText('Health', '+'..formatNumber(bp.Defense.MaxHealth / 10 * i) ) or 'error:vet defined and no defense defined' )
                         if bp.Buffs then
 
                             local sortedBuffs = {}

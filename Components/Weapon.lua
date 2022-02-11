@@ -246,13 +246,13 @@ function GetWeaponInfoboxData(wep, bp)
             ( not (IsDeathWeapon(wep) and not wep.FireOnDeath) and "Note: This doesn't count additional scripted effects, such as splintering projectiles, and variable scripted damage.")
         },
         {'Damage to shields:', (wep.DamageToShields or wep.ShieldDamage)},
-        {'Damage radius:', (wep.NukeInnerRingRadius or wep.DamageRadius)},
+        {'Damage radius:', formatDistance(wep.NukeInnerRingRadius or wep.DamageRadius)},
         {'Outer damage:', wep.NukeOuterRingDamage},
-        {'Outer radius:', wep.NukeOuterRingRadius},
+        {'Outer radius:', formatDistance(wep.NukeOuterRingRadius)},
         {'Damage instances:', GetDamageInstances(wep)},
         {'Damage type:', wep.DamageType and xml:code(wep.DamageType)},
-        {'Max range:', not IsDeathWeapon(wep) and wep.MaxRadius},
-        {'Min range:', wep.MinRadius},
+        {'Max range:', not IsDeathWeapon(wep) and formatDistance(wep.MaxRadius)},
+        {'Min range:', formatDistance(wep.MinRadius)},
         {'Firing arc:', ArcTable{wep.Turreted and wep.TurretYawRange}},
         {'Firing cycle:', GetFiringCycle(wep)},
         {'Firing cost:',
@@ -261,7 +261,7 @@ function GetWeaponInfoboxData(wep, bp)
                 wep.EnergyRequired and wep.EnergyRequired ~= 0 and
                 (
                     wep.EnergyRequired ..
-                    (wep.EnergyDrainPerSecond and LOCBrackets(LOCPerSec(wep.EnergyDrainPerSecond)..' for '..numberFormatNoTrailingZeros(math.ceil((wep.EnergyRequired/wep.EnergyDrainPerSecond)*10)/10)..'s') or '')
+                    (wep.EnergyDrainPerSecond and LOCBrackets(LOCPerSec(wep.EnergyDrainPerSecond)..' for '..formatNumber(math.ceil((wep.EnergyRequired/wep.EnergyDrainPerSecond)*10)/10)..'s') or '')
                 )
             )
         },

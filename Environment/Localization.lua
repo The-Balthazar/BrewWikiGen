@@ -33,5 +33,5 @@ function LOCtag(s) return string.match(s, '<LOC ([^>.]*)>') end
 function LOC(s) return s and (LocalizedStrings[LOCtag(s)] or noLOC(s)) end
 
 function LOCBrackets(s) return s and string.format(LOC'<LOC wiki_bracket_text> (%s)', s) end
-function LOCPerSec(s) return s and string.format(LOC'<LOC wiki_per_second>%s/s', numberFormatNoTrailingZeros(s)) end
-function LOCPlusPerSec(s) return s and string.format(LOC'<LOC wiki_plus_per_second>+%s/s', numberFormatNoTrailingZeros(s)) end
+function LOCPerSec(s) return s and string.format(LOC'<LOC wiki_per_second>%s/s', formatNumber(s)) end
+function LOCPlusPerSec(s) return s and string.format(LOC'<LOC wiki_plus_per_second>+%s/s', formatNumber(s)) end

@@ -20,11 +20,6 @@ function stringSanitiseXMLAttribute(s)
     return string.gsub(s, '"', "''")
 end
 
-function numberFormatNoTrailingZeros(n)
-    str = tostring(n)
-    return string.sub(str, -2) == '.0' and tonumber(string.sub(str, 1, -3)) or n
-end
-
 function hoverTip(title, text)
     return title and ' '..xml:span{title=title}(text or "(<u>?</u>)") or ''
 end
@@ -75,8 +70,8 @@ end
 --------------------------------------------------------------------------------
 
 function iconText(icon, text, text2)
-    text = numberFormatNoTrailingZeros(text)
-    text2 = numberFormatNoTrailingZeros(text2)
+    text = formatNumber(text)
+    text2 = formatNumber(text2)
 
     local icons = {
         Health = 'icons/health.png',
@@ -240,6 +235,28 @@ function formatTime(n)
     else
         return time
     end
+end
+
+function formatNumber(n)
+    str = tostring(n)
+    return string.sub(str, -2) == '.0' and tonumber(string.sub(str, 1, -3)) or n
+end
+
+function formatSpeed(s, naval)
+    return s and s~=0 and (
+        not naval and ( s > 13.7 -- Mach 0.8 or greater
+            and hoverTip(string.format('%0.0f km/h, %0.0f mph, Mach %0.2f', s*72, s*44.74, s*0.058309), string.format('%s (%0.0f m/s)', s, s*20)) --o (m): km, mph, Mach
+            or hoverTip(string.format('%0.0f km/h, %0.0f mph', s*72, s*44.74), string.format('%s (%0.0f m/s)', s, s*20)) --o (m): km, mph
+        )
+        or hoverTip(string.format('%0.0f km/h, %0.0f kn', s*72, s*38.8769), string.format('%s (%0.0f m/s)', s, s*20)) --o (m): km, knots
+    ) or s
+end
+
+function formatDistance(s)
+    return s and s~=0 and (s < 25 -- 500m or less
+        and hoverTip(string.format('%0.2f km, %0.2f mi', s*0.02, s*0.0124274), string.format('%s (%0.0f m)', s, s*20)) --o (m): km, mi
+        or hoverTip(string.format('%0.0f m, %0.2f mi', s*20, s*0.0124274), string.format('%s (%s km)', s, formatNumber(s*0.02))) --o (km): m, mi
+    ) or s
 end
 
 function BuildableLayer(phys)
