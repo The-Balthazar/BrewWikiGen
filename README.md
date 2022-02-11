@@ -250,7 +250,9 @@ match the case of the original `.bp` file, unless it's entirely lowercase, in
 which case uppercase.
 
 If you have files at `images/units/[ID].jpg` in the output directory it will insert
-them in the matching unit infoboxes.
+them in the matching unit infoboxes, and if you have files at `images/units/[ID]-n.jpg`
+where `n` is a number from `1` onwards, it will create a gallery section for them
+on said pages.
 
 If you have mixed case unit icon files that don't match, this script can be used
 to rename them to `[uppercase ID]_icon.png`:

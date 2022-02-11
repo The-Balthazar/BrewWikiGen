@@ -632,8 +632,19 @@ UnitBodytextSectionData = function(bp)
             end
         },
         {
+            '<LOC wiki_sect_gallery>Gallery',
+            check = FileExists(OutputDirectory..'images/units/'..bp.ID..'-1.jpg'),
+            Data = function(bp)
+                local text = ''
+                for img in galleryiter('images/units/'..bp.ID) do
+                    text = text..(text ~= '' and "\n" or '')..xml:a{href=img}(xml:img{src=img, width='128px'})
+                end
+                return text
+            end,
+        },
+        {
             '<LOC wiki_sect_videos>Videos',
-            check = pcall(function() assert(UnitData and UnitData[bp.ID] and UnitData[bp.ID].Videos and #UnitData[bp.ID].Videos > 0) end),
+            check = UnitData[bp.ID].Videos and #UnitData[bp.ID].Videos > 0,
             Data = function(bp)
                 local text = ''
                 for i, video in ipairs(UnitData[bp.ID].Videos) do

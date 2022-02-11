@@ -24,6 +24,15 @@ function sortedpairs(set, sort)
     end
 end
 
+function galleryiter(name)
+    local i = 0
+    return function()
+        i = i+1
+        local path = name..'-'..i..'.jpg'
+        return FileExists(OutputDirectory..path) and path or nil
+    end
+end
+
 -- returns the index of the first matching value in array
 function table.find(array, str)
     if not array then return end
