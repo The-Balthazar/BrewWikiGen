@@ -7,7 +7,7 @@ local LocalizedStrings = {}
 
 local function LoadLocalizationFile(FileLocation)
     local good, loc = pcall(GetSandboxedLuaFile, FileLocation)
-    if good then
+    if good and loc then
         if Logging.LocalisationLoaded then print("  Preloading LOC "..FileLocation) end
         for k, v in pairs(loc) do
             LocalizedStrings[k] = v

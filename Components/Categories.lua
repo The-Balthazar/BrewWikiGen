@@ -60,17 +60,10 @@ function UnitPageCategories(bp)
     for i, cat in ipairs(FooterCategories) do
         if bp.CategoriesHash[cat] then
 
-            if not categoryData[cat] then
-                categoryData[cat] = {}
-            end
-
+            if not categoryData[cat] then categoryData[cat] = {} end
             table.insert(categoryData[cat], bp)
 
-            if cattext ~= '' then
-                cattext = cattext..' · '
-            end
-
-            cattext = cattext.."\n"..xml:a{href='_categories.'..stringSanitiseFilename(cat)}(cat)
+            cattext = cattext..(cattext~=''and' · 'or'').."\n"..xml:a{href='_categories.'..stringSanitiseFilename(cat)}(cat)
         end
     end
     if cattext ~= '' then
