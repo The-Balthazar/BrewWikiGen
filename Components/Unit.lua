@@ -16,6 +16,7 @@ local function UnitHeaderString(bp)
 end
 
 local function UnitInfobox(bp)
+    local BPimg = 'images/units/'..bp.ID..'.jpg'
     return Infobox{
         Style = 'main-right',
         Header = {
@@ -26,7 +27,7 @@ local function UnitInfobox(bp)
                 (bp.General.UnitName or xml:i'Unnamed'),
                 (bp.TechDescription or xml:i'No description')
             ),
-            FileExists(OutputDirectory..'images/units/'..bp.ID..'.jpg') and xml:a{href='images/units/'..bp.ID..'.jpg'}(xml:img{width='256px', src='images/units/'..bp.ID..'.jpg'}) or nil
+            FileExists(OutputDirectory..BPimg) and xml:a{href=BPimg}(xml:img{width='256px', src=BPimg}) or nil
         },
         Data = GetUnitInfoboxData(bp),
     }

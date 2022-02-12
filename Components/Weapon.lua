@@ -132,7 +132,7 @@ local function GetDamageInstances(wep)
         if s ~= '' then
             s = s..'<br />'
         end
-        s = math.ceil( (wep.BeamLifetime or 1) / (wep.BeamCollisionDelay + 0.1) )..' beam collisions'
+        s = s..math.ceil( (wep.BeamLifetime or 1) / (wep.BeamCollisionDelay + 0.1) )..' beam collisions'
     end
     if s == '' then s = nil end
     return s
