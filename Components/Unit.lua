@@ -21,9 +21,9 @@ local function UnitInfobox(bp)
         Style = 'main-right',
         Header = {
             string.format(
-                '<img align="left" title="%s unit icon" src="%s_icon.png" />%s<br />%s',
+                '<img align="left" title="%s unit icon" src="%s" />%s<br />%s',
                 (bp.General.UnitName or 'The'),
-                'icons/units/'..bp.ID,
+                UnitIconDir(bp.ID),
                 (bp.General.UnitName or xml:i'Unnamed'),
                 (bp.TechDescription or xml:i'No description')
             ),

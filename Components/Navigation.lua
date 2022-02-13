@@ -62,7 +62,7 @@ function TechTable(units, maxcols)
                 for coli = 1, maxcols do
                     local buildbp = group[maxcols*(trow-1)+coli]
                     if buildbp then
-                        tdtext = tdtext..'        '..xml:td( pageLink(buildbp.ID, xml:img{src='icons/units/'..buildbp.ID..'_icon.png', width='64px', title=buildbp.TechDescription}) ).."\n"
+                        tdtext = tdtext..'        '..xml:td( pageLink(buildbp.ID, UnitIcon(buildbp.ID, {width='64px', title=buildbp.TechDescription}) ) ).."\n"
                     end
                 end
                 trtext = trtext..'    '..xml:tr(tdtext..'    ').."\n"

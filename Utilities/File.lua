@@ -94,3 +94,13 @@ function FileExists(dir)
     local file = io.open(dir, 'rb')
     return file and file:close()
 end
+
+function UnitIconDir(ID)
+    local path = 'icons/units/'..ID..'_icon.png'
+    return FileExists(OutputDirectory..path) and path or 'icons/units/unidentified_icon.png'
+end
+
+function UnitIcon(ID, data)
+    data.src = UnitIconDir(ID)
+    return xml:img(data)
+end
