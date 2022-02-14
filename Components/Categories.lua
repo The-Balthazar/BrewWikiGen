@@ -42,6 +42,7 @@ function HashUnitCategories(bp)
         ALLUNITS = 'ALLUNITS',
     }
     bp.FactionCategoryHash = {}
+    bp.FactionCategory = nil -- sanitise in case of multiple calls
     if not bp.Categories then return end
     for i, cat in ipairs(bp.Categories) do
         cat = string.upper(cat)
