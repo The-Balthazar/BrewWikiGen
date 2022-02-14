@@ -19,6 +19,7 @@ function BlueprintSanityChecks(bp)
     if not Sanity.BlueprintChecks or not bp.WikiPage then
         return
     end
+    HashUnitCategories(bp) -- Sanity happens before this happens for reals, so do it again. It'll get overwritten later, but that's fine.
 
     local issues = {}
 
@@ -51,7 +52,7 @@ function BlueprintSanityChecks(bp)
             end
 
             local builtby = arraySubFind(bp.Categories, 'BUILTBY')
-            if builtby then
+            if builtby and t then
 
                 local function UpgradesFrom(to, from)
                     return (to.General.UpgradesFrom == from.id and from.General.UpgradesTo == to.id) and from

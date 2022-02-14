@@ -80,7 +80,7 @@ function GeneratorMain(Output)
     --[[ ------------------------------------------------------------------ ]]--
     --[[ Generate wiki                                                      ]]--
     --[[ ------------------------------------------------------------------ ]]--
-    if Logging.BlueprintChecks           then safecall(CheckUnitBlueprintSanity) end
+    if Sanity.BlueprintChecks            then safecall(CheckUnitBlueprintSanity) end
     if CleanupOptions.CleanUnitBpFiles   then safecall(CleanupBlueprintsFiles) end
     if WikiOptions.GenerateUnitPages     then safecall(GenerateUnitPages) end
     if WikiOptions.GenerateSidebar       then safecall(GenerateSidebar) end
