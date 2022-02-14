@@ -115,15 +115,9 @@ local function UpdateGeneratedPartOfPage(page, tag, content)
 end
 
 function GenerateSidebar()
-    local SidebarNavigationData = {}
-
-    for i = (NavigationData[0] and 0 or 1), #NavigationData do
-        SidebarNavigationData[i+(NavigationData[0] and 1 or 0)] = NavigationData[i]
-    end
-
     local sidebarstring = ''
 
-    for modindex, moddata in ipairs(SidebarNavigationData) do
+    for modindex, moddata in sortedpairs(NavigationData) do
         local modname = moddata[1]
 
         sidebarstring = sidebarstring .. "<details markdown=\"1\">\n<summary>[Show] <a href=\""..stringSanitiseFilename(moddata.ModInfo.name)..[[">]]..moddata.ModInfo.name.."</a></summary>\n<p>\n<table>\n<tr>\n<td width=\"269px\">\n\n"

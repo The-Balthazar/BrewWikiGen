@@ -664,6 +664,21 @@ UnitBodytextSectionData = function(bp)
                 return text
             end
         },
+        {
+            '<LOC wiki_sect_trivia>Trivia',
+            check = UnitData[bp.ID].Trivia,
+            Data = function(bp)
+                if type(UnitData[bp.ID].Trivia) == 'table' then
+                    local text = ''
+                    for i, v in ipairs(UnitData[bp.ID].Trivia) do
+                        text = text.."\n* "..v
+                    end
+                    return text
+                else
+                    return UnitData[bp.ID].Trivia
+                end
+            end,
+        },
     }, {
 
         __tostring = function(self)

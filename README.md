@@ -78,6 +78,8 @@ Include a slash at the end.
     with table values containing keys that match the syntax `[Section]Prefix` or
     `[Section]Suffix`, where `[Section]` matches the English names of sections,
     like `Weapons` or `Adjacency`, or `LeadSuffix`, with string values, or keyed
+    with `Trivia` with the value either being a string or an array of strings; a
+    string included as-is, and an array being formatted as a bulleted list, or keyed
     with `Videos` with an array of tables that match the format
     `{YouTube = '[Video ID]', '[Display name]'}`, where `[Video ID]` is the 11-ish
     character YouTube video ID, and `[Display name]` is the link caption to display.
@@ -85,11 +87,15 @@ Include a slash at the end.
     ```lua
     UnitData = {
         SSL0403 = {
+            LeadSuffix = "Paragraph to appear after the generated lead paragraph.",
+            AdjacencyPrefix = "Paragraph to appear before the Adjacency section.",
             Videos = {
                 {YouTube = 'IInITjdtaPM', 'Time-lapse'},
             },
-            LeadSuffix = "Paragraph to appear after the generated lead paragraph.",
-            AdjacencyPrefix = "Paragraph to appear before the Adjacency section."
+            Trivia = {
+                'This would appear as a bullet point in the trivia section.',
+                'As would this.',
+            },
         },
     }
     ```
