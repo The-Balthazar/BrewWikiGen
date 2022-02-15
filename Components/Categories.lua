@@ -54,6 +54,12 @@ function HashUnitCategories(bp)
     HashFactionCat(bp)
 end
 
+function categoryLink(cat, text)
+    if cat then
+        return xml:a{href='_categories.'..stringSanitiseFilename(cat)}(text or cat)
+    end
+end
+
 function UnitPageCategories(bp)
     if not FooterCategories[1] then return '' end
 
@@ -64,7 +70,7 @@ function UnitPageCategories(bp)
             if not categoryData[cat] then categoryData[cat] = {} end
             table.insert(categoryData[cat], bp)
 
-            cattext = cattext..(cattext~=''and' · 'or'').."\n"..xml:a{href='_categories.'..stringSanitiseFilename(cat)}(cat)
+            cattext = cattext..(cattext~=''and' · 'or'').."\n"..categoryLink(cat)
         end
     end
     if cattext ~= '' then
@@ -102,7 +108,7 @@ function GenerateCategoryPages()
         end
 
         md = io.open(OutputDirectory..'_categories.'..cat..'.md', "w")
-        :write('Units with the '..xml:code(cat).." category.\n"..xml:table(catRow(datum)).."\n")
+        :write(#datum..' unit'..(#datum == 1 and ' has' or 's have')..' the '..xml:code(cat).." category.\n"..xml:table(catRow(datum)).."\n")
         :close()
         num = num+1
     end

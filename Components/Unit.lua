@@ -47,6 +47,7 @@ function LoadModUnitBlueprints(ModInfo) -- First pass
         bp.ModInfo = ModInfo
         bp.WikiPage = true
         all_units[id] = bp
+        ModInfo.Units = (ModInfo.Units or 0)+1
     end
 end
 
@@ -58,6 +59,7 @@ function LoadEnvUnitBlueprints(GeneratorDir)
             bp.ModInfo = EnvironmentData.GenerateWikiPages and EnvironmentData
             if bp.ModInfo then
                 bp.ModInfo.ModIndex = 0
+                bp.ModInfo.Units = (bp.ModInfo.Units or 0)+1
             end
             bp.WikiPage = EnvironmentData.GenerateWikiPages
         end

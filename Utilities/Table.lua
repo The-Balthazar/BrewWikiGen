@@ -148,6 +148,8 @@ function tableMergeCopy(t1, t2)
     return t1
 end
 
+function table.getn(t) return #t end
+
 -- #t for keyed tables
 function table.getsize(t)
     local num = 0

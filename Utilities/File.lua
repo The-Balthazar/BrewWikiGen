@@ -41,6 +41,8 @@ local Sandboxes = {
             math = math,
 
             type = type,
+            tostring = tostring,
+            tonumber = tonumber,
         }
     end
 }

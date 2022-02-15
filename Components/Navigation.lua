@@ -118,25 +118,25 @@ function GenerateSidebar()
     local sidebarstring = ''
 
     for modindex, moddata in sortedpairs(NavigationData) do
-        local modname = moddata[1]
+        if (moddata.ModInfo.Units or 0)>0 then
+            sidebarstring = sidebarstring .. "<details markdown=\"1\">\n<summary>[Show] <a href=\""..stringSanitiseFilename(moddata.ModInfo.name)..[[">]]..moddata.ModInfo.name.."</a></summary>\n<p>\n<table>\n<tr>\n<td width=\"269px\">\n\n"
+            for i, faction in ipairs(FactionsByIndex) do
+                local unitarray = moddata.Factions[i]
+                if unitarray then
+                    sidebarstring = sidebarstring .. "<details>\n<summary>"..faction.."</summary>\n<p>\n\n"
+                    for unitI, bp in sortedpairs(unitarray, TechDescendingDescriptionAscending) do
 
-        sidebarstring = sidebarstring .. "<details markdown=\"1\">\n<summary>[Show] <a href=\""..stringSanitiseFilename(moddata.ModInfo.name)..[[">]]..moddata.ModInfo.name.."</a></summary>\n<p>\n<table>\n<tr>\n<td width=\"269px\">\n\n"
-        for i, faction in ipairs(FactionsByIndex) do
-            local unitarray = moddata.Factions[i]
-            if unitarray then
-                sidebarstring = sidebarstring .. "<details>\n<summary>"..faction.."</summary>\n<p>\n\n"
-                for unitI, bp in sortedpairs(unitarray, TechDescendingDescriptionAscending) do
+                        sidebarstring = sidebarstring .. '* '..xml:a{
+                            title=(bp.General.UnitName or bp.ID),
+                            href=stringSanitiseFilename(bp.ID)
+                        }(bp.TechDescription or bp.ID).."\n"
 
-                    sidebarstring = sidebarstring .. '* '..xml:a{
-                        title=(bp.General.UnitName or bp.ID),
-                        href=stringSanitiseFilename(bp.ID)
-                    }(bp.TechDescription or bp.ID).."\n"
-
+                    end
+                    sidebarstring = sidebarstring .. "</p>\n</details>\n"
                 end
-                sidebarstring = sidebarstring .. "</p>\n</details>\n"
             end
+            sidebarstring = sidebarstring .. "\n</td>\n</tr>\n</table>\n</p>\n</details>\n"
         end
-        sidebarstring = sidebarstring .. "\n</td>\n</tr>\n</table>\n</p>\n</details>\n"
     end
 
     UpdateGeneratedPartOfPage('_Sidebar.md', 'brewwikisidebar', sidebarstring)
@@ -146,53 +146,61 @@ end
 
 function GenerateModPages()
     for modindex, moddata in pairs(NavigationData) do
-
-        local ModInfobox = Infobox{
-            Style = 'main-right',
-            Header = {
-                moddata.ModInfo.name,
-                xml:img{src='images/mods/'..(moddata.ModInfo.icon and stringSanitiseFilename(moddata.ModInfo.name, true, true) or 'mod')..'.png', width='256px'}
-            },
-            Data = {
-                { 'Author:', moddata.ModInfo.author },
-                { 'Version:', moddata.ModInfo.version },
-                {''},
-                {'', xml:strong('Unit counts:') }
+        if (moddata.ModInfo.Units or 0)>0 then
+            local ModInfobox = Infobox{
+                Style = 'main-right',
+                Header = {
+                    moddata.ModInfo.name,
+                    xml:img{src='images/mods/'..(moddata.ModInfo.icon and stringSanitiseFilename(moddata.ModInfo.name, true, true) or 'mod')..'.png', width='256px'}
+                },
+                Data = {
+                    { 'Author:', moddata.ModInfo.author },
+                    { 'Version:', moddata.ModInfo.version },
+                    {''},
+                    {'', xml:strong('Unit counts:') }
+                }
             }
-        }
 
-        local leadString = "\n***"..moddata.ModInfo.name..'*** is'..(modindex ~= 0 and' a mod' or '')..' by '..(moddata.ModInfo.author or 'an unknown author')..'.'
-        ..(moddata.ModInfo.description and " Its mod menu description is:\n"
-        ..xml:blockquote(moddata.ModInfo.description).."\n" or ' ')
+            local leadString = "\n***"..moddata.ModInfo.name..'*** is'..(modindex ~= 0 and' a mod' or '')..' by '..(moddata.ModInfo.author or 'an unknown author')..'.'
+            ..(moddata.ModInfo.description and " Its mod menu description is:\n"
+            ..xml:blockquote(moddata.ModInfo.description).."\n" or ' ')
 
-        local unitsSection = (moddata.ModInfo.version and "Version "
-        ..moddata.ModInfo.version or '*'..moddata.ModInfo.name..'*').." contains the following units:\n"
+            local unitsSection = (moddata.ModInfo.version and "Version "
+            ..moddata.ModInfo.version or '*'..moddata.ModInfo.name..'*').." contains the following units:\n"
 
-        for i = 1, #FactionsByIndex do
-            local faction = FactionsByIndex[i]
-            local unitarray = moddata.Factions[i]
-            if unitarray then
-                table.insert(ModInfobox.Data, { faction..':', #moddata.Factions[i] })
-                unitsSection = unitsSection .. MDHead(faction) .. TechTable(unitarray, 8)
+            for i = 1, #FactionsByIndex do
+                local faction = FactionsByIndex[i]
+                local unitarray = moddata.Factions[i]
+                if unitarray then
+                    table.insert(ModInfobox.Data, { faction..':', #moddata.Factions[i] })
+                    unitsSection = unitsSection .. MDHead(faction) .. TechTable(unitarray, 8)
+                end
             end
+
+            table.insert(ModInfobox.Data, { 'Total:', tableSubcount(moddata.Factions) })
+
+            local MDPageName = stringSanitiseFilename(moddata.ModInfo.name)..'.md'
+
+            UpdateGeneratedPartOfPage(MDPageName, 'brewwikimodinfobox', tostring(ModInfobox))
+            UpdateGeneratedPartOfPage(MDPageName, 'brewwikileadtext', leadString)
+            UpdateGeneratedPartOfPage(MDPageName, 'brewwikimodunits', unitsSection)
         end
-
-        table.insert(ModInfobox.Data, { 'Total:', tableSubcount(moddata.Factions) })
-
-        local MDPageName = stringSanitiseFilename(moddata.ModInfo.name)..'.md'
-
-        UpdateGeneratedPartOfPage(MDPageName, 'brewwikimodinfobox', tostring(ModInfobox))
-        UpdateGeneratedPartOfPage(MDPageName, 'brewwikileadtext', leadString)
-        UpdateGeneratedPartOfPage(MDPageName, 'brewwikimodunits', unitsSection)
     end
 
     print("Generated "..#NavigationData.." mod pages")
 end
 
 function GenerateHomePage()
+    local UnitMods = {}
+    for modindex, moddata in sortedpairs(NavigationData) do
+        if (moddata.ModInfo.Units or 0)>0 then
+            table.insert(UnitMods, moddata)
+        end
+    end
+
     local colLimit = 6
 
-    local numMods = #NavigationData + (NavigationData[0] and 1 or 0)
+    local numMods = #UnitMods
     local rows = math.ceil(numMods/colLimit)
     local col = math.floor(numMods / rows)
     local extra = rows - (numMods % rows)
@@ -207,7 +215,7 @@ function GenerateHomePage()
     for i = 1, #cols do
         local homeModNav1, homeModNav2 = '', ''
         for j = modindex+1, modindex+cols[i] do
-            local ModInfo = NavigationData[j - (NavigationData[0] and 1 or 0)].ModInfo
+            local ModInfo = UnitMods[j].ModInfo
 
             homeModNav1 = homeModNav1.."\n"..xml:th{align='center'}(xml:a{href=stringSanitiseFilename(ModInfo.name)}(xml:img{
                 src='images/mods/'..(ModInfo.icon and stringSanitiseFilename(ModInfo.name, true, true) or 'mod')..'.png',
