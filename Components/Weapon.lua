@@ -112,15 +112,8 @@ end
 
 local function GetDamageInstances(wep)
     local s = WepProjectiles(wep)
-    if s and s > 1 then
-        if wep.BeamCollisionDelay then
-            s = tostring(s)..' beams'
-        else
-            s = tostring(s)..' projectiles'
-        end
-    else
-        s = ''
-    end
+    s = s and s>1 and (tostring(s)..(wep.BeamCollisionDelay and ' beams' or ' projectiles')) or ''
+
     local dot = wep.DoTPulses
     if dot and dot > 1 then
         if s ~= '' then

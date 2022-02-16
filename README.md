@@ -26,11 +26,11 @@ edit `Run.lua`.
 The following are all the values read from `Run.lua`. Some will need updating for
 your setup:
 
-* `OutputDirectory` needs to point to a real directory. I'd go for wherever you
-check out your mods wiki repository, but what you do with the output is up to you.
+* `OutputDirectory` should point to a clone of your mods wiki repository. If you
+don't have one, it at very least needs to be a valid folder. Use forward slashes
+`/`, and include a trailing slash at the end.
 
-* `WikiGeneratorDirectory` should point to the folder `Main.lua` is located in.
-Include a slash at the end.
+* `WikiGeneratorDirectory` should point to `Main.lua`, like: `"C:/BrewWikiGen/Main.lua"`.
 
 * `EnvironmentData` contains the following environmental values:
 
@@ -68,8 +68,8 @@ Include a slash at the end.
 
   * `name` is how it refers to the environment in navigation.
 
-  * `author`, `version`, and `icon` are all used in the 'mod page' for generated
-    for the environment if `GenerateWikiPages` is true.
+  * `author`, `version`, and `icon` are all used in the 'mod page' generated for
+    the environment if `GenerateWikiPages` is true.
 
   * `ExtraData` can point to an optional extra document of hand written content
     for specific sections of specific unit pages. It expects said document to be
@@ -109,7 +109,12 @@ Include a slash at the end.
   * `GenerateHomePage`, `GenerateSidebar`, `GenerateModPages`, `GenerateUnitPages`,
     and `GenerateCategoryPages`; `true` or `false`: Generate those parts or not.
 
-  * `AbilityDescriptions`; `true` or `false`: If `false` it lists the abilities of
+  * `IncludeStrategicIcon`; `true` or `false`: If true it will include the strategic
+    icon in the infobox and automatically copy required icons into the output from
+    the generator directory. The packaged icons are from the *BrewLAN* large icon
+    mod. If you want something else, like the vanilla icons, that's on you.
+
+  * `AbilityDescriptions`; `true` or `false`: If false it lists the abilities of
     the units verbatim in the abilities section. If true it will try to map them
     to tooltips in the `abilityDesc` table in `/Environment/Game.lua`.
 
@@ -149,9 +154,10 @@ Include a slash at the end.
     an extensive formula.
 
 * `ModDirectories` should point to your local copies of the mod(s) you wish to
-generate wiki pages for. It assumes, but doesn't require, multiple mods. It
-expects a `mod_info.lua` file directly in each item on the list. The order listed
-is used for navigation ordering on the sidebar and home page generations.
+load. It assumes, but doesn't require, multiple mods. It expects a `mod_info.lua`
+file directly in each item on the list. The order listed is used for navigation
+ordering on the sidebar and home page generations. If a mod contains no units it
+will still be loaded but won't have a page or affect the sidebar or home page.
 
 * `UnitBlueprintsFolder` is where within the mod folders it should start looking
 for blueprints. Standard convention is `units`. This value can be removed, but

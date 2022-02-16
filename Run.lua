@@ -7,7 +7,7 @@
 --[[ Inputs -- NOTE: Mod input files must be valid lua                      ]]--
 --[[ ---------------------------------------------------------------------- ]]--
 local OutputDirectory = "C:/BrewLAN.wiki/"
-local WikiGeneratorDirectory = "C:/BrewWikiGen/"
+local WikiGeneratorDirectory = "C:/BrewWikiGen/Main.lua"
 
 EnvironmentData = {
     Blueprints = true, --Search env for blueprints
@@ -39,6 +39,7 @@ WikiOptions = {
     GenerateCategoryPages = true,
 
     -- Unit page options
+    IncludeStrategicIcon = true,
     AbilityDescriptions = true,
     BalanceNote = '<LOC wiki_balance_stats_steam>Displayed stats are from when launched on the steam/retail version of the game.',
     ConstructionNote = '<LOC wiki_builders_note_steam>Build times from the Steam/retail version of the game:',
@@ -130,13 +131,14 @@ Logging = {
     FileAppendWrites   = true,
     FileUpdateWrites   = false,
 
-    ThreatCalculationWarnings = false
+    ThreatCalculationWarnings = false,
 }
 Sanity = {
     BlueprintChecks         = false,
     BlueprintPedanticChecks = false,
+    BlueprintStrategicIconChecks = false,
 }
 
-dofile(WikiGeneratorDirectory.."Main.lua")
+dofile(WikiGeneratorDirectory)
 GeneratorMain(OutputDirectory)
 

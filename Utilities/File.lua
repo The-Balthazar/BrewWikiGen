@@ -36,6 +36,9 @@ local Sandboxes = {
             _ALERT = SandboxedPrint(file, 'Log: '),
             WARN = SandboxedPrint(file, 'Warn: '),
 
+            error = error,
+            assert = assert,
+
             table = table,
             string = string,
             math = math,
@@ -97,12 +100,37 @@ function FileExists(dir)
     return file and file:close()
 end
 
+local OutputAssets = {} -- reduce file loads by cachine processed files
+
+function OutputAsset(dir)
+    if not OutputAssets[dir] and not FileExists(OutputDirectory..dir) and FileExists(WikiGeneratorDirectory..dir) then
+        local output = io.open(OutputDirectory..dir, 'wb')
+        if not output then
+            os.execute("mkdir "..string.gsub(OutputDirectory..string.match(dir, '(.*)/'), '/', '\\'))
+        end
+        (output or io.open(OutputDirectory..dir, 'wb')):write(
+            io.open(WikiGeneratorDirectory..dir, 'rb'):read('all')
+        ):close()
+        OutputAssets[dir] = true
+    end
+end
+
 function UnitIconDir(ID)
     local path = 'icons/units/'..ID..'_icon.png'
     return FileExists(OutputDirectory..path) and path or 'icons/units/unidentified_icon.png'
 end
 
 function UnitIcon(ID, data)
+    data = data or {}
     data.src = UnitIconDir(ID)
+    return xml:img(data)
+end
+
+function StrategicIcon(icon, data)
+    if not (WikiOptions.IncludeStrategicIcon and icon) then return '' end
+    data = data or {}
+    data.table = data.table or 'Strategic icon'
+    data.src = 'icons/strategicicons/'..icon..'_rest.png'
+    OutputAsset(data.src)
     return xml:img(data)
 end

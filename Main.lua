@@ -5,14 +5,14 @@
 debug.setmetatable(nil, {__index={}})
 
 OutputDirectory = nil
+WikiGeneratorDirectory = nil
 __active_mods = {}
 
 function printif(check, ...) if check then print(...) end end
 
 function GeneratorMain(Output)
     OutputDirectory = Output
-
-    local WikiGeneratorDirectory = (debug.getinfo(1, 'S').short_src):match('.*/')
+    WikiGeneratorDirectory = (debug.getinfo(1, 'S').short_src):match('.*/')
 
     local function safecall(...)
         local pass, msg = pcall(...)

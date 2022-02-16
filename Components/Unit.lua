@@ -20,13 +20,9 @@ local function UnitInfobox(bp)
     return Infobox{
         Style = 'main-right',
         Header = {
-            string.format(
-                '<img align="left" title="%s unit icon" src="%s" />%s<br />%s',
-                (bp.General.UnitName or 'The'),
-                UnitIconDir(bp.ID),
-                (bp.General.UnitName or xml:i'Unnamed'),
-                (bp.TechDescription or xml:i'No description')
-            ),
+            UnitIcon(bp.ID, {align='left', title=(bp.General.UnitName or 'The')..' unit icon'})..
+            StrategicIcon(bp.StrategicIconName, {align='right'})..
+            (bp.General.UnitName or xml:i'Unnamed')..xml:br()..(bp.TechDescription or xml:i'No description'),
             FileExists(OutputDirectory..BPimg) and xml:a{href=BPimg}(xml:img{width='256px', src=BPimg}) or nil
         },
         Data = GetUnitInfoboxData(bp),
