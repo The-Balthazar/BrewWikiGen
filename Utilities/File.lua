@@ -106,18 +106,22 @@ function OutputAsset(dir)
     if not OutputAssets[dir] and not FileExists(OutputDirectory..dir) and FileExists(WikiGeneratorDirectory..dir) then
         local output = io.open(OutputDirectory..dir, 'wb')
         if not output then
-            os.execute("mkdir "..string.gsub(OutputDirectory..string.match(dir, '(.*)/'), '/', '\\'))
+            local mkdir = string.gsub(OutputDirectory..string.match(dir, '(.*)/'), '/', '\\')
+            printif(Logging.FileAssetCopies, 'Creating directory', mkdir)
+            os.execute("mkdir "..mkdir)
         end
+        printif(Logging.FileAssetCopies, 'Copying asset to', OutputDirectory..dir); --this semicolon is actually important. Without it the next line tries to call the output of the printif.
         (output or io.open(OutputDirectory..dir, 'wb')):write(
             io.open(WikiGeneratorDirectory..dir, 'rb'):read('all')
         ):close()
         OutputAssets[dir] = true
     end
+    return dir
 end
 
 function UnitIconDir(ID)
     local path = 'icons/units/'..ID..'_icon.png'
-    return FileExists(OutputDirectory..path) and path or 'icons/units/unidentified_icon.png'
+    return FileExists(OutputDirectory..path) and path or OutputAsset('icons/units/unidentified_icon.png')
 end
 
 function UnitIcon(ID, data)
@@ -129,8 +133,7 @@ end
 function StrategicIcon(icon, data)
     if not (WikiOptions.IncludeStrategicIcon and icon) then return '' end
     data = data or {}
-    data.table = data.table or 'Strategic icon'
-    data.src = 'icons/strategicicons/'..icon..'_rest.png'
-    OutputAsset(data.src)
+    data.title = data.title or 'Strategic icon'
+    data.src = OutputAsset('icons/strategicicons/'..icon..'_rest.png')
     return xml:img(data)
 end

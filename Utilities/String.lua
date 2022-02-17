@@ -98,8 +98,8 @@ function iconText(icon, text, text2)
         [3] = 'Tech 3',
         [4] = 'Experimental',
     }
-    return text and ((icons[icon] and
-        xml:img{src=icons[icon], title=(titles[icon] or icon)}..' ' or '')..text..(text2 or '')
+    return text and ((icons[icon] and 
+        xml:img{src=OutputAsset(icons[icon]), title=(titles[icon] or icon)}..' ' or '')..text..(text2 or '')
     )
 end
 

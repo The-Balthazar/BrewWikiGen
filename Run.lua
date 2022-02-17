@@ -130,6 +130,7 @@ Logging = {
     NewFileWrites      = true,
     FileAppendWrites   = true,
     FileUpdateWrites   = false,
+    FileAssetCopies    = true,
 
     ThreatCalculationWarnings = false,
 }

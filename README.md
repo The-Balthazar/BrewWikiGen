@@ -259,7 +259,7 @@ cause clashes. I recommend that the icon be 64x64px and the image be 512x512px.
 
 It expects to find unit icons at `icons/units/[ID]_icon.png`, it expects ID to
 match the case of the original `.bp` file, unless it's entirely lowercase, in
-which case uppercase.
+which case uppercase. If it doesn't find the icon it will use a default fall-back.
 
 If you have files at `images/units/[ID].jpg` in the output directory it will insert
 them in the matching unit infoboxes, and if you have files at `images/units/[ID]-n.jpg`
