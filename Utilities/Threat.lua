@@ -12,6 +12,8 @@ local function CalculatedDamage(weapon)
     return ((weapon.Damage or 0) + (weapon.NukeInnerRingDamage or 0)) * ProjectileCount * (weapon.DoTPulses or 1)
 end
 
+local function HasCat(bp, cat) return bp.CategoriesHash[cat] or not bp.CategoriesHash and table.find(bp.Categories, cat) end
+
 local function ShouldWeCalculateBuildRate(bp)
     if not bp.Economy.BuildRate or table.find(bp.Categories, 'WALL') then return end
     local TrueCats = {
@@ -22,7 +24,7 @@ local function ShouldWeCalculateBuildRate(bp)
         'ENGINEERSTATION',
     }
     for i, v in ipairs(TrueCats) do
-        if table.find(bp.Categories, v) then
+        if HasCat(bp, v) then
             return true
         end
     end
@@ -30,31 +32,28 @@ local function ShouldWeCalculateBuildRate(bp)
     return not (bp.General.UpgradesTo and table.find(bp.Economy.BuildableCategory or {}, bp.General.UpgradesTo)) and not (bp.Economy.BuildableCategory or {})[2]
 end
 
+local function ShieldRadius(bp) return math.max((bp.Defense.Shield.ShieldSize--[[diameter]] or 0)/2, bp.Defense.Shield.ShieldProjectionRadius or 0) end
+local function IsPersonalShield(bp) return bp.Defense.Shield.PersonalShield or not HasCat(bp, 'TRANSPORT') and (ShieldRadius(bp) < math.max(bp.SizeX or 1, bp.SizeZ or 1) + 3) end
+local function PersonalShieldThreat(bp) return IsPersonalShield(bp) and (shield.ShieldMaxHealth or 0) * 0.01 or 0 end
+local function ShieldArea(bp) local rad=ShieldRadius(bp) return rad*rad*math.pi end
+local function SkirtArea(bp) return (bp.Physics.SkirtSizeX or 3) * (bp.Physics.SkirtSizeY or 3) end
+local function ShieldThreat(bp) return not IsPersonalShield(bp) and ((ShieldArea(bp)-SkirtArea(bp)) * (bp.Defense.Shield.ShieldMaxHealth or 0) * (bp.Defense.Shield.ShieldRegenRate or 1))/250000000 or 0 end
+local function SpecialThreat(bp) return (HasCat(bp, 'SPECIALHIGHPRI') and 250 or 0) end
+local function DockingThreat(bp) return (bp.Transport.DockingSlots or 0) end
+
 function CalculateUnitThreatValues(bp)
+
     local ThreatData = {
         AirThreatLevel = 0,
-        EconomyThreatLevel = 0,
+        EconomyThreatLevel = ShieldThreat(bp) + SpecialThreat(bp) + DockingThreat(bp),
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
         --These are temporary to be merged into the others after calculations
-        HealthThreat = 0,
-        PersonalShieldThreat = 0,
+        HealthThreat = (bp.Defense.MaxHealth or 0) * 0.01,
+        PersonalShieldThreat = PersonalShieldThreat(bp),
         UnknownWeaponThreat = 0,
     }
     local Warnings
-    if bp.Defense.MaxHealth then
-        ThreatData.HealthThreat = bp.Defense.MaxHealth * 0.01
-    end
-    if bp.Defense.Shield then
-        local shield = bp.Defense.Shield                                               --ShieldProjectionRadius entirely only for the Pillar of Prominence
-        local shieldarea = (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * math.pi
-        local skirtarea = (bp.Physics.SkirtSizeX or 3) * (bp.Physics.SkirtSizeY or 3)                                                              -- Added so that transport shields dont count as personal shields.
-        if (bp.Display.Abilities and table.find(bp.Display.Abilities,'<LOC ability_personalshield>Personal Shield') or shieldarea < skirtarea) and not table.find(bp.Categories, 'TRANSPORT') then
-            ThreatData.PersonalShieldThreat = (shield.ShieldMaxHealth or 0) * 0.01
-        else
-            ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + ((shieldarea - skirtarea) * (shield.ShieldMaxHealth or 0) * (shield.ShieldRegenRate or 1)) / 250000000
-        end
-    end
 
     --Define eco production values
     if bp.Economy.ProductionPerSecondMass then
@@ -97,54 +96,46 @@ function CalculateUnitThreatValues(bp)
         ThreatData.PersonalShieldThreat = 0
     end
 
-    --Arbitrary high bonus threat for special high pri
-    if table.find(bp.Categories, 'SPECIALHIGHPRI') then
-        ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + 250
-    end
-
-    --No one really cares about air staging, well maybe a little bit.
-    if bp.Transport.DockingSlots then
-        ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + bp.Transport.DockingSlots
-    end
-
     --Wepins
     if bp.Weapon then
         for i, weapon in ipairs(bp.Weapon) do
-            if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or string.find(weapon.WeaponCategory or '', 'Anti Air') then
-                ThreatData.AirThreatLevel = ThreatData.AirThreatLevel + DPSEstimate(weapon) / 10
-            elseif weapon.RangeCategory == 'UWRC_AntiNavy' or string.find(weapon.WeaponCategory or '', 'Anti Navy') then
-                if string.find(weapon.WeaponCategory or '', 'Bomb') or string.find(weapon.Label or '', 'Bomb') or weapon.NeedToComputeBombDrop or (bp.Air and bp.Air.Winged) then
+            if not weapon.EnabledByEnhancement then
+                if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or string.find(weapon.WeaponCategory or '', 'Anti Air') then
+                    ThreatData.AirThreatLevel = ThreatData.AirThreatLevel + DPSEstimate(weapon) / 10
+                elseif weapon.RangeCategory == 'UWRC_AntiNavy' or string.find(weapon.WeaponCategory or '', 'Anti Navy') then
+                    if string.find(weapon.WeaponCategory or '', 'Bomb') or string.find(weapon.Label or '', 'Bomb') or weapon.NeedToComputeBombDrop or (bp.Air and bp.Air.Winged) then
+                        --print("Bomb drop damage value " .. CalculatedDamage(weapon))
+                        ThreatData.SubThreatLevel = ThreatData.SubThreatLevel + CalculatedDamage(weapon) / 100
+                    else
+                        ThreatData.SubThreatLevel = ThreatData.SubThreatLevel + DPSEstimate(weapon) / 10
+                    end
+                elseif weapon.RangeCategory == 'UWRC_DirectFire' or string.find(weapon.WeaponCategory or '', 'Direct Fire')
+                or weapon.RangeCategory == 'UWRC_IndirectFire' or string.find(weapon.WeaponCategory or '', 'Artillery') then
+                    --Range cutoff for artillery being considered eco and surface threat is 100
+                    local wepDPS = DPSEstimate(weapon) or CalculatedDamage(weapon)
+                    local rangeCutoff = 50
+                    local econMult = 1
+                    local surfaceMult = 0.1
+                    if weapon.MinRadius and weapon.MinRadius >= rangeCutoff then
+                        ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + wepDPS * econMult
+                    elseif weapon.MaxRadius and weapon.MaxRadius <= rangeCutoff then
+                        ThreatData.SurfaceThreatLevel = ThreatData.SurfaceThreatLevel + wepDPS * surfaceMult
+                    else
+                        local distr = (rangeCutoff - (weapon.MinRadius or 0)) / (weapon.MaxRadius - (weapon.MinRadius or 0))
+                        ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + wepDPS * (1 - distr) * econMult
+                        ThreatData.SurfaceThreatLevel = ThreatData.SurfaceThreatLevel + wepDPS * distr * surfaceMult
+                    end
+                elseif weapon.NeedToComputeBombDrop or string.find(weapon.WeaponCategory or '', 'Bomb') or string.find(weapon.Label or '', 'Bomb') then
                     --print("Bomb drop damage value " .. CalculatedDamage(weapon))
-                    ThreatData.SubThreatLevel = ThreatData.SubThreatLevel + CalculatedDamage(weapon) / 100
+                    ThreatData.SurfaceThreatLevel = ThreatData.SurfaceThreatLevel + CalculatedDamage(weapon) / 100
+                elseif string.find(weapon.WeaponCategory or '', 'Death') then
+                    --print(ThreatData.EconomyThreatLevel, DPSEstimate(weapon) )
+                    ThreatData.EconomyThreatLevel = math.floor(ThreatData.EconomyThreatLevel + (DPSEstimate(weapon) or 0) / 200)
                 else
-                    ThreatData.SubThreatLevel = ThreatData.SubThreatLevel + DPSEstimate(weapon) / 10
+                    ThreatData.UnknownWeaponThreat = ThreatData.UnknownWeaponThreat + (DPSEstimate(weapon) or 0)
+                    printif(Logging.ThreatCalculationWarnings, " * WARNING: Unknown weapon type on: " .. bp.id .. " with the weapon label: " .. (weapon.Label or "nil") )
+                    Warnings = (Warnings or 0) + 1
                 end
-            elseif weapon.RangeCategory == 'UWRC_DirectFire' or string.find(weapon.WeaponCategory or '', 'Direct Fire')
-            or weapon.RangeCategory == 'UWRC_IndirectFire' or string.find(weapon.WeaponCategory or '', 'Artillery') then
-                --Range cutoff for artillery being considered eco and surface threat is 100
-                local wepDPS = DPSEstimate(weapon) or CalculatedDamage(weapon)
-                local rangeCutoff = 50
-                local econMult = 1
-                local surfaceMult = 0.1
-                if weapon.MinRadius and weapon.MinRadius >= rangeCutoff then
-                    ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + wepDPS * econMult
-                elseif weapon.MaxRadius and weapon.MaxRadius <= rangeCutoff then
-                    ThreatData.SurfaceThreatLevel = ThreatData.SurfaceThreatLevel + wepDPS * surfaceMult
-                else
-                    local distr = (rangeCutoff - (weapon.MinRadius or 0)) / (weapon.MaxRadius - (weapon.MinRadius or 0))
-                    ThreatData.EconomyThreatLevel = ThreatData.EconomyThreatLevel + wepDPS * (1 - distr) * econMult
-                    ThreatData.SurfaceThreatLevel = ThreatData.SurfaceThreatLevel + wepDPS * distr * surfaceMult
-                end
-            elseif string.find(weapon.WeaponCategory or '', 'Bomb') or string.find(weapon.Label or '', 'Bomb') or weapon.NeedToComputeBombDrop then
-                --print("Bomb drop damage value " .. CalculatedDamage(weapon))
-                ThreatData.SurfaceThreatLevel = ThreatData.SurfaceThreatLevel + CalculatedDamage(weapon) / 100
-            elseif string.find(weapon.WeaponCategory or '', 'Death') then
-                --print(ThreatData.EconomyThreatLevel, DPSEstimate(weapon) )
-                ThreatData.EconomyThreatLevel = math.floor(ThreatData.EconomyThreatLevel + (DPSEstimate(weapon) or 0) / 200)
-            else
-                ThreatData.UnknownWeaponThreat = ThreatData.UnknownWeaponThreat + (DPSEstimate(weapon) or 0)
-                printif(Logging.ThreatCalculationWarnings, " * WARNING: Unknown weapon type on: " .. bp.id .. " with the weapon label: " .. (weapon.Label or "nil") )
-                Warnings = (Warnings or 0) + 1
             end
         end
     end

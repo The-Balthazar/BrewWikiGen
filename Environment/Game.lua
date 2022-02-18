@@ -60,11 +60,11 @@ TechCategoryByIndex = {
 }
 -- Layers
 LayerBits = {
-    Land   = 1,
-    Seabed = 2,
-    Sub    = 4,
-    Water  = 8,
-    Air    = 16,
+    Land   = 1, -- 0x01
+    Seabed = 2, -- 0x02
+    Sub    = 4, -- 0x04
+    Water  = 8, -- 0x08
+    Air    = 16, -- 0x10
 }
 
 LayerHash = {
@@ -85,18 +85,49 @@ LayersByIndex = {
     --'LAYER_Orbit',
 }
 
+LayerCaps = {
+    [1] = {         Land = 1                       },
+    [3] = {         Land = 1, Seabed = 2           },
+    [8] = {                               Water = 8},
+    [9] = {         Land = 1,             Water = 8},
+    [12]= {Sub = 4,                       Water = 8},
+}
+
 -- Motion types mapped to layers they relevantly be firing from.
 motionTypes = {
     RULEUMT_Air                = {Air = 16},
-    RULEUMT_Amphibious         = {         Land = 1, Seabed = 2           },
-    RULEUMT_AmphibiousFloating = {         Land = 1,             Water = 8},
-    RULEUMT_Biped              = {         Land = 1                       },
-    RULEUMT_Land               = {         Land = 1                       },
-    RULEUMT_Hover              = {         Land = 1,             Water = 8},
-    RULEUMT_Water              = {                               Water = 8},
-    RULEUMT_SurfacingSub       = {Sub = 4,                       Water = 8},
+    RULEUMT_Amphibious         = LayerCaps[ 0x01 | 0x02 ],
+    RULEUMT_AmphibiousFloating = LayerCaps[ 0x01 | 0x08 ],
+    RULEUMT_Biped              = LayerCaps[ 0x01 ],
+    RULEUMT_Land               = LayerCaps[ 0x01 ],
+    RULEUMT_Hover              = LayerCaps[ 0x01 | 0x08 ],
+    RULEUMT_Water              = LayerCaps[ 0x08 ],
+    RULEUMT_SurfacingSub       = LayerCaps[ 0x04 | 0x08 ],
     RULEUMT_None               = {Sub = 4, Land = 1, Seabed = 2, Water = 8},
     --RULEUMT_Special            = {'',{}}, -- Mentioned in the engine, but reports malformed if you try to use it
+}
+
+Footprints = {
+    Vehicle1x1        = { SizeX = 1,  SizeZ = 1,  Caps = LayerCaps[ 0x01 ],        MaxWaterDepth = 0.05,                 MaxSlope = 0.75, Flags = 0 },
+    Vehicle2x2        = { SizeX = 2,  SizeZ = 2,  Caps = LayerCaps[ 0x01 ],        MaxWaterDepth = 0.05,                 MaxSlope = 0.75, Flags = 0 },
+    Vehicle5x5        = { SizeX = 5,  SizeZ = 5,  Caps = LayerCaps[ 0x01 ],        MaxWaterDepth = 0.05,                 MaxSlope = 0.75, Flags = 0x01 },
+    Amphibious1x1     = { SizeX = 1,  SizeZ = 1,  Caps = LayerCaps[ 0x01 | 0x02 ], MaxWaterDepth = 25,                   MaxSlope = 0.75, Flags = 0 },
+    Amphibious3x3     = { SizeX = 3,  SizeZ = 3,  Caps = LayerCaps[ 0x01 | 0x02 ], MaxWaterDepth = 25,                   MaxSlope = 0.75, Flags = 0x01 },
+    Amphibious6x6     = { SizeX = 6,  SizeZ = 6,  Caps = LayerCaps[ 0x01 | 0x02 ], MaxWaterDepth = 25,                   MaxSlope = 0.75, Flags = 0x01 },
+    WaterLand1x1      = { SizeX = 1,  SizeZ = 1,  Caps = LayerCaps[ 0x01 | 0x08 ], MaxWaterDepth = 1, MinWaterDepth=0.1, MaxSlope = 0.75, Flags = 0 },
+    WaterLand2x2      = { SizeX = 2,  SizeZ = 2,  Caps = LayerCaps[ 0x01 | 0x08 ], MaxWaterDepth = 1, MinWaterDepth=0.1, MaxSlope = 0.75, Flags = 0 },
+    WaterLand3x3      = { SizeX = 3,  SizeZ = 3,  Caps = LayerCaps[ 0x01 | 0x08 ], MaxWaterDepth = 5, MinWaterDepth=0,   MaxSlope = 0.75, Flags = 0 },
+    WaterLand5x5      = { SizeX = 5,  SizeZ = 5,  Caps = LayerCaps[ 0x01 | 0x08 ], MaxWaterDepth = 5, MinWaterDepth=0,   MaxSlope = 0.75, Flags = 0 },
+    SurfacingSub2x2   = { SizeX = 2,  SizeZ = 2,  Caps = LayerCaps[ 0x04 | 0x08 ],                    MinWaterDepth=1.5,                  Flags = 0 },
+    SurfacingSub3x3   = { SizeX = 3,  SizeZ = 3,  Caps = LayerCaps[ 0x04 | 0x08 ],                    MinWaterDepth=1.5,                  Flags = 0 },
+    SurfacingSub4x4   = { SizeX = 4,  SizeZ = 4,  Caps = LayerCaps[ 0x04 | 0x08 ],                    MinWaterDepth=1.5,                  Flags = 0 },
+    SurfacingSub12x12 = { SizeX = 12, SizeZ = 12, Caps = LayerCaps[ 0x04 | 0x08 ],                    MinWaterDepth=1.5,                  Flags = 0 },
+    Water1x1          = { SizeX = 1,  SizeZ = 1,  Caps = LayerCaps[ 0x08 ],                           MinWaterDepth=1.5,                  Flags = 0 },
+    Water3x3          = { SizeX = 3,  SizeZ = 3,  Caps = LayerCaps[ 0x08 ],                           MinWaterDepth=0.25,                 Flags = 0 },
+    Water4x4          = { SizeX = 4,  SizeZ = 4,  Caps = LayerCaps[ 0x08 ],                           MinWaterDepth=1.5,                  Flags = 0 },
+    Water6x6          = { SizeX = 6,  SizeZ = 6,  Caps = LayerCaps[ 0x08 ],                           MinWaterDepth=1.5,                  Flags = 0 },
+    Water8x8          = { SizeX = 8,  SizeZ = 8,  Caps = LayerCaps[ 0x08 ],                           MinWaterDepth=1.5,                  Flags = 0 },
+    Water11x11        = { SizeX = 11, SizeZ = 11, Caps = LayerCaps[ 0x08 ],                           MinWaterDepth=1.5,                  Flags = 0 },
 }
 
 defaultOrdersTable = {

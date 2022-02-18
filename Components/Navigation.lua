@@ -202,7 +202,7 @@ function GenerateHomePage()
 
     local numMods = #UnitMods
     local rows = math.ceil(numMods/colLimit)
-    local col = math.floor(numMods / rows)
+    local col = numMods//rows
     local extra = rows - (numMods % rows)
     local cols = {}
     for i = 1, rows do

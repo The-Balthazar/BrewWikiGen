@@ -9,7 +9,7 @@ local function SandboxedPrint(file, logtype)
         if Logging.SandboxedFileLogs then
             if not FileMessages[file] then
                 FileMessages[file] = true
-                print('Logs from ', file)
+                print('Logs from', file)
             end
             print('        '..logtype,...)
         end
@@ -30,11 +30,11 @@ local Sandboxes = {
             pairs = pairs,
             ipairs = ipairs,
 
-            print = SandboxedPrint(file, 'Print: '),
-            LOG = SandboxedPrint(file, 'Log: '),
-            SPEW = SandboxedPrint(file, 'Debug: '),
-            _ALERT = SandboxedPrint(file, 'Log: '),
-            WARN = SandboxedPrint(file, 'Warn: '),
+            print = SandboxedPrint(file, 'Print:'),
+            LOG = SandboxedPrint(file, 'Log:'),
+            SPEW = SandboxedPrint(file, 'Debug:'),
+            _ALERT = SandboxedPrint(file, 'Log:'),
+            WARN = SandboxedPrint(file, 'Warn:'),
 
             error = error,
             assert = assert,
@@ -47,7 +47,24 @@ local Sandboxes = {
             tostring = tostring,
             tonumber = tonumber,
         }
-    end
+    end,
+    Blueprint = function()
+        local filebps = {}
+        local function export(bptype)
+            return function(t) table.insert(filebps, setmetatable(t, {__name = bptype})) end
+        end
+        return {
+            Sound = function(t) return setmetatable(t, {__name = 'Sound'}) end,
+            BeamBlueprint         = export'Beam',
+            MeshBlueprint         = export'Mesh',
+            PropBlueprint         = export'Prop',
+            EmitterBlueprint      = export'Emitter',
+            ProjectileBlueprint   = export'Projectile',
+            TrailEmitterBlueprint = export'TrailEmitter',
+            UnitBlueprint         = export'Unit',
+            Blueprints            = filebps,
+        }
+    end,
 }
 
 function GetSandboxedLuaFile(file, env)
@@ -56,9 +73,24 @@ function GetSandboxedLuaFile(file, env)
     if chunk then
         chunk()
         return env
-    elseif not string.find(msg, 'No such file or directory') then
-        print(msg)
     end
+    printif(not string.find(msg, 'No such file or directory'), msg)
+end
+
+function GetSanitisedLuaFile(file, env)
+    local env = env and Sandboxes[env](file) or {}
+    local openfile = io.open(file, 'r')
+    local filestring = (openfile:read'a')
+        :gsub('#', '--')
+        :gsub('\\[^"^\']', '/')
+    openfile:close()
+    --local filename = string.match(file, '/([^/.]+)$')
+    local chunk, msg = load(filestring, file, 't', env)
+    if chunk then
+        chunk()
+        return env
+    end
+    printif(not string.find(msg, 'No such file or directory'), msg)
 end
 
 function LoadModInfo(dir, i)
@@ -68,6 +100,9 @@ function LoadModInfo(dir, i)
     )
     ModInfo.location = dir
     ModInfo.ModIndex = i
+    if ModInfo.GenerateWikiPages == nil then
+        ModInfo.GenerateWikiPages = true
+    end
     return ModInfo
 end
 
@@ -78,9 +113,7 @@ function LoadHelpStrings(dir)
         Tooltips    = 'lua/ui/help/tooltips.lua',
     } do
         local env = GetSandboxedLuaFile(dir..path, 'HelpStrings')
-        if env then
-            tableMergeCopy(_G[output], env[output])
-        end
+        tableMergeCopy(_G[output], env[output])
         log = log..' '..output..' '..(env and LogEmoji'🆗' or LogEmoji'❌')
     end
     if Logging.HelpStringsLoaded then print(log) end
@@ -133,7 +166,7 @@ end
 function StrategicIcon(icon, data)
     if not (WikiOptions.IncludeStrategicIcon and icon) then return '' end
     data = data or {}
-    data.title = data.title or 'Strategic icon'
+    data.title = data.title or icon
     data.src = OutputAsset('icons/strategicicons/'..icon..'_rest.png')
     return xml:img(data)
 end

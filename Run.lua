@@ -7,26 +7,22 @@
 --[[ Inputs -- NOTE: Mod input files must be valid lua                      ]]--
 --[[ ---------------------------------------------------------------------- ]]--
 local OutputDirectory = "C:/BrewLAN.wiki/"
-local WikiGeneratorDirectory = "C:/BrewWikiGen/Main.lua"
+local WikiGeneratorDirectory = "C:/BrewWikiGen/"
 
 EnvironmentData = {
-    Blueprints = true, --Search env for blueprints
-    GenerateWikiPages = false, --Generate pages for env blueprints
-    
-    Factions = {
-        {'NOMADS', 'Nomads'},
-        {'ARM', 'Arm'},
-        {'CORE', 'Core'},
-    },
-
-    Lua = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
-    LOC = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
-    ExtraData = 'C:/BrewLAN/mods/BrewLAN/documentation/Wiki Data.lua',
-    -- Psuedo mod-info for env.
     name = 'Forged Alliance',
     author = 'Gas Powered Games',
     version = '1.6.6',
     icon = false,
+    location = WikiGeneratorDirectory..'Environment/',
+
+    ModIndex = 0,
+    GenerateWikiPages = false, --Generate pages for env blueprints
+
+    Blueprints = true, --Search env for blueprints
+    Lua = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
+    LOC = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
+    ExtraData = 'C:/BrewLAN/mods/BrewLAN/documentation/Wiki Data.lua',
 }
 
 WikiOptions = {
@@ -116,6 +112,7 @@ FooterCategories = { -- In order
 }
 
 Logging = {
+Logging = { -- Functional logs
     LogEmojiSupported  = false,
 
     LocalisationLoaded = false,
@@ -134,12 +131,15 @@ Logging = {
 
     ThreatCalculationWarnings = false,
 }
-Sanity = {
+Sanity = { -- Advice logs
     BlueprintChecks         = false,
     BlueprintPedanticChecks = false,
     BlueprintStrategicIconChecks = false,
 }
+Info = { -- Misc data logs
+    UnitLODCounts = true,
+}
 
-dofile(WikiGeneratorDirectory)
+dofile(WikiGeneratorDirectory.."Main.lua")
 GeneratorMain(OutputDirectory)
 

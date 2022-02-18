@@ -28,20 +28,20 @@ function GeneratorMain(Output)
     for i, file in ipairs{
         'Environment/Localization.lua',
         'Environment/Game.lua',
-        'Utilities/Blueprint.lua',
+        'Utilities/Blueprints.lua',
         'Utilities/Builders.lua',
         'Utilities/Cleanup.lua',
         'Utilities/File.lua',
+        'Utilities/Infobox.lua',
         'Utilities/Mesh.lua',
         'Utilities/Sanity.lua',
         'Utilities/String.lua',
         'Utilities/Table.lua',
         "Utilities/Threat.lua",
-        'Components/Bodytext.lua',
         'Components/Categories.lua',
-        'Components/Infobox.lua',
         'Components/Navigation.lua',
-        'Components/Unit.lua',
+        'Components/UnitBodytext.lua',
+        'Components/UnitInfobox.lua',
         'Components/Weapon.lua',
     } do
         safecall(dofile, WikiGeneratorDirectory..file)
@@ -57,7 +57,7 @@ function GeneratorMain(Output)
     -- Env data
     if EnvironmentData.LOC        then safecall(LoadLocalization, EnvironmentData.LOC) end
     if EnvironmentData.Lua        then safecall(LoadHelpStrings,  EnvironmentData.Lua) end
-    if EnvironmentData.Blueprints then safecall(LoadEnvUnitBlueprints, WikiGeneratorDirectory) end
+    if EnvironmentData.Blueprints then safecall(LoadBlueprints, EnvironmentData) end
 
     for i, dir in ipairs(ModDirectories) do
         __active_mods[i] = LoadModInfo(dir, i)
@@ -67,7 +67,7 @@ function GeneratorMain(Output)
     for i, mod in ipairs(__active_mods) do
         safecall(LoadModLocalization, mod.location)
         safecall(LoadModHelpStrings, mod.location)
-        safecall(LoadModUnitBlueprints, mod)
+        safecall(LoadBlueprints, mod)
     end
 
     --[[ ------------------------------------------------------------------ ]]--
@@ -81,6 +81,7 @@ function GeneratorMain(Output)
     --[[ Generate wiki                                                      ]]--
     --[[ ------------------------------------------------------------------ ]]--
     if Sanity.BlueprintChecks            then safecall(CheckUnitBlueprintSanity) end
+    if Info.UnitLODCounts                then safecall(GetUnitMiscInfo) end
     if CleanupOptions.CleanUnitBpFiles   then safecall(CleanupBlueprintsFiles) end
     if WikiOptions.GenerateUnitPages     then safecall(GenerateUnitPages) end
     if WikiOptions.GenerateSidebar       then safecall(GenerateSidebar) end

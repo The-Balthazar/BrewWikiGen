@@ -30,7 +30,7 @@ your setup:
 don't have one, it at very least needs to be a valid folder. Use forward slashes
 `/`, and include a trailing slash at the end.
 
-* `WikiGeneratorDirectory` should point to `Main.lua`, like: `"C:/BrewWikiGen/Main.lua"`.
+* `WikiGeneratorDirectory` should point to the folder `Main.lua` is in, like: `"C:/BrewWikiGen/"`.
 
 * `EnvironmentData` contains the following environmental values:
 

@@ -251,3 +251,29 @@ function BlueprintSanityChecks(bp)
         end
     end
 end
+
+local miscData = {
+    LODs = {},
+}
+
+function MiscLogs(bp)
+    if bp.WikiPage and bp.Display.Mesh.LODs then
+        miscData.LODs[#bp.Display.Mesh.LODs] = (miscData.LODs[#bp.Display.Mesh.LODs] or 0) + 1
+        for i, lod in ipairs(bp.Display.Mesh.LODs) do
+            miscData.lowest = miscData.lowest and math.min(lod.LODCutoff, miscData.lowest) or lod.LODCutoff
+            miscData.highest = miscData.highest and math.max(lod.LODCutoff, miscData.highest) or lod.LODCutoff
+        end
+    end
+end
+
+function printMiscData()
+    for i, v in sortedpairs(miscData) do
+        print(i, v)
+        --print("LODs", 'No. Units')
+        if type(v) == 'table' then
+            for j, k in ipairs(v) do
+                print(j, k)
+            end
+        end
+    end
+end

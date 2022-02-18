@@ -4,7 +4,18 @@
 --------------------------------------------------------------------------------
 local function Binary2bit(a,b) return (a and 2 or 0) + (b and 1 or 0) end
 
-UnitBodytextLeadText = function(bp)
+local function GetSectionExtraData(id, sect)
+    return UnitData[id][sect] and "\n"..LOC(UnitData[id][sect]).."\n" or ''
+end
+
+function UnitHeaderString(bp)
+    return bp.General.UnitName and bp.TechDescription and string.format("\"%s\": %s\n----\n", bp.General.UnitName, bp.TechDescription)
+    or bp.General.UnitName and string.format("\"%s\"\n----\n", bp.General.UnitName )
+    or bp.TechDescription and string.format("%s\n----\n", bp.TechDescription)
+    or ''
+end
+
+function UnitBodytextLeadText(bp)
 
     local faction = FactionFromFactionCategory(bp.FactionCategory)
 
@@ -44,10 +55,10 @@ UnitBodytextLeadText = function(bp)
     }
     BuildIntroBuild = BuildIntroBuild[Binary2bit(Description[bp.id], arraySubFind(bp.Categories, 'BUILTBY'))]
 
-    return bodytext..BuildIntroTDesc..BuildIntroBuild..GetModUnitData(bp.ID, 'LeadSuffix')
+    return bodytext..BuildIntroTDesc..BuildIntroBuild..GetSectionExtraData(bp.ID, 'LeadSuffix')
 end
 
-UnitBodytextSectionData = function(bp)
+function UnitBodytextSectionData(bp)
     return setmetatable({
         {
             '<LOC wiki_sect_abilities>Abilities',
@@ -77,7 +88,7 @@ UnitBodytextSectionData = function(bp)
                     if math.floor(bp.Physics[offsetA] or 0) ~= (bp.Physics[offsetA] or 0) - 0.5 then
                         sizevalue = sizevalue - 1
                     end
-                    return math.floor(sizevalue / 2) * 2
+                    return sizevalue//2*2
                 end
 
                 local EffectiveSize = math.max(2, GetEffectiveSkirtSize(bp,'X') ) + math.max(2, GetEffectiveSkirtSize(bp, 'Z'))
@@ -687,9 +698,9 @@ UnitBodytextSectionData = function(bp)
                 if section.check then
                     bodytext = bodytext
                     ..MDHead(section[1])
-                    ..GetModUnitData(bp.ID, noLOC(section[1])..'Prefix')
+                    ..GetSectionExtraData(bp.ID, noLOC(section[1])..'Prefix')
                     ..section.Data(bp).."\n"
-                    ..GetModUnitData(bp.ID, noLOC(section[1])..'Suffix')
+                    ..GetSectionExtraData(bp.ID, noLOC(section[1])..'Suffix')
                 end
             end
             return bodytext
@@ -700,7 +711,7 @@ end
 
 --------------------------------------------------------------------------------
 
-TableOfContents = function(BodyTextSections)
+function TableOfContents(BodyTextSections)
     local sections = 0
 
     for i, section in ipairs(BodyTextSections) do
@@ -710,28 +721,19 @@ TableOfContents = function(BodyTextSections)
     end
 
     if sections >= 3 then
-        local text = "\n<details>\n<summary>"..LOC("<LOC wiki_toc_contents>Contents").."</summary>\n\n"
+        local text = ''
         local index = 1
         for i, section in ipairs(BodyTextSections) do
             if section.check then
-                text = text .. index..'. – '..sectionLink(LOC(section[1])).."\n"
+                text = text..index..'. – '..sectionLink(LOC(section[1])).."\n"
                 index = index + 1
             end
         end
-        return text.."</details>\n"
+        return "\n"..xml:details(xml:summary(LOC"<LOC wiki_toc_contents>Contents"),'',text).."\n"
     end
     return ''
 end
 
-MDHead = function(header, hnum)
+function MDHead(header, hnum)
     return "\n"..string.rep('#', hnum or 3)..' '..LOC(header).."\n"
 end
-
-GetModUnitData = function(id, sect)
-    if pcall(function()assert(UnitData[id])end) and UnitData[id][sect] then
-        return "\n"..UnitData[id][sect].."\n"
-    end
-    return ''
-end
-
---------------------------------------------------------------------------------

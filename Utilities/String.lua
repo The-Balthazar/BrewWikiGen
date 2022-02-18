@@ -98,7 +98,7 @@ function iconText(icon, text, text2)
         [3] = 'Tech 3',
         [4] = 'Experimental',
     }
-    return text and ((icons[icon] and 
+    return text and ((icons[icon] and
         xml:img{src=OutputAsset(icons[icon]), title=(titles[icon] or icon)}..' ' or '')..text..(text2 or '')
     )
 end
@@ -222,7 +222,7 @@ function detailsLink(section)
 end
 
 function formatTime(n)
-    local h, m, s = math.floor(n/3600), math.floor(n/60)%60, math.floor(n%60)
+    local h, m, s = n//3600, n//60%60, math.floor(n%60)
     local good, time = pcall(string.format,
         (h~=0 and '%d:' or '')..'%02d:%02d',
         h~=0 and h or m,
