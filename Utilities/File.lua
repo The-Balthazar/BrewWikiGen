@@ -67,6 +67,38 @@ local Sandboxes = {
     end,
 }
 
+local function MatchesExclusion(name, exclusions)
+    if not exclusions then return end
+    for i, v in ipairs(exclusions) do
+        if string.find(name:lower(),v) then return true end
+    end
+end
+
+function FindBlueprints(dir, shell)
+    local paths = {}
+
+    local dirs = io.popen('dir "'..dir..'" /b /s /a-s-h-d | findstr /e .bp')
+    for bppath in dirs:lines() do
+        bppath = bppath:gsub('\\', '/')
+        if not MatchesExclusion(bppath, BlueprintExclusions) then
+            table.insert(paths, {string.match(bppath, '(.*/)([^/.]*%.bp)')})
+        end
+    end
+    dirs:close()
+
+    if not shell and not paths[1] then -- Follow links only if we found nothing, and only follow one, once.
+        dirs = io.popen('dir "'..dir..'" /b /s /a-s-h-d | findstr /e .lnk')
+        for lnk in dirs:lines() do
+            paths = FindBlueprints(GetDirFromShellLnk(lnk), true)
+            break
+        end
+        dirs:close()
+    end
+
+    collectgarbage()
+    return paths
+end
+
 function GetSandboxedLuaFile(file, env)
     local env = env and Sandboxes[env](file) or {}
     local chunk, msg = loadfile(file, 'bt', env)

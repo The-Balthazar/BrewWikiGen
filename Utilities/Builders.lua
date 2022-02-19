@@ -63,7 +63,7 @@ function GetBuildableModUnits(buildcats)
     for i, buildcat in ipairs(buildcats) do
         if BuildableCategories[buildcat].Buildable then
             for id, bp in pairs(BuildableCategories[buildcat].Buildable) do
-                if bp.WikiPage then
+                if bp.ModInfo.GenerateWikiPages then
                     units[id] = bp
                 end
             end

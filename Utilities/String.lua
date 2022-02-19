@@ -28,7 +28,7 @@ function pluralS(n) return n ~= 1 and 's' or '' end
 
 function pageLink(page,text)
     local bp = getBP(page)
-    if not bp or (bp and not bp.WikiPage) then
+    if not bp or (bp and not bp.ModInfo.GenerateWikiPages) then
         return text or page
     else
         return xml:a{href=stringSanitiseFilename(page)} (text or page)
@@ -37,9 +37,9 @@ end
 
 function unitDescLink(id)
     local bp = getBP(id)
-    if bp and not bp.WikiPage then
+    if bp and not bp.ModInfo.GenerateWikiPages then
         return bp.TechDescription
-    elseif bp and bp.WikiPage then
+    elseif bp and bp.ModInfo.GenerateWikiPages then
         return xml:a{href=stringSanitiseFilename(id)} (bp.TechDescription or id)
     end
     return id and xml:code(id) or nil

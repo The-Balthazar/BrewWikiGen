@@ -14,9 +14,8 @@ EnvironmentData = {
     author = 'Gas Powered Games',
     version = '1.6.6',
     icon = false,
-    location = WikiGeneratorDirectory..'Environment/',
+    location = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
 
-    ModIndex = 0,
     GenerateWikiPages = false, --Generate pages for env blueprints
 
     Blueprints = true, --Search env for blueprints
@@ -64,17 +63,10 @@ ModDirectories = { -- In order
     'C:/BrewLAN/mods/BrewLAN_Units/BrewTurrets/',
 }
 
--- Optional, reduces scope of file search, which is the slowest part.
-UnitBlueprintsFolder = 'units'
-
-BlueprintFolderExclusions = { -- Excludes folders that match any of these (regex)
-    '^[zZ]', --Starts with z or Z
-    '^OP[EC]', --Exclude operation units, like OPE2001
-    '^[UX][ARSE]C', --Exclude civilian units.
-}
-
-BlueprintFileExclusions = { -- Excludes _unit.bp files that match any of these (regex)
-    '^[zZ]',
+BlueprintExclusions = {
+    '/z[^/.]*_unit%.bp', --bp files that start with z
+    '/op[ec][^/.]*_unit%.bp', --bp files like OPE2001
+    '/[ux][arse]c[^/.]*_unit%.bp', --Exclude civilian units.
 }
 
 BlueprintIdExclusions = { -- Excludes blueprints with any of these IDs (case insensitive)
@@ -111,7 +103,6 @@ FooterCategories = { -- In order
     'STRUCTURE',
 }
 
-Logging = {
 Logging = { -- Functional logs
     LogEmojiSupported  = false,
 
@@ -137,7 +128,7 @@ Sanity = { -- Advice logs
     BlueprintStrategicIconChecks = false,
 }
 Info = { -- Misc data logs
-    UnitLODCounts = true,
+    UnitLODCounts = false,
 }
 
 dofile(WikiGeneratorDirectory.."Main.lua")

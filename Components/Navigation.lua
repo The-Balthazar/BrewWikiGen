@@ -73,8 +73,8 @@ function TechTable(units, maxcols)
 end
 
 function InsertInNavigationData(bp)
-    if not bp.WikiPage then return end
-    local index = bp.ModInfo.ModIndex
+    if not bp.ModInfo.GenerateWikiPages then return end
+    local index = (bp.ModInfo.ModIndex or 0)
 
     if not NavigationData[index] then
         NavigationData[index] = {ModInfo = bp.ModInfo, Factions = {} }

@@ -34,15 +34,11 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
 
 * `EnvironmentData` contains the following environmental values:
 
-  * `Blueprints`, a bool for if it should search subfolders of the `/Environment/`
-    folder for blueprints or a shell links to blueprints. (Note: any link still
-    needs to be in a subfolder). Don't ask why I implemented reading shell links
-    for just this instead of just making the value a path. I genuinely don't know.
+  * `location` optionally is a path for it to search for environmental blueprints.
+    If it finds none it will use a shell link in there instead. Note this isn't recursive.
 
-  * `GenerateWikiPages`, assuming `Blueprints` is true, this bool defines if it
-    should generate pages for the environmental blueprints. If not they will only
-    be used for built-by lists and upgrades to/from information, and won't include
-    them in navigation/category pages or include them in engineering build lists.
+  * `GenerateWikiPages`, if true, has the generator treat the environment as 'mod 0'.
+    Otherwise it will just be used for added context for mod pages.
 
   * `Factions`, optionally, is a an array of custom factions formatted as sub-arrays
     containing the faction category then the faction name. For example:
@@ -66,10 +62,7 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
     to load `loc/`Language`/strings_db.lua` from. It is expected to be valid Lua
     and is sandboxed with no access to functions.
 
-  * `name` is how it refers to the environment in navigation.
-
-  * `author`, `version`, and `icon` are all used in the 'mod page' generated for
-    the environment if `GenerateWikiPages` is true.
+  * `name`, `author`, `version`, and `icon` are for environment pseudo mod info.
 
   * `ExtraData` can point to an optional extra document of hand written content
     for specific sections of specific unit pages. It expects said document to be
@@ -154,20 +147,13 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
     an extensive formula.
 
 * `ModDirectories` should point to your local copies of the mod(s) you wish to
-load. It assumes, but doesn't require, multiple mods. It expects a `mod_info.lua`
-file directly in each item on the list. The order listed is used for navigation
-ordering on the sidebar and home page generations. If a mod contains no units it
-will still be loaded but won't have a page or affect the sidebar or home page.
+load in the order you wish them to appear. It assumes, but doesn't require, multiple
+mods. It requires a valid `mod_info.lua` file directly in each. If a mod contains
+no units, then no page will be generated for it.
 
-* `UnitBlueprintsFolder` is where within the mod folders it should start looking
-for blueprints. Standard convention is `units`. This value can be removed, but
-execution can take double the time to complete.
-
-* `BlueprintFolderExclusions` and `BlueprintFileExclusions` are arrays of regex
-matches for what to exclude from the blueprint search. The first is used against
-anything without a `.` in it, assumed to be folders, the second is used against
-anything that ends in `_unit.bp`. It won't look in any folder that matches, or
-open any file that matches.
+* `BlueprintExclusions` is an array of regex matches for what to exclude from
+blueprint searches. They are matched against the whole path of any `.bp` file.
+Lowercase.
 
 * `BlueprintIdExclusions` is an array of exact blueprint IDs to exclude. Case insensitive.
 
@@ -176,7 +162,6 @@ category pages for, and link to at the bottom of the relevant units. They appear
 on unit pages in the order written, so I tried to order them in a natural language
 order, or as close to as possible. If you have no units in a given category, no
 page will be generated. Add or remove as seems appropriate for your mods needs.
-Can be completely removed if you don't need categories.
 
 * `Logging` contains several options for verbose logging of additional information
 which can be interesting or helpful in the case of any issues.
@@ -207,14 +192,13 @@ Tags are:
 * `<brewwikimodunits>` for the unit navigation images on mod pages.
 
 ### Blueprints.lua:
-If you have content modified or generated in `Blueprints.lua` that would be
-important to the wiki, you can have the generator run it by adding a `WikiBlueprints`
-function to that file. That function is called in much the same way as
-`ModBlueprints`, except by the generator instead of the game. Input argument is the
-same, except only `.Unit` is populated currently. This is easier to achieve if
-your `Blueprints.lua` is formatted such that your `ModBlueprints` hook is
-populated with function calls rather than with code ran directly within that hook.
-However, as outlined below, it needs to be valid Lua.
+If you have important content in `/hook/lua/system/Blueprints.lua`, you can have
+the generator run it by adding a `WikiBlueprints` function to that file called in
+the same way as `ModBlueprints`, except by the generator instead of the game.
+
+This is easier to achieve if your `Blueprints.lua` is formatted such that your
+`ModBlueprints` hook is populated with function calls rather than with code ran
+directly within that hook. However, as outlined below, it needs to be valid Lua 5.4.
 
 ### Lua validation:
 Since this generator runs mod files directly for data, any referenced `.lua` file

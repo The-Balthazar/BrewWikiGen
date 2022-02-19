@@ -32,7 +32,7 @@ function UnitBodytextLeadText(bp)
     FactionText[3]=FactionText[1]
 
     bodytext = bodytext..
-    FactionText[Binary2bit(next(bp.FactionCategoryHash), bp.FactionCategory)]..
+    FactionText[Binary2bit(next(bp.FactionCategoryHash), bp.FactionCategory ~= 'OTHER')]..
     string.format(
         LOC('<LOC wiki_intro_motion_type> %s included in *%s*.'),
         LOC('<LOC wiki_intro_'..string.lower(bp.Physics.MotionType or 'RULEUMT_None')..'>'),
@@ -197,7 +197,7 @@ function UnitBodytextSectionData(bp)
                                     pageLink(
                                         builderbp.ID,
                                         -- For more context, it will include the name if it exists when no page will be linked to.
-                                        (builderbp.General.UnitName and not builderbp.WikiPage and ('"'..builderbp.General.UnitName..'": ') or '')..builderbp.TechDescription
+                                        (builderbp.General.UnitName and not builderbp.ModInfo.GenerateWikiPages and ('"'..builderbp.General.UnitName..'": ') or '')..builderbp.TechDescription
                                     ),
                                     builderbp.Economy.BuildRate,
                                     UpgradesFrom(bp, builderbp)

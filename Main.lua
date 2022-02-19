@@ -52,12 +52,12 @@ function GeneratorMain(Output)
     --[[ ------------------------------------------------------------------ ]]--
     -- Wiki data
     safecall(SetWikiLocalization, WikiGeneratorDirectory, WikiOptions.Language)
-    if EnvironmentData.ExtraData  then safecall(dofile,           EnvironmentData.ExtraData) end
+    if EnvironmentData.ExtraData then safecall(dofile,           EnvironmentData.ExtraData) end
 
     -- Env data
-    if EnvironmentData.LOC        then safecall(LoadLocalization, EnvironmentData.LOC) end
-    if EnvironmentData.Lua        then safecall(LoadHelpStrings,  EnvironmentData.Lua) end
-    if EnvironmentData.Blueprints then safecall(LoadBlueprints, EnvironmentData) end
+    if EnvironmentData.LOC       then safecall(LoadLocalization, EnvironmentData.LOC) end
+    if EnvironmentData.Lua       then safecall(LoadHelpStrings,  EnvironmentData.Lua) end
+    if EnvironmentData.location  then safecall(LoadBlueprints,   EnvironmentData) end
 
     for i, dir in ipairs(ModDirectories) do
         __active_mods[i] = LoadModInfo(dir, i)

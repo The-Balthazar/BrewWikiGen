@@ -37,7 +37,8 @@ local function RepaceSectionInFile(path, section, replace)
 end
 
 function CleanupUnitBlueprintFile(bp)
-    if not bp.WikiPage then return end
+    if not bp.ModInfo.GenerateWikiPages then return end
+    if getmetatable(bp).__name ~= 'Unit' then return end
     if bp.SourceFileBlueprintCount ~= 1 then
         return print"Can't cleanup "..bp.Source..", it contains multiple bps. Not implemented."
     else

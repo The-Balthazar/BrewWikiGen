@@ -16,7 +16,7 @@ local IconMotionTypes = {
 }
 
 function BlueprintSanityChecks(bp)
-    if not Sanity.BlueprintChecks or not bp.WikiPage then
+    if not Sanity.BlueprintChecks or not bp.ModInfo.GenerateWikiPages then
         return
     end
     HashUnitCategories(bp) -- Sanity happens before this happens for reals, so do it again. It'll get overwritten later, but that's fine.
@@ -257,7 +257,7 @@ local miscData = {
 }
 
 function MiscLogs(bp)
-    if bp.WikiPage and bp.Display.Mesh.LODs then
+    if bp.ModInfo.GenerateWikiPages and bp.Display.Mesh.LODs then
         miscData.LODs[#bp.Display.Mesh.LODs] = (miscData.LODs[#bp.Display.Mesh.LODs] or 0) + 1
         for i, lod in ipairs(bp.Display.Mesh.LODs) do
             miscData.lowest = miscData.lowest and math.min(lod.LODCutoff, miscData.lowest) or lod.LODCutoff

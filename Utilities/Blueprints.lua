@@ -27,48 +27,23 @@ function printTotalBlueprintValues()
 end
 
 --[[ ---------------------------------------------------------------------- ]]--
---[[ Blueprint file utilities                                               ]]--
---[[ ---------------------------------------------------------------------- ]]--
-local function MatchesExclusion(name, exclusions)
-    if not exclusions then return end
-    for i, v in ipairs(exclusions) do
-        if string.find(name,v) then return true end
-    end
-end
-local function MatchesFileExclusion(name) return MatchesExclusion(name, BlueprintFileExclusions) end
-local function MatchesFolderExclusion(name) return MatchesExclusion(name, BlueprintFolderExclusions) end
-local function IsFileOrSystemFolder(name) return name:find'%.' end
-local function IsGoodBlueprintFile(name) return name:lower():find'_unit.bp$' end
-
-local function GetModBlueprintPaths(dir)
-    local BlueprintPathsArray = {}
-    do
-        local dirsearch; dirsearch = function(folder, p)
-            local file <close> = io.popen('dir "'..folder..'" /b '..(p or ''))
-            for line in file:lines() do
-                if line:find'.lnk$' then
-                    local lnk = GetDirFromShellLnk(folder..'/'..line)
-                    print("    Loading: ", lnk)
-                    dirsearch(lnk)
-                end
-
-                if IsGoodBlueprintFile(line) and not MatchesFileExclusion(line) then
-                    table.insert(BlueprintPathsArray, {folder, line})
-                elseif not IsFileOrSystemFolder(line) and not MatchesFolderExclusion(line) then
-                    dirsearch(folder..'/'..line)
-                end
-            end
-        end
-
-        dirsearch(dir, '/ad')
-    end
-    collectgarbage() -- Potentially a lot of garbage here
-    return BlueprintPathsArray
-end
-
---[[ ---------------------------------------------------------------------- ]]--
 --[[ Blueprint data cleanup and validation                                  ]]--
 --[[ ---------------------------------------------------------------------- ]]--
+local function shortID(file)
+    return string.match(file, "([^/.]+)_[Uu][Nn][Ii][Tt]%.[Bb][Pp]$") or string.match(file, "([^/.]+)%.[Bb][Pp]$")
+end
+
+local function longID(file, modinfo)
+    local key = string.sub(file:lower(), modinfo.location:len())
+    if (modinfo.ModIndex or 0) == 0 then
+        return key
+    else
+        return string.match(file:lower(), '(/mods/.*)')
+        or ('/mods'..string.match(modinfo.location:lower(), '(/[^/.]+)/$')
+        ..key)
+    end
+end
+
 local function bpTypeIs(bp, name) return getmetatable(bp).__name == name end
 
 local function isValidBlueprint(bp)
@@ -81,41 +56,41 @@ local function isExcludedId(id)
     for i, v in ipairs(BlueprintIdExclusions) do if v:lower() == id:lower() then return true end end
 end
 
-local function shortID(file)
-    return string.match(file, "(.*)_[Uu][Nn][Ii][Tt].[Bb][Pp]$") or string.match(file, "(.*).[Bb][Pp]$")
-end
+local function fileCaseID(id) return id == id:lower() and id:upper() or id end
 
-local function fileCaseID(id)
-    return id == id:lower() and id:upper() or id
-end
+local function projFIleCaseId(id) return id:match('(.*)_[Pp][Rr][Oo][Jj]%.[Bb][Pp]') or id:match('(.*)%.[Bb][Pp]') end
 
 --[[ ---------------------------------------------------------------------- ]]--
 --[[ Blueprint loading                                                      ]]--
 --[[ ---------------------------------------------------------------------- ]]--
 local function RegisterBlueprintsFromFile(dir, file, modinfo)
-    local filedir = dir..'/'..file
+    local filedir = dir..file
     local bps = GetSanitisedLuaFile(filedir, 'Blueprint').Blueprints
     for i, bp in ipairs(bps) do
         local id = bp.BlueprintId or shortID(file)
         bp.Source = filedir
         bp.SourceFolder = dir
         bp.SourceFileBlueprintCount = #bps
+        bp.ModInfo = modinfo
         if not bp.Merge and isValidBlueprint(bp) and not isExcludedId(id) then
             if bpTypeIs(bp,'Unit') then
                 bp.id = id:lower()
                 bp.ID = fileCaseID(id)
-                assert(not all_units[bp.id], LogEmoji('⚠️').." Found blueprints between mods with clashing ID "..id)
+                assert(not all_units[bp.id], LogEmoji'⚠️'.." Found blueprints between mods with clashing ID "..id)
                 all_units[bp.id] = bp
                 modinfo.Units = (modinfo.Units or 0)+1
-                bp.ModInfo = modinfo
-                bp.WikiPage = modinfo.GenerateWikiPages
-            else
-
+            elseif bpTypeIs(bp,'Projectile') then
+                bp.id = longID(filedir, modinfo)
+                bp.ID = projFIleCaseId(file)
+                all_projectiles[bp.id] = bp
+                modinfo.Projectiles = (modinfo.Projectiles or 0)+1
             end
-        else
+            if bp.id then
+            end
+        elseif getmetatable(bp).__name == 'Unit' or getmetatable(bp).__name == 'Projectile' then
             TotalIgnoredBlueprints = TotalIgnoredBlueprints + 1
             if Logging.ExcludedBlueprints then
-                print(LogEmoji('⚠️').." Excluding "..id,
+                print(LogEmoji'⚠️'.." Excluding "..id,
                     (bp.Merge and "Merge") or
                     (not isValidBlueprint(bp) and "Invalid bp" ) or ""
                 )
@@ -126,15 +101,14 @@ end
 
 function LoadBlueprints(modinfo)
     print(modinfo.name)
-    local BlueprintPathsArray = GetModBlueprintPaths(modinfo.location..(modinfo.ModIndex~=0 and UnitBlueprintsFolder or ''))
+    local BlueprintPathsArray = FindBlueprints(modinfo.location)
 
     for i, dirData in ipairs(BlueprintPathsArray) do
         RegisterBlueprintsFromFile(dirData[1], dirData[2], modinfo)
     end
 
     --[[ Logging ]]--
-    print('    Loaded '..(modinfo.Units or 0)..' blueprint'..pluralS(modinfo.Units)
-    ..' from '..#BlueprintPathsArray..' file'..pluralS(#BlueprintPathsArray)..'. ' )
+    print('    Loaded '..(modinfo.Units or 0)..' units and '..(modinfo.Projectiles or 0)..' projectiles from '..#BlueprintPathsArray..' file'..pluralS(#BlueprintPathsArray)..'. ' )
     TotalBlueprintFiles = TotalBlueprintFiles + #BlueprintPathsArray
     TotalValidBlueprints = TotalValidBlueprints + (modinfo.Units or 0)
 end
@@ -162,10 +136,11 @@ local function SetUnitCommonStrings(bp)
     bp.General.UnitName = LOC(bp.General.UnitName)
     bp.TechName = bp.TechIndex and
         LOC('<LOC wiki_tech_'..bp.TechIndex..'>')
-    bp.TechDescription = (bp.TechIndex == 4 or not bp.TechIndex) and LOC(bp.Description) or (bp.TechName..' '..LOC(bp.Description))
+    bp.TechDescription = (bp.TechIndex == 4 or not bp.TechIndex) and LOC(bp.Description) or
+    (bp.TechName and bp.Description and bp.TechName..' '..LOC(bp.Description))
 end
 
-function GenerateUnitPages() -- Second pass
+function GenerateUnitPages()
     for id, bp in pairs(all_units) do
         HashUnitCategories(bp)
         SetUnitCommonStrings(bp)
@@ -178,7 +153,7 @@ function GenerateUnitPages() -- Second pass
         BlueprintBuiltBy(bp)
     end
     for id, bp in pairs(all_units) do
-        if bp.WikiPage then
+        if bp.ModInfo.GenerateWikiPages then
             local ModInfo = bp.ModInfo
             local BodyTextSections = UnitBodytextSectionData(bp)
 
@@ -203,6 +178,6 @@ function LoadModSystemBlueprintsFile(modDir)
     local SystemBlueprints = GetSandboxedLuaFile(modDir..'hook/lua/system/Blueprints.lua', "MohoLua")
 
     if SystemBlueprints.WikiBlueprints then
-        SystemBlueprints.WikiBlueprints({Unit=all_units})
+        SystemBlueprints.WikiBlueprints(all_blueprints)
     end
 end
