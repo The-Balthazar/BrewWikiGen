@@ -232,6 +232,7 @@ end
 function GetWeaponInfoboxData(wep, bp)
     return {
         {'Target type:', GetWeaponTargets(wep, bp)},
+        {'Projectile:', GetProjectilePageLink(wep.ProjectileId, bp)},
         {'DPS estimate:', NewDPSEstimate(wep), "Note: This only counts listed stats."},
         {
             'Damage:',

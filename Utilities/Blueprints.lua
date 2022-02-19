@@ -4,12 +4,13 @@
 --------------------------------------------------------------------------------
 local all_units = {}
 local all_projectiles = {}
-local all_blueprints = {
+all_blueprints = {
     Unit = all_units,
     Projectile = all_projectiles,
 }
 
 function getBP(id) return id and (all_units[id] or all_units[id:lower()]) end
+function getProj(id) return id and (all_projectiles[id] or all_projectiles[id:lower()]) end
 
 --[[ ---------------------------------------------------------------------- ]]--
 --[[ Blueprint metadata                                                     ]]--
@@ -58,7 +59,9 @@ end
 
 local function fileCaseID(id) return id == id:lower() and id:upper() or id end
 
-local function projFIleCaseId(id) return id:match('(.*)_[Pp][Rr][Oo][Jj]%.[Bb][Pp]') or id:match('(.*)%.[Bb][Pp]') end
+function projShortId(id) return id:match('([^/.]+)_[Pp][Rr][Oo][Jj]%.[Bb][Pp]') or id:match('([^/.]+)%.[Bb][Pp]') end
+
+function projSectionId(id) return projShortId(id):gsub('_',' '):gsub('(%S)(%u%l+)', '%1 %2'):gsub('(%S)(%u%l+)', '%1 %2'):gsub('(%S)(%d+)', '%1 %2') end
 
 --[[ ---------------------------------------------------------------------- ]]--
 --[[ Blueprint loading                                                      ]]--
@@ -81,7 +84,7 @@ local function RegisterBlueprintsFromFile(dir, file, modinfo)
                 modinfo.Units = (modinfo.Units or 0)+1
             elseif bpTypeIs(bp,'Projectile') then
                 bp.id = longID(filedir, modinfo)
-                bp.ID = projFIleCaseId(file)
+                bp.ID = projSectionId(file)
                 all_projectiles[bp.id] = bp
                 modinfo.Projectiles = (modinfo.Projectiles or 0)+1
             end
@@ -113,67 +116,15 @@ function LoadBlueprints(modinfo)
     TotalValidBlueprints = TotalValidBlueprints + (modinfo.Units or 0)
 end
 
-function CheckUnitBlueprintSanity()
-    for id, bp in pairs(all_units) do
-        BlueprintSanityChecks(bp)
-    end
-end
-
-function GetUnitMiscInfo()
-    for id, bp in pairs(all_units) do
-        MiscLogs(bp)
-    end
-    printMiscData()
-end
-
 function CleanupBlueprintsFiles()
     for id, bp in pairs(all_units) do
         CleanupUnitBlueprintFile(bp)
     end
 end
 
-local function SetUnitCommonStrings(bp)
-    bp.General.UnitName = LOC(bp.General.UnitName)
-    bp.TechName = bp.TechIndex and
-        LOC('<LOC wiki_tech_'..bp.TechIndex..'>')
-    bp.TechDescription = (bp.TechIndex == 4 or not bp.TechIndex) and LOC(bp.Description) or
-    (bp.TechName and bp.Description and bp.TechName..' '..LOC(bp.Description))
-end
-
-function GenerateUnitPages()
-    for id, bp in pairs(all_units) do
-        HashUnitCategories(bp)
-        SetUnitCommonStrings(bp)
-        GetMeshBones(bp)
-
-        InsertInNavigationData(bp)
-        GetBuildableCategoriesFromBp(bp)
-    end
-    for id, bp in pairs(all_units) do
-        BlueprintBuiltBy(bp)
-    end
-    for id, bp in pairs(all_units) do
-        if bp.ModInfo.GenerateWikiPages then
-            local ModInfo = bp.ModInfo
-            local BodyTextSections = UnitBodytextSectionData(bp)
-
-            local md = io.open(OutputDirectory..stringSanitiseFilename(bp.ID)..'.md', "w"):write(
-                UnitHeaderString(bp)..
-                tostring(UnitInfobox(bp))..
-                UnitBodytextLeadText(bp)..
-                TableOfContents(BodyTextSections)..
-                tostring(BodyTextSections)..
-                UnitPageCategories(bp)..
-                "\n"
-            ):close()
-        end
-    end
-end
-
 --[[ ---------------------------------------------------------------------- ]]--
 --[[ Blueprint loading                                                      ]]--
 --[[ ---------------------------------------------------------------------- ]]--
-
 function LoadModSystemBlueprintsFile(modDir)
     local SystemBlueprints = GetSandboxedLuaFile(modDir..'hook/lua/system/Blueprints.lua', "MohoLua")
 

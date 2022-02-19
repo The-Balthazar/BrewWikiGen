@@ -89,7 +89,7 @@ function InsertInNavigationData(bp)
     table.insert(NavigationData[index].Factions[factioni], bp)
 end
 
-local function UpdateGeneratedPartOfPage(page, tag, content)
+function UpdateGeneratedPartOfPage(page, tag, content)
     local md = io.open(OutputDirectory..page, "r")
     local mdstring = md and md:read('a')
     pcall(io.close,md)

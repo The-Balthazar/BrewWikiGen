@@ -31,6 +31,7 @@ WikiOptions = {
     GenerateSidebar = true,
     GenerateModPages = true,
     GenerateUnitPages = true,
+    GenerateProjectilesPage = true,
     GenerateCategoryPages = true,
 
     -- Unit page options

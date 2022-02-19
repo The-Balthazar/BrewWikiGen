@@ -100,7 +100,8 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
     be loaded. They are not ISO_639-1. Non-`'US'` is only partially supported.
 
   * `GenerateHomePage`, `GenerateSidebar`, `GenerateModPages`, `GenerateUnitPages`,
-    and `GenerateCategoryPages`; `true` or `false`: Generate those parts or not.
+    `GenerateProjectilesPage` and `GenerateCategoryPages`; `true` or `false`:
+    Generate those parts or not.
 
   * `IncludeStrategicIcon`; `true` or `false`: If true it will include the strategic
     icon in the infobox and automatically copy required icons into the output from

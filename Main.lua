@@ -40,6 +40,8 @@ function GeneratorMain(Output)
         "Utilities/Threat.lua",
         'Components/Categories.lua',
         'Components/Navigation.lua',
+        'Components/Projectiles.lua',
+        'Components/Unit.lua',
         'Components/UnitBodytext.lua',
         'Components/UnitInfobox.lua',
         'Components/Weapon.lua',
@@ -84,6 +86,7 @@ function GeneratorMain(Output)
     if Info.UnitLODCounts                then safecall(GetUnitMiscInfo) end
     if CleanupOptions.CleanUnitBpFiles   then safecall(CleanupBlueprintsFiles) end
     if WikiOptions.GenerateUnitPages     then safecall(GenerateUnitPages) end
+    if WikiOptions.GenerateProjectilesPage then safecall(GenerateProjectilePage) end
     if WikiOptions.GenerateSidebar       then safecall(GenerateSidebar) end
     if WikiOptions.GenerateModPages      then safecall(GenerateModPages) end
     if WikiOptions.GenerateCategoryPages then safecall(GenerateCategoryPages) end

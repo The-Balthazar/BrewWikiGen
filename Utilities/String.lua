@@ -118,11 +118,11 @@ function abilityTitle(ability)
     return hoverTip( LOC(abilityDesc[noLOC(ability)]) or 'error:description', LOC(ability))
 end
 
-function stringConcatLB(args)
+function stringConcatLB(args, toeach, html)
     local s = ''
-    if #args == 1 then s = args[1] else
+    if #args == 1 then s = toeach and toeach(args[1]) or args[1] else
         for i, v in ipairs(args) do
-            s = s.."\n"..v
+            s = s..((html and i~=1 and '<br />')or"\n")..(toeach and toeach(v) or v)
         end
     end
     return s
