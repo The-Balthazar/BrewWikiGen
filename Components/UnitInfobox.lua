@@ -51,6 +51,9 @@ function UnitInfobox(bp)
                 }
             },
             {''},
+            {'<LOC wiki_infobox_deposit>'   ..'Build restriction:', bp.Physics.BuildRestriction=='RULEUBR_OnMassDeposit'and iconText('OnMass', xml:span{title=bp.Physics.BuildRestriction}(LOC'<LOC wiki_infobox_ruleubr_mass>Mass point')) or
+                                                                    bp.Physics.BuildRestriction=='RULEUBR_OnHydrocarbonDeposit'and iconText('OnHydro', xml:span{title=bp.Physics.BuildRestriction}(LOC'<LOC wiki_infobox_ruleubr_hydro>Hydrocarbon'))},
+            {'<LOC wiki_infobox_cost_cap>'  ..'Population cost:',   iconText('Unit',   (bp.General.CapCost or 1)~=1 and bp.General.CapCost)},
             {'<LOC wiki_infobox_cost_e>'    ..'Energy cost:',       iconText('Energy', bp.Economy.BuildCostEnergy)},
             {'<LOC wiki_infobox_cost_m>'    ..'Mass cost:',         iconText('Mass',   bp.Economy.BuildCostMass)},
             {'<LOC wiki_infobox_cost_t>'    ..'Build time:',        iconText('',       bp.Economy.BuildTime, bp.BuiltByCategories and detailsLink('<LOC wiki_sect_construction>Construction') or '' )},
@@ -105,6 +108,7 @@ function UnitInfobox(bp)
                 bp.Transport.Class1Capacity and
                 bp.Transport.Class1Capacity..detailsLink('<LOC wiki_sect_transport>Transport capacity')
             )},
+            {'<LOC wiki_infobox_transportflags>'    ..'Flags:', InfoboxFlagsList{bp.Transport.CanFireFromTransport and '<LOC wiki_infobox_fire_from_transport>Fire from transport'}},
             {''},
             {'<LOC wiki_infobox_miscrad>' ..'Misc radius:', formatDistance(bp.CategoriesHash.OVERLAYMISC and bp.AI.StagingPlatformScanRadius), LOC'<LOC wiki_misc_radius_note>Defined by the air staging radius value. Often used to indicate things without a dedicated range ring.' },
             {'<LOC wiki_infobox_weapons>' ..'Weapons:',     bp.Weapon and #bp.Weapon..detailsLink('<LOC wiki_sect_weapons>Weapons')},

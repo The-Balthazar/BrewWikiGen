@@ -87,12 +87,19 @@ function iconText(icon, text, text2)
         Fuel = 'icons/fuel.png',
         Attached = 'icons/attached.png',
 
+        Unit = 'icons/tank.png',
+
+        OnMass = 'icons/mass_marker.png',
+        OnHydro = 'icons/hydrocarbon_marker.png',
+
         [1] = 'icons/T1.png',
         [2] = 'icons/T2.png',
         [3] = 'icons/T3.png',
         [4] = 'icons/T4.png',
     }
     local titles = {
+        OnMass = 'Mass marker',
+        OnHydro = 'Hydrocarbon marker',
         [1] = 'Tech 1',
         [2] = 'Tech 2',
         [3] = 'Tech 3',
