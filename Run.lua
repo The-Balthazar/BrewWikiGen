@@ -18,7 +18,6 @@ EnvironmentData = {
 
     GenerateWikiPages = false, --Generate pages for env blueprints
 
-    Blueprints = true, --Search env for blueprints
     Lua = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
     LOC = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
     ExtraData = 'C:/BrewLAN/mods/BrewLAN/documentation/Wiki Data.lua',
@@ -65,9 +64,9 @@ ModDirectories = { -- In order
 }
 
 BlueprintExclusions = {
-    '/z[^/.]*_unit%.bp', --bp files that start with z
-    '/op[ec][^/.]*_unit%.bp', --bp files like OPE2001
-    '/[ux][arse]c[^/.]*_unit%.bp', --Exclude civilian units.
+    '/z[^/]*_unit%.bp', --bp files that start with z
+    '/op[ec][^/]*_unit%.bp', --bp files like OPE2001
+    '/[ux][arse]c[^/]*_unit%.bp', --Exclude civilian units.
 }
 
 BlueprintIdExclusions = { -- Excludes blueprints with any of these IDs (case insensitive)
@@ -110,7 +109,11 @@ Logging = { -- Functional logs
     LocalisationLoaded = false,
     HelpStringsLoaded  = false,
     SCMLoadIssues      = false,
-    SandboxedFileLogs  = false,
+    SandboxedFileLogs  = {
+        Debug = false, -- SPEW
+        Log   = true, -- LOG, _ALERT, print
+        Warn  = true, -- WARN
+    },
 
     ExcludedBlueprints = false,
     BlueprintTotals    = true,

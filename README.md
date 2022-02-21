@@ -271,9 +271,7 @@ end
 
 print("end")
 ```
-To use it save it as `.lua` in the images folder and run it. Powershell or a batch
-script would probably be more convenient, but I don't know those, and you need to
-run Lua files for the generator anyway. It creates renamed copies in a `\test\`
-sub folder. That folder may or may not need to exist before hand. I've not tested.
+To use it save it as `.lua` in the images folder, create a `/test/` subfolder and
+run it. It creates renamed copies in the test folder.
 
 If your unit blueprints themselves are mixed case then god help you.

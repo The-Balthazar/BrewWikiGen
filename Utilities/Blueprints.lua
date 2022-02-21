@@ -31,7 +31,7 @@ end
 --[[ Blueprint data cleanup and validation                                  ]]--
 --[[ ---------------------------------------------------------------------- ]]--
 local function shortID(file)
-    return string.match(file, "([^/.]+)_[Uu][Nn][Ii][Tt]%.[Bb][Pp]$") or string.match(file, "([^/.]+)%.[Bb][Pp]$")
+    return string.match(file, "([^/]+)_[Uu][Nn][Ii][Tt]%.[Bb][Pp]$") or string.match(file, "([^/]+)%.[Bb][Pp]$")
 end
 
 local function longID(file, modinfo)
@@ -40,7 +40,7 @@ local function longID(file, modinfo)
         return key
     else
         return string.match(file:lower(), '(/mods/.*)')
-        or ('/mods'..string.match(modinfo.location:lower(), '(/[^/.]+)/$')
+        or ('/mods'..string.match(modinfo.location:lower(), '(/[^/]+)/$')
         ..key)
     end
 end
@@ -59,7 +59,7 @@ end
 
 local function fileCaseID(id) return id == id:lower() and id:upper() or id end
 
-function projShortId(id) return id:match('([^/.]+)_[Pp][Rr][Oo][Jj]%.[Bb][Pp]') or id:match('([^/.]+)%.[Bb][Pp]') end
+function projShortId(id) return id:match('([^/]+)_[Pp][Rr][Oo][Jj]%.[Bb][Pp]') or id:match('([^/]+)%.[Bb][Pp]') end
 
 function projSectionId(id) return projShortId(id):gsub('_',' '):gsub('(%S)(%u%l+)', '%1 %2'):gsub('(%S)(%u%l+)', '%1 %2'):gsub('(%S)(%d+)', '%1 %2') end
 
@@ -79,7 +79,7 @@ local function RegisterBlueprintsFromFile(dir, file, modinfo)
             if bpTypeIs(bp,'Unit') then
                 bp.id = id:lower()
                 bp.ID = fileCaseID(id)
-                assert(not all_units[bp.id], LogEmoji'⚠️'.." Found blueprints between mods with clashing ID "..id)
+                printif(all_units[bp.id], LogEmoji'⚠️'..' Found non-merge clashing ID '..id..' using version from '..tostring(modinfo.name))
                 all_units[bp.id] = bp
                 modinfo.Units = (modinfo.Units or 0)+1
             elseif bpTypeIs(bp,'Projectile') then
@@ -111,7 +111,7 @@ function LoadBlueprints(modinfo)
     end
 
     --[[ Logging ]]--
-    print('    Loaded '..(modinfo.Units or 0)..' units and '..(modinfo.Projectiles or 0)..' projectiles from '..#BlueprintPathsArray..' file'..pluralS(#BlueprintPathsArray)..'. ' )
+    print('    Loaded '..(modinfo.Units or 0)..' units and '..(modinfo.Projectiles or 0)..' projectiles from '..#BlueprintPathsArray..' .bp file'..pluralS(#BlueprintPathsArray)..'. ' )
     TotalBlueprintFiles = TotalBlueprintFiles + #BlueprintPathsArray
     TotalValidBlueprints = TotalValidBlueprints + (modinfo.Units or 0)
 end

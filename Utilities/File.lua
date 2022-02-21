@@ -3,15 +3,13 @@
 -- Copyright 2021-2022 Sean 'Balthazar' Wheeldon                      Lua 5.4.2
 --------------------------------------------------------------------------------
 
-local FileMessages = {}
 local function SandboxedPrint(file, logtype)
+    local FileMessages
     return function(...)
-        if Logging.SandboxedFileLogs then
-            if not FileMessages[file] then
-                FileMessages[file] = true
-                print('Logs from', file)
-            end
-            print('        '..logtype,...)
+        if Logging.SandboxedFileLogs[logtype] then
+            printif(not FileMessages,'Logs from', file)
+            FileMessages = true
+            print('        '..logtype..':',...)
         end
     end
 end
@@ -27,25 +25,30 @@ local Sandboxes = {
         return {
             __active_mods = __active_mods,
 
-            pairs = pairs,
+            pairs  = sortedpairs,
             ipairs = ipairs,
+            next   = next,
 
-            print = SandboxedPrint(file, 'Print:'),
-            LOG = SandboxedPrint(file, 'Log:'),
-            SPEW = SandboxedPrint(file, 'Debug:'),
-            _ALERT = SandboxedPrint(file, 'Log:'),
-            WARN = SandboxedPrint(file, 'Warn:'),
+            print  = SandboxedPrint(file, 'Log'),
+            LOG    = SandboxedPrint(file, 'Log'),
+            SPEW   = SandboxedPrint(file, 'Debug'),
+            _ALERT = SandboxedPrint(file, 'Log'),
+            WARN   = SandboxedPrint(file, 'Warn'),
 
-            error = error,
+            error  = error,
             assert = assert,
+            pcall  = pcall,
 
-            table = table,
+            table  = table,
             string = string,
-            math = math,
+            math   = math,
 
-            type = type,
+            type     = type,
             tostring = tostring,
             tonumber = tonumber,
+
+            getmetatable = getmetatable,
+            setmetatable = setmetatable,
         }
     end,
     Blueprint = function()
@@ -81,7 +84,7 @@ function FindBlueprints(dir, shell)
     for bppath in dirs:lines() do
         bppath = bppath:gsub('\\', '/')
         if not MatchesExclusion(bppath, BlueprintExclusions) then
-            table.insert(paths, {string.match(bppath, '(.*/)([^/.]*%.bp)')})
+            table.insert(paths, {string.match(bppath, '(.*/)([^/]*%.bp)')})
         end
     end
     dirs:close()
@@ -116,8 +119,8 @@ function GetSanitisedLuaFile(file, env)
         :gsub('#', '--')
         :gsub('\\[^"^\']', '/')
     openfile:close()
-    --local filename = string.match(file, '/([^/.]+)$')
-    local chunk, msg = load(filestring, file, 't', env)
+    local filename = string.match(file, "[^/]+$")--name for errors
+    local chunk, msg = load(filestring, filename, 't', env)
     if chunk then
         chunk()
         return env

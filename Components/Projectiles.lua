@@ -8,7 +8,7 @@ function GetProjectilePageLink(projid, unitbp)
 
         return WikiOptions.GenerateProjectilesPage and xml:a{href='Projectiles#'..stringSanitiseFilename(projbp.ID,1,1)}(xml:code(projShortId(projid))) or projShortId(projid)
     elseif projid then
-        return "<error: can't find projectile"..projid..">"..xml:code(projShortId(projid))
+        return "<error: can't find projectile: "..projid..">"..xml:code(projShortId(projid))
     end
 end
 
