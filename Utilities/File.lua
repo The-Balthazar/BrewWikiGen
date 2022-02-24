@@ -23,6 +23,7 @@ local Sandboxes = {
     end,
     MohoLua = function(file)
         return {
+            _VERSION = _VERSION,
             __active_mods = __active_mods,
 
             pairs  = sortedpairs,
@@ -171,7 +172,7 @@ end
 local OutputAssets = {} -- reduce file loads by cachine processed files
 
 function OutputAsset(dir)
-    if not OutputAssets[dir] and not FileExists(OutputDirectory..dir) and FileExists(WikiGeneratorDirectory..dir) then
+    if dir and not OutputAssets[dir] and not FileExists(OutputDirectory..dir) and FileExists(WikiGeneratorDirectory..dir) then
         local output = io.open(OutputDirectory..dir, 'wb')
         if not output then
             local mkdir = string.gsub(OutputDirectory..string.match(dir, '(.*)/'), '/', '\\')

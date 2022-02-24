@@ -133,6 +133,7 @@ Sanity = { -- Advice logs
 }
 Info = { -- Misc data logs
     UnitLODCounts = false,
+    ProjectileBlueprintCounts = true,
 }
 
 dofile(WikiGeneratorDirectory.."Main.lua")
