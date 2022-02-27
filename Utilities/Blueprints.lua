@@ -81,29 +81,38 @@ local function RegisterBlueprintsFromFile(dir, file, modinfo)
     for i, bp in ipairs(bps) do
         local id = bp.BlueprintId or shortID(file)
         local meta = getmetatable(bp)
+
         meta.Source = filedir
         meta.SourceFolder = dir
         meta.SourceFileBlueprintCount = #bps
         meta.ModInfo = modinfo
+
+        bp.BlueprintId = nil
+        meta.id = id:lower()
+        meta.ID = fileCaseID(id)
+
         if isExcludedId(id) then
             LogExcludedBlueprint(id, bp)
+
         elseif bp.Merge and bp.__name=='Unit' then
             id = id:lower()
-            --bp.id = id:lower()
-            --bp.ID = fileCaseID(id)
+            bp.Merge = nil
+            meta.Merge = true
             merge_blueprints[id] = merge_blueprints[id] or {}
             table.insert(merge_blueprints[id], bp)
+            modinfo.UnitMerges = (modinfo.UnitMerges or 0)+1
+
         elseif not bp.Merge and isValidUnitBlueprint(bp) then
-            meta.id = id:lower()
-            meta.ID = fileCaseID(id)
             printif(all_units[bp.id], LogEmoji'⚠️'..' Found non-merge clashing ID '..id..' using version from '..tostring(modinfo.name))
             all_units[bp.id] = bp
             modinfo.Units = (modinfo.Units or 0)+1
+
         elseif not bp.Merge and bp.__name=='Projectile' then
             meta.id = longID(filedir, modinfo)
             meta.ID = projSectionId(file)
             all_projectiles[bp.id] = bp
             modinfo.Projectiles = (modinfo.Projectiles or 0)+1
+
         else
             LogExcludedBlueprint(id, bp)
         end
@@ -119,7 +128,7 @@ function LoadBlueprints(modinfo)
     end
 
     --[[ Logging ]]--
-    print('    Loaded '..(modinfo.Units or 0)..' units and '..(modinfo.Projectiles or 0)..' projectiles from '..#BlueprintPathsArray..' .bp file'..pluralS(#BlueprintPathsArray)..'. ' )
+    print('    Loaded '..(modinfo.Units or 0)..' units, '..(modinfo.UnitMerges or 0)..' unit merges, and '..(modinfo.Projectiles or 0)..' projectiles from '..#BlueprintPathsArray..' .bp file'..pluralS(#BlueprintPathsArray)..'. ' )
     TotalBlueprintFiles = TotalBlueprintFiles + #BlueprintPathsArray
     TotalValidBlueprints = TotalValidBlueprints + (modinfo.Units or 0)
 end

@@ -25,6 +25,9 @@ function BuildMenuSort(bp)
     (bp.BuildIconSortPriority or bp.StrategicIconSortPriority or 0))
     ..(tonumber(string.gsub(bp.id, '%W', ''), 36) or 0)
 end
+function mergeSortByOriginal(fun) return function(bp) return fun(getBP(bp.id)) end end
+
+function GenerateModPageFor(ModInfo) return ModInfo.GenerateWikiPages and ((ModInfo.Units or 0)>0 or (ModInfo.UnitMerges or 0)>0) end
 
 function SplitUnitsByTech(units, index)
     local groups = {{},{},{},{},{}}
@@ -118,7 +121,7 @@ function GenerateSidebar()
     local sidebarstring = ''
 
     for modindex, moddata in sortedpairs(NavigationData) do
-        if (moddata.ModInfo.Units or 0)>0 then
+        if GenerateModPageFor(moddata.ModInfo) then
             sidebarstring = sidebarstring .. "<details markdown=\"1\">\n<summary>[Show] <a href=\""..stringSanitiseFilename(moddata.ModInfo.name)..[[">]]..moddata.ModInfo.name.."</a></summary>\n<p>\n<table>\n<tr>\n<td width=\"269px\">\n\n"
             for i, faction in ipairs(FactionsByIndex) do
                 local unitarray = moddata.Factions[i]
@@ -146,7 +149,7 @@ end
 
 function GenerateModPages()
     for modindex, moddata in pairs(NavigationData) do
-        if (moddata.ModInfo.Units or 0)>0 then
+        if GenerateModPageFor(moddata.ModInfo) then
             local ModInfobox = Infobox{
                 Style = 'main-right',
                 Header = {
@@ -179,11 +182,44 @@ function GenerateModPages()
 
             table.insert(ModInfobox.Data, { 'Total:', tableSubcount(moddata.Factions) })
 
+            local bpMergesSection = ''
+
+            do
+                local merges = {}
+                for i = 1, #FactionsByIndex do
+                    merges[i]={}
+                end
+                for id, bps in sortedpairs(merge_blueprints) do
+                    for i, bp in ipairs(bps) do
+                        if bp.ModInfo == moddata.ModInfo then
+                            table.insert(merges[ FactionCategoryIndexes[getBP(id).FactionCategory or 'OTHER'] ], bp)
+                        end
+                    end
+                end
+                for cati, catbps in ipairs(merges) do
+                    if #catbps ~= 0 then
+                        if bpMergesSection == '' then
+                            bpMergesSection = MDHead('Blueprint merges',2)
+                        end
+                        bpMergesSection = bpMergesSection..MDHead(FactionsByIndex[cati],3)
+                        for i, bp in sortedpairs(catbps, mergeSortByOriginal(TechDescendingDescriptionAscending)) do
+
+                            bpMergesSection = bpMergesSection..tostring(Infobox{
+                                Style = 'detail-left',
+                                Header = { '[Show] '..unitDescLink(bp.id) },
+                                Data = InfoboxFormatRawBlueprint(bp,{{'<LOC wiki_infobox_unitid>Unit ID:', xml:code(bp.id)}}),
+                            })
+                        end
+                    end
+                end
+            end
+
             local MDPageName = stringSanitiseFilename(moddata.ModInfo.name)..'.md'
 
             UpdateGeneratedPartOfPage(MDPageName, 'brewwikimodinfobox', tostring(ModInfobox))
             UpdateGeneratedPartOfPage(MDPageName, 'brewwikileadtext', leadString)
             UpdateGeneratedPartOfPage(MDPageName, 'brewwikimodunits', unitsSection)
+            UpdateGeneratedPartOfPage(MDPageName, 'brewwikimergeunits', bpMergesSection)
         end
     end
 
@@ -193,7 +229,7 @@ end
 function GenerateHomePage()
     local UnitMods = {}
     for modindex, moddata in sortedpairs(NavigationData) do
-        if (moddata.ModInfo.Units or 0)>0 then
+        if GenerateModPageFor(moddata.ModInfo) then
             table.insert(UnitMods, moddata)
         end
     end

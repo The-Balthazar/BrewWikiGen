@@ -159,55 +159,11 @@ function UnitBodytextSectionData(bp)
                     end
                     -- This should have been recursive.
                     for i, mergebp in ipairs(merge_blueprints[bp.id]) do
-                        local mergeinfo = Infobox{
+                        text = text..tostring(Infobox{
                             Style = 'detail-left',
                             Header = { 'From '..xml:i(mergebp.ModInfo.name) },
-                            Data = {},
-                        }
-                        for k, v in sortedpairs(mergebp) do
-                            if type(v) ~= 'table' then
-                                if k ~= 'Merge' then
-                                    table.insert(mergeinfo.Data, {k,v})
-                                end
-                            else
-                                if k == 'Categories' then
-                                    table.insert(mergeinfo.Data, {k, stringConcatLB(v, xml:code{},1)})
-                                else
-                                    if k ~= 'Weapon' then
-                                        table.insert(mergeinfo.Data, {'',xml:b(k)})
-                                    end
-                                    for k2, v2 in sortedpairs(v) do
-                                        if type(v2) == 'table' then
-                                            if type(v2[1]) == 'string' then
-                                                table.insert(mergeinfo.Data, {k2, stringConcatLB(v2, xml:code{},1)})
-                                            else
-                                                if next(v2) then
-                                                    if k == 'Weapon' then
-                                                        table.insert(mergeinfo.Data, {'',xml:b(k..' '..tostring(k2))})
-                                                    else
-                                                        table.insert(mergeinfo.Data, {'',xml:b(tostring(k2))})
-                                                    end
-                                                    for k3, v3 in sortedpairs(v2) do
-                                                        if type(v3) ~= 'table' then
-                                                            table.insert(mergeinfo.Data, {k3,v3})
-                                                        else
-                                                            table.insert(mergeinfo.Data, {k3,'...'})
-                                                        end
-                                                    end
-                                                    table.insert(mergeinfo.Data, {''})
-                                                end
-                                            end
-                                        else
-                                            table.insert(mergeinfo.Data, {k2,v2})
-                                        end
-                                    end
-                                    if k ~= 'Weapon' then
-                                        table.insert(mergeinfo.Data, {''})
-                                    end
-                                end
-                            end
-                        end
-                        text = text..tostring(mergeinfo)
+                            Data = InfoboxFormatRawBlueprint(mergebp),
+                        })
                     end
                 end
                 return text

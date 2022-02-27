@@ -107,3 +107,32 @@ function DoToInfoboxDataCell(fun, infodata, key, value)
         end
     end
 end
+
+local spacer = {''}
+
+function InfoboxFormatRawBlueprint(bp, data, k0)
+    data = data or {}
+    for k, v in sortedpairs(bp) do
+        if type(v) ~= 'table' then
+            table.insert(data, {k,v})
+        elseif type(v[1])=='string' then
+            if v[1]:upper()==v[1] or getBP(v[1]) then
+                table.insert(data, {k, stringConcatLB(v, xml:code{},1)})
+            else
+                table.insert(data, {k, stringConcatLB(v, LOC,1)})
+            end
+        elseif next(v) then
+            if type(v[1])~='table' then
+                table.insert(data, {'',xml:b((type(k)=='number'and k0..' ' or '')..k)})
+            end
+            InfoboxFormatRawBlueprint(v, data, k)
+            if type(v[1])~='table' and data[#data] ~= spacer then
+                table.insert(data, spacer)
+            end
+        end
+    end
+    if data[#data] == spacer then
+        table.remove(data)
+    end
+    return data
+end
