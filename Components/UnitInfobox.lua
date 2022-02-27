@@ -87,14 +87,14 @@ function UnitInfobox(bp)
                 }
             },
             {''},
-            {'<LOC wiki_infobox_motion>'         ..'Motion type:',       bp.Physics.MotionType and ('<code>'..bp.Physics.MotionType..'</code>')},
-            {'<LOC wiki_infobox_build_layers>'   ..'Buildable layers:', (bp.Physics.MotionType == 'RULEUMT_None') and BuildableLayer(bp.Physics)},
+            {'<LOC wiki_infobox_motion>'         ..'Motion type:',      xml:code(bp.Physics.MotionType or 'RULEUMT_None')},
+            {'<LOC wiki_infobox_build_layers>'   ..'Buildable layers:', ((bp.Physics.MotionType or 'RULEUMT_None') == 'RULEUMT_None') and BuildableLayer(bp.Physics)},
             {'<LOC wiki_infobox_movement_speed>' ..'Movement speed:',   formatSpeed(bp.Air.MaxAirspeed or bp.Physics.MaxSpeed, bp.Physics.MotionType == 'RULEUMT_Water' or bp.Physics.MotionType == 'RULEUMT_SurfacingSub')},
             {'<LOC wiki_infobox_fuel>'           ..'Fuel:',             (bp.Physics.FuelUseTime and iconText('Fuel', formatTime(bp.Physics.FuelUseTime), '') )},
             {'<LOC wiki_infobox_elevation>'      ..'Elevation:',        (bp.Air and bp.Physics.Elevation)},
             {'<LOC wiki_infobox_transport_class>'..'Transport class:', (
                 (
-                    bp.Physics.MotionType ~= 'RULEUMT_None' and (
+                    (bp.Physics.MotionType or 'RULEUMT_None') ~= 'RULEUMT_None' and (
                         bp.General.CommandCaps.RULEUCC_CallTransport or
                         bp.General.CommandCaps.RULEUCC_Dock or
                         bp.CategoriesHash.POD

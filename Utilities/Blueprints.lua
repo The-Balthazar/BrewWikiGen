@@ -47,7 +47,7 @@ local function longID(file, modinfo)
     end
 end
 
-local function isValidUnitBlueprint(bp) return bp.__name=='Unit' and bp.Display and bp.Categories and bp.Defense and bp.Physics and bp.General end
+local function isValidUnitBlueprint(bp) return bp.__name=='Unit' and bp.Display and bp.Categories and bp.Defense and bp.General end
 
 local function isExcludedId(id)
     if not BlueprintIdExclusions then return end
@@ -95,11 +95,10 @@ local function RegisterBlueprintsFromFile(dir, file, modinfo)
             LogExcludedBlueprint(id, bp)
 
         elseif bp.Merge and bp.__name=='Unit' then
-            id = id:lower()
             bp.Merge = nil
             meta.Merge = true
-            merge_blueprints[id] = merge_blueprints[id] or {}
-            table.insert(merge_blueprints[id], bp)
+            merge_blueprints[bp.id] = merge_blueprints[bp.id] or {}
+            table.insert(merge_blueprints[bp.id], bp)
             modinfo.UnitMerges = (modinfo.UnitMerges or 0)+1
 
         elseif not bp.Merge and isValidUnitBlueprint(bp) then

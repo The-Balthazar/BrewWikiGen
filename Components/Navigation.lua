@@ -25,7 +25,7 @@ function BuildMenuSort(bp)
     (bp.BuildIconSortPriority or bp.StrategicIconSortPriority or 0))
     ..(tonumber(string.gsub(bp.id, '%W', ''), 36) or 0)
 end
-function mergeSortByOriginal(fun) return function(bp) return fun(getBP(bp.id)) end end
+function mergeSortByOriginal(fun) return function(bp) return fun(getBP(bp.id) or bp) end end
 
 function GenerateModPageFor(ModInfo) return ModInfo.GenerateWikiPages and ((ModInfo.Units or 0)>0 or (ModInfo.UnitMerges or 0)>0) end
 
