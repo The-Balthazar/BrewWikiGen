@@ -9,6 +9,8 @@ all_blueprints = {
     Projectile = all_projectiles,
 }
 
+merge_blueprints = {}
+
 function getBP(id) return id and (all_units[id] or all_units[id:lower()]) end
 function getProj(id) return id and (all_projectiles[id] or all_projectiles[id:lower()]) end
 
@@ -45,12 +47,7 @@ local function longID(file, modinfo)
     end
 end
 
-local function bpTypeIs(bp, name) return getmetatable(bp).__name == name end
-
-local function isValidBlueprint(bp)
-    return bpTypeIs(bp,'Unit') and bp.Display and bp.Categories and bp.Defense and bp.Physics and bp.General
-    or bpTypeIs(bp,'Projectile')
-end
+local function isValidUnitBlueprint(bp) return bp.__name=='Unit' and bp.Display and bp.Categories and bp.Defense and bp.Physics and bp.General end
 
 local function isExcludedId(id)
     if not BlueprintIdExclusions then return end
@@ -66,38 +63,49 @@ function projSectionId(id) return projShortId(id):gsub('_',' '):gsub('(%S)(%u%l+
 --[[ ---------------------------------------------------------------------- ]]--
 --[[ Blueprint loading                                                      ]]--
 --[[ ---------------------------------------------------------------------- ]]--
+local function LogExcludedBlueprint(id, bp)
+    if getmetatable(bp).__name == 'Unit' or getmetatable(bp).__name == 'Projectile' then
+        TotalIgnoredBlueprints = TotalIgnoredBlueprints + 1
+        if Logging.ExcludedBlueprints then
+            print(LogEmoji'⚠️'..' Excluding '..id,
+                (bp.Merge and 'Merge') or
+                (bp.__name=='Unit' and not isValidUnitBlueprint(bp) and 'Invalid unit bp') or ''
+            )
+        end
+    end
+end
+
 local function RegisterBlueprintsFromFile(dir, file, modinfo)
     local filedir = dir..file
     local bps = GetSanitisedLuaFile(filedir, 'Blueprint').Blueprints
     for i, bp in ipairs(bps) do
         local id = bp.BlueprintId or shortID(file)
-        bp.Source = filedir
-        bp.SourceFolder = dir
-        bp.SourceFileBlueprintCount = #bps
-        bp.ModInfo = modinfo
-        if not bp.Merge and isValidBlueprint(bp) and not isExcludedId(id) then
-            if bpTypeIs(bp,'Unit') then
-                bp.id = id:lower()
-                bp.ID = fileCaseID(id)
-                printif(all_units[bp.id], LogEmoji'⚠️'..' Found non-merge clashing ID '..id..' using version from '..tostring(modinfo.name))
-                all_units[bp.id] = bp
-                modinfo.Units = (modinfo.Units or 0)+1
-            elseif bpTypeIs(bp,'Projectile') then
-                bp.id = longID(filedir, modinfo)
-                bp.ID = projSectionId(file)
-                all_projectiles[bp.id] = bp
-                modinfo.Projectiles = (modinfo.Projectiles or 0)+1
-            end
-            if bp.id then
-            end
-        elseif getmetatable(bp).__name == 'Unit' or getmetatable(bp).__name == 'Projectile' then
-            TotalIgnoredBlueprints = TotalIgnoredBlueprints + 1
-            if Logging.ExcludedBlueprints then
-                print(LogEmoji'⚠️'.." Excluding "..id,
-                    (bp.Merge and "Merge") or
-                    (not isValidBlueprint(bp) and "Invalid bp" ) or ""
-                )
-            end
+        local meta = getmetatable(bp)
+        meta.Source = filedir
+        meta.SourceFolder = dir
+        meta.SourceFileBlueprintCount = #bps
+        meta.ModInfo = modinfo
+        if isExcludedId(id) then
+            LogExcludedBlueprint(id, bp)
+        elseif bp.Merge and bp.__name=='Unit' then
+            id = id:lower()
+            --bp.id = id:lower()
+            --bp.ID = fileCaseID(id)
+            merge_blueprints[id] = merge_blueprints[id] or {}
+            table.insert(merge_blueprints[id], bp)
+        elseif not bp.Merge and isValidUnitBlueprint(bp) then
+            meta.id = id:lower()
+            meta.ID = fileCaseID(id)
+            printif(all_units[bp.id], LogEmoji'⚠️'..' Found non-merge clashing ID '..id..' using version from '..tostring(modinfo.name))
+            all_units[bp.id] = bp
+            modinfo.Units = (modinfo.Units or 0)+1
+        elseif not bp.Merge and bp.__name=='Projectile' then
+            meta.id = longID(filedir, modinfo)
+            meta.ID = projSectionId(file)
+            all_projectiles[bp.id] = bp
+            modinfo.Projectiles = (modinfo.Projectiles or 0)+1
+        else
+            LogExcludedBlueprint(id, bp)
         end
     end
 end

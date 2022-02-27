@@ -55,7 +55,15 @@ local Sandboxes = {
     Blueprint = function()
         local filebps = {}
         local function export(bptype)
-            return function(t) table.insert(filebps, setmetatable(t, {__name = bptype})) end
+            return function(t)
+                local meta; meta = {
+                    __name = bptype,
+                    __index = function(self, val)
+                        return rawget(meta, val)
+                    end
+                }
+                table.insert(filebps, setmetatable(t, meta))
+            end
         end
         return {
             Sound = function(t) return setmetatable(t, {__name = 'Sound'}) end,

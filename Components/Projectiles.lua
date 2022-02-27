@@ -85,26 +85,18 @@ function LogFullProjectileBp()
     local vals = {}
     for id, bp in pairs(all_blueprints.Projectile) do
         for section, group in pairs(bp) do
-            if section ~= 'ID'
-            and section ~= 'id'
-            and section ~= 'ModInfo'
-            and section ~= 'Source'
-            and section ~= 'SourceFolder'
-            and section ~= 'SourceFileBlueprintCount'
-            then
-                vals[section] = vals[section] or {}
-                if type(group) == 'table' then
-                    for k, v in pairs(group) do
-                        if type(v) ~= 'table' then
-                            vals[section][k] = vals[section][k] or {}
-                            vals[section][k][v] = (vals[section][k][v] or 0)+1
-                            --table.insert(vals[section][k], v)
-                        end
+            vals[section] = vals[section] or {}
+            if type(group) == 'table' then
+                for k, v in pairs(group) do
+                    if type(v) ~= 'table' then
+                        vals[section][k] = vals[section][k] or {}
+                        vals[section][k][v] = (vals[section][k][v] or 0)+1
+                        --table.insert(vals[section][k], v)
                     end
-                else
-                    vals[section][group] = (vals[section][group] or 0)+1
-                    --table.insert(vals[section], group)
                 end
+            else
+                vals[section][group] = (vals[section][group] or 0)+1
+                --table.insert(vals[section], group)
             end
         end
     end

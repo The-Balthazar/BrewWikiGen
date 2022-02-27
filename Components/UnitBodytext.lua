@@ -123,29 +123,94 @@ function UnitBodytextSectionData(bp)
         },
         {
             '<LOC wiki_sect_balance>Balance',
-            check = bp.WikiBalance,
+            check = bp.WikiBalance or merge_blueprints[bp.id],
             Data = function(bp)
-                local text = WikiOptions.BalanceNote and LOC('<LOC wiki_balance_dynamic_script>A dynamic balance script changes the stats of this unit on game launch based on the stats of other units.') or ''
+                local text = ''
+                if bp.WikiBalance then
+                    text = WikiOptions.BalanceNote and LOC'<LOC wiki_balance_dynamic_script>A dynamic balance script changes the stats of this unit on game launch based on the stats of other units.' or ''
 
-                if bp.WikiBalance.Affects then
-                    text = (text ~= '' and text..' ' or '')..string.format(LOC((#bp.WikiBalance.Affects == 1) and
-                        '<LOC wiki_balance_stats_affected_singular>Stats effected are from the %s blueprint section' or
-                        '<LOC wiki_balance_stats_affected>Stats effected are from the %s blueprint sections'
-                    ), stringConcatOxfordComma(bp.WikiBalance.Affects, xml:code{}))
+                    if bp.WikiBalance.Affects then
+                        text = (text ~= '' and text..' ' or '')..string.format(LOC((#bp.WikiBalance.Affects == 1) and
+                            '<LOC wiki_balance_stats_affected_singular>Stats effected are from the %s blueprint section' or
+                            '<LOC wiki_balance_stats_affected>Stats effected are from the %s blueprint sections'
+                        ), stringConcatOxfordComma(bp.WikiBalance.Affects, xml:code{}))
 
-                    if bp.WikiBalance.ReferenceIDs then
-                        local refNum = #bp.WikiBalance.ReferenceIDs
+                        if bp.WikiBalance.ReferenceIDs then
+                            local refNum = #bp.WikiBalance.ReferenceIDs
 
-                        text = text..string.format(LOC(refNum == 1 and '<LOC wiki_balance_based> and are based on %s' or
-                        refNum == 2 and '<LOC wiki_balance_based_average> and are based on an average of %s and %s'),
-                        unitDescLink(bp.WikiBalance.ReferenceIDs[1]),
-                        unitDescLink(bp.WikiBalance.ReferenceIDs[2]))
+                            text = text..string.format(LOC(refNum == 1 and '<LOC wiki_balance_based> and are based on %s' or
+                            refNum == 2 and '<LOC wiki_balance_based_average> and are based on an average of %s and %s'),
+                            unitDescLink(bp.WikiBalance.ReferenceIDs[1]),
+                            unitDescLink(bp.WikiBalance.ReferenceIDs[2]))
+                        end
+
+                        text = text..".\n\n"
                     end
-
-                    text = text..".\n\n"
+                    text = text..(WikiOptions.BalanceNote and LOC(WikiOptions.BalanceNote) or '')
                 end
-
-                return text..(WikiOptions.BalanceNote and LOC(WikiOptions.BalanceNote) or '')
+                if bp.WikiBalance and merge_blueprints[bp.id] then
+                    text = text.."\n\n"
+                end
+                if merge_blueprints[bp.id] then
+                    if #merge_blueprints[bp.id] == 1 then
+                        text = text.."This unit has the folloing blueprint merge affecting it:\n"
+                    else
+                        text = text.."This unit is affected by the following blueprint merges:\n"
+                    end
+                    -- This should have been recursive.
+                    for i, mergebp in ipairs(merge_blueprints[bp.id]) do
+                        local mergeinfo = Infobox{
+                            Style = 'detail-left',
+                            Header = { 'From '..xml:i(mergebp.ModInfo.name) },
+                            Data = {},
+                        }
+                        for k, v in sortedpairs(mergebp) do
+                            if type(v) ~= 'table' then
+                                if k ~= 'Merge' then
+                                    table.insert(mergeinfo.Data, {k,v})
+                                end
+                            else
+                                if k == 'Categories' then
+                                    table.insert(mergeinfo.Data, {k, stringConcatLB(v, xml:code{},1)})
+                                else
+                                    if k ~= 'Weapon' then
+                                        table.insert(mergeinfo.Data, {'',xml:b(k)})
+                                    end
+                                    for k2, v2 in sortedpairs(v) do
+                                        if type(v2) == 'table' then
+                                            if type(v2[1]) == 'string' then
+                                                table.insert(mergeinfo.Data, {k2, stringConcatLB(v2, xml:code{},1)})
+                                            else
+                                                if next(v2) then
+                                                    if k == 'Weapon' then
+                                                        table.insert(mergeinfo.Data, {'',xml:b(k..' '..tostring(k2))})
+                                                    else
+                                                        table.insert(mergeinfo.Data, {'',xml:b(tostring(k2))})
+                                                    end
+                                                    for k3, v3 in sortedpairs(v2) do
+                                                        if type(v3) ~= 'table' then
+                                                            table.insert(mergeinfo.Data, {k3,v3})
+                                                        else
+                                                            table.insert(mergeinfo.Data, {k3,'...'})
+                                                        end
+                                                    end
+                                                    table.insert(mergeinfo.Data, {''})
+                                                end
+                                            end
+                                        else
+                                            table.insert(mergeinfo.Data, {k2,v2})
+                                        end
+                                    end
+                                    if k ~= 'Weapon' then
+                                        table.insert(mergeinfo.Data, {''})
+                                    end
+                                end
+                            end
+                        end
+                        text = text..tostring(mergeinfo)
+                    end
+                end
+                return text
             end
         },
         {
