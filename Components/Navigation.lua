@@ -311,7 +311,7 @@ function TOCFromMDHeads(mddir)
             end
             prevH = hI:len()
 
-            tocbody = tocbody..(indent == 0 and index..'.' or ((' '):rep(indent*2)..'*') )..' – '..sectionLink(sectname..(namecounts[sectname]==0 and '' or '-'..namecounts[sectname]),hText).."\n"
+            tocbody = tocbody..(indent == 0 and index..'.' or ((' '):rep(indent*4)..'*') )..' – '..sectionLink(sectname..(namecounts[sectname]==0 and '' or '-'..namecounts[sectname]),hText).."\n"
             if indent == 0 then
                 index = index + 1
             end
