@@ -113,6 +113,7 @@ local spacer = {''}
 function InfoboxFormatRawBlueprint(bp, data, k0)
     data = data or {}
     for k, v in sortedpairs(bp) do
+        k = type(k)=='string'and stringHTMLWrap(k:gsub('(%S)(%u%l+)', '%1 %2'):gsub('(%S)(%u%l+)', '%1 %2'),15) or k
         if type(v) ~= 'table' then
             table.insert(data, {k,v})
         elseif type(v[1])=='string' then

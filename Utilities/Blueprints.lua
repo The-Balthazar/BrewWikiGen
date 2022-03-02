@@ -32,9 +32,7 @@ end
 --[[ ---------------------------------------------------------------------- ]]--
 --[[ Blueprint data cleanup and validation                                  ]]--
 --[[ ---------------------------------------------------------------------- ]]--
-local function shortID(file)
-    return string.match(file, "([^/]+)_[Uu][Nn][Ii][Tt]%.[Bb][Pp]$") or string.match(file, "([^/]+)%.[Bb][Pp]$")
-end
+local function shortID(file) return file:match"([^/]+)_[Uu][Nn][Ii][Tt]%.[Bb][Pp]$" or file:match"([^/]+)%.[Bb][Pp]$" end
 
 local function longID(file, modinfo)
     local key = string.sub(file:lower(), modinfo.location:len())

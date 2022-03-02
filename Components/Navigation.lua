@@ -171,12 +171,15 @@ function GenerateModPages()
             local unitsSection = (moddata.ModInfo.version and "Version "
             ..moddata.ModInfo.version or '*'..moddata.ModInfo.name..'*').." contains the following units:\n"
 
+            local unitSectionsCount = 0
+
             for i = 1, #FactionsByIndex do
                 local faction = FactionsByIndex[i]
                 local unitarray = moddata.Factions[i]
                 if unitarray then
                     table.insert(ModInfobox.Data, { faction..':', #moddata.Factions[i] })
                     unitsSection = unitsSection .. MDHead(faction) .. TechTable(unitarray, 8)
+                    unitSectionsCount = unitSectionsCount+1
                 end
             end
 
@@ -214,12 +217,18 @@ function GenerateModPages()
                 end
             end
 
+            -- Add a units section header if we have a merge section or would get a TOC
+            if unitSectionsCount >= 3 or bpMergesSection ~= '' then
+                unitsSection = MDHead('Units',2)..unitsSection
+            end
+
             local MDPageName = stringSanitiseFilename(moddata.ModInfo.name)..'.md'
 
             UpdateGeneratedPartOfPage(MDPageName, 'brewwikimodinfobox', tostring(ModInfobox))
-            UpdateGeneratedPartOfPage(MDPageName, 'brewwikileadtext', leadString)
+            UpdateGeneratedPartOfPage(MDPageName, 'brewwikileadtext', leadString.."\n"..xml:brewwikitoc()().."\n")
             UpdateGeneratedPartOfPage(MDPageName, 'brewwikimodunits', unitsSection)
             UpdateGeneratedPartOfPage(MDPageName, 'brewwikimergeunits', bpMergesSection)
+            UpdateGeneratedPartOfPage(MDPageName, 'brewwikitoc', TOCFromMDHeads(OutputDirectory..MDPageName) )
         end
     end
 
@@ -279,4 +288,38 @@ function GenerateHomePage()
     UpdateGeneratedPartOfPage('Home.md', 'brewwikihome', homestring)
 
     print("Generated home page")
+end
+
+function TOCFromMDHeads(mddir)
+
+    local tocbody = ''
+    local indent, index, sects, prevH = 0, 1, 0
+    local namecounts = {}
+
+    for line in io.open(mddir):lines() do
+        local hI, hText = line:match'([#]+)%s+(.+)'
+        if hI then
+            local sectname = stringSanitiseFilename(hText,1,1)
+            namecounts[sectname] = namecounts[sectname] and (namecounts[sectname]+1) or 0
+            sects = sects+1
+
+            prevH = prevH or hI:len()
+            if hI:len() > prevH then
+                indent = indent + 1
+            elseif hI:len() < prevH then
+                indent = math.max(indent-1,0)
+            end
+            prevH = hI:len()
+
+            tocbody = tocbody..(indent == 0 and index..'.' or ((' '):rep(indent*2)..'*') )..' – '..sectionLink(sectname..(namecounts[sectname]==0 and '' or '-'..namecounts[sectname]),hText).."\n"
+            if indent == 0 then
+                index = index + 1
+            end
+        end
+    end
+    if sects >= 3 then
+        return "\n"..xml:details(xml:summary(LOC"<LOC wiki_toc_contents>Contents"),'',tocbody).."\n"
+    else
+        return ''
+    end
 end
