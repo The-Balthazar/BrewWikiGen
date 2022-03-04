@@ -92,19 +92,24 @@ local function RegisterBlueprintsFromFile(dir, file, modinfo)
         if isExcludedId(id) then
             LogExcludedBlueprint(id, bp)
 
-        elseif bp.Merge and bp.__name=='Unit' then
+        elseif bp.Merge then
             bp.Merge = nil
             meta.Merge = true
-            merge_blueprints[bp.id] = merge_blueprints[bp.id] or {}
-            table.insert(merge_blueprints[bp.id], bp)
-            modinfo.UnitMerges = (modinfo.UnitMerges or 0)+1
+            if bp.__name=='Unit' and next(bp) then
+                merge_blueprints[bp.id] = merge_blueprints[bp.id] or {}
+                table.insert(merge_blueprints[bp.id], bp)
+                modinfo.UnitMerges = (modinfo.UnitMerges or 0)+1
 
-        elseif not bp.Merge and isValidUnitBlueprint(bp) then
+            else
+                LogExcludedBlueprint(id, bp)
+            end
+
+        elseif isValidUnitBlueprint(bp) then
             printif(all_units[bp.id], LogEmoji'⚠️'..' Found non-merge clashing ID '..id..' using version from '..tostring(modinfo.name))
             all_units[bp.id] = bp
             modinfo.Units = (modinfo.Units or 0)+1
 
-        elseif not bp.Merge and bp.__name=='Projectile' then
+        elseif bp.__name=='Projectile' then
             meta.id = longID(filedir, modinfo)
             meta.ID = projSectionId(file)
             all_projectiles[bp.id] = bp

@@ -113,9 +113,13 @@ local spacer = {''}
 function InfoboxFormatRawBlueprint(bp, data, k0)
     data = data or {}
     for k, v in sortedpairs(bp) do
-        k = type(k)=='string'and stringHTMLWrap(k:gsub('(%S)(%u%l+)', '%1 %2'):gsub('(%S)(%u%l+)', '%1 %2'),15) or k
+        k = type(k)=='string'and stringHTMLWrap(k:gsub('_',' '):gsub('(%S)(%u%l+)', '%1 %2'):gsub('(%S)(%u%l+)', '%1 %2'),15) or k
         if type(v) ~= 'table' then
-            table.insert(data, {k,v})
+            if type(v) == 'boolean' then
+                table.insert(data, {k,xml:code(tostring(v))})
+            else
+                table.insert(data, {k,v})
+            end
         elseif type(v[1])=='string' then
             if v[1]:upper()==v[1] or getBP(v[1]) then
                 table.insert(data, {k, stringConcatLB(v, xml:code{},1)})

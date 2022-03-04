@@ -499,6 +499,7 @@ function UnitBodytextSectionData(bp)
                     end
 
                     local numSmallBones
+                    local numDockSlots = bp.Transport.DockingSlots
                     local totalAttachBones = 0
                     local numGroupsClassLimited = 0
                     local numGroupsBoneLimited = 0
@@ -509,7 +510,7 @@ function UnitBodytextSectionData(bp)
                         local LongClass = 'Class'..(datum.Class or 1)..'AttachSize'
 
                         if datum.Class and bp.Transport[LongClass] then
-                            datum.Limit = numSmallBones/bp.Transport[LongClass]
+                            datum.Limit = (numDockSlots or numSmallBones)/bp.Transport[LongClass]
                             if datum.Limit < datum.Count and datum.Count > 1 then numGroupsClassLimited = numGroupsClassLimited + 1 end
                             if datum.Limit > datum.Count and datum.Count > 1 then numGroupsBoneLimited = numGroupsBoneLimited + 1 end
                             if datum.Count ~= 0 then table.insert(usedClasses, { Class = LongClass, Name = datum.Name }) end
@@ -523,9 +524,9 @@ function UnitBodytextSectionData(bp)
                     if totalAttachBones > 0 then
                         local text = 'This unit has '
                         local sects = {}
-                        if (bp.Transport.DockingSlots and bp.Transport.DockingSlots > 0) then
+                        if (numDockSlots and numDockSlots > 0) then
                         --or (bp.Transport.StorageSlots and bp.Transport.StorageSlots > 0) then
-                            text = text..bp.Transport.DockingSlots..' docking slot'..pluralS(bp.Transport.DockingSlots)..' consisting of '
+                            text = text..numDockSlots..' docking slot'..pluralS(numDockSlots)..' consisting of '
                         end
                         for i, datum in ipairs(data) do
                             if datum.Count > 0 then
@@ -544,25 +545,25 @@ function UnitBodytextSectionData(bp)
                         and numSmallBones > 1
                         and totalAttachBones > 1
                         and numGroups > 1 then
-                            text = text.."Using an attach point that isn't small costs a number of small attach points. Specifically "
+                            text = text.."Using an attach point costs a number of docking slots. Specifically 1 for small"
                             for i, datum in ipairs(usedClasses) do
-                                if i > 1 then text = text..', ' end
-                                if i == #usedClasses and i > 1 then text = text..'and ' end
+                                text = text..', '
+                                if i == #usedClasses then text = text..'and ' end
                                 text = text..bp.Transport[datum.Class]..' for '..datum.Name
-                                if i == #usedClasses then text = text..'. ' end
                             end
+                            text = text..'. '
                         end
 
                         if numGroupsClassLimited > 0 then
                             if numGroupsClassLimited == 1 then
                                 for i, datum in ipairs(data) do
                                     if datum.Count > 1 and datum.Limit and datum.Limit < datum.Count then
-                                        text = text..'Due to these costs, not all '..datum.Name..' attach points can be used concurrently; at most '..math.floor(datum.Limit)..' of them could be used at a given time, and the physical layout of them may reduce that number further.'
+                                        text = text..'Due to these costs not all '..datum.Name..' attach points can be used concurrently; at most '..math.floor(datum.Limit)..' of them could be used at a given time, and the physical layout of them may reduce that number further.'
                                         break
                                     end
                                 end
                             else--if numGroupsClassLimited > 1 then
-                                text = text..'Due to these costs; at most '
+                                text = text..'Due to these costs at most '
                                 local done = 0
                                 for i, datum in ipairs(data) do
                                     if datum.Count > 1 and datum.Limit and datum.Limit < datum.Count then
@@ -573,14 +574,14 @@ function UnitBodytextSectionData(bp)
                                         if done + 1 == numGroupsClassLimited then text = text..'or ' end
                                     end
                                 end
-                                text = text..'attach points can be used concurrently, and this may be further reduced by the physical layout of said bones. '
+                                text = text..' attach points can be used concurrently, and this may be further reduced by the physical layout of said bones. '
                             end
                         end
                         if numGroupsBoneLimited > 0 then
                             if numGroupsBoneLimited == 1 then
                                 for i, datum in ipairs(data) do
                                     if datum.Count > 1 and datum.Limit and datum.Limit > datum.Count then
-                                        local freeSmalls = numSmallBones-(math.floor(datum.Count)*bp.Transport['Class'..datum.Class..'AttachSize'])
+                                        local freeSmalls = (numDockSlots or numSmallBones)-(math.floor(datum.Count)*bp.Transport['Class'..datum.Class..'AttachSize'])
 
                                         text = text..'With all '..datum.Name..' bones occupied '..freeSmalls..' small attach point'..pluralS(freeSmalls)..' would be free still.'
                                         break
@@ -592,7 +593,7 @@ function UnitBodytextSectionData(bp)
                                 for i, datum in ipairs(data) do
                                     if datum.Count > 1 and datum.Limit and datum.Limit > datum.Count then
                                         done = done + 1
-                                        local freeSmalls = numSmallBones-(math.floor(datum.Count)*bp.Transport['Class'..datum.Class..'AttachSize'])
+                                        local freeSmalls = (numDockSlots or numSmallBones)-(math.floor(datum.Count)*bp.Transport['Class'..datum.Class..'AttachSize'])
 
                                         text = text..freeSmalls..' with '..datum.Name
 

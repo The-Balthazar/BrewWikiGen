@@ -1,4 +1,4 @@
-local UsedProjectiles = {}
+local UsedProjectiles, UsedShortProjIds = {}, {}
 
 function GetProjectilePageLink(projid, unitbp)
     local projbp = getProj(projid)
@@ -11,8 +11,6 @@ function GetProjectilePageLink(projid, unitbp)
         return "<error: can't find projectile: "..projid..">"..xml:code(projShortId(projid))
     end
 end
-
-local UsedShortProjIds = {}
 
 local function projUsersList(users)
     local text = ''
