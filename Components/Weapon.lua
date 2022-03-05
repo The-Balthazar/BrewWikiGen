@@ -110,22 +110,20 @@ local function WepProjectiles(weapon)
     return ProjectileCount
 end
 
+local function br(s) return s~=''and'<br />'or'' end
+
 local function GetDamageInstances(wep)
     local s = WepProjectiles(wep)
     s = s and s>1 and (tostring(s)..(wep.BeamCollisionDelay and ' beams' or ' projectiles')) or ''
+    local f = ProjectileFragmentMultiplier(wep)
+    s = s..(f and br(s)..f..' fragments' or '')
 
     local dot = wep.DoTPulses
     if dot and dot > 1 then
-        if s ~= '' then
-            s = s..'<br />'
-        end
-        s = s..dot.. ' DoT pulses'
+        s = s..br(s)..dot.. ' DoT pulses'
     end
     if (wep.BeamLifetime and wep.BeamLifetime > 0) and wep.BeamCollisionDelay then
-        if s ~= '' then
-            s = s..'<br />'
-        end
-        s = s..math.ceil( (wep.BeamLifetime or 1) / (wep.BeamCollisionDelay + 0.1) )..' beam collisions'
+        s = s..br(s)..math.ceil( (wep.BeamLifetime or 1) / (wep.BeamCollisionDelay + 0.1) )..' beam collisions'
     end
     if s == '' then s = nil end
     return s
@@ -192,7 +190,7 @@ function DPSEstimate(weapon)
         rof = 1 / ((weapon.BeamCollisionDelay or 0) + 0.1)
     end
 
-    return math.floor(damage * rof + 0.5)
+    return math.floor((damage * (ProjectileFragmentMultiplier(weapon) or 1)) * rof + 0.5)
 end
 
 local function ArcTable(spec)
@@ -237,7 +235,7 @@ function GetWeaponInfoboxData(wep, bp)
         {
             'Damage:',
             (wep.NukeInnerRingDamage or wep.Damage),
-            ( not (IsDeathWeapon(wep) and not wep.FireOnDeath) and "Note: This doesn't count additional scripted effects, such as splintering projectiles, and variable scripted damage.")
+            ( not (IsDeathWeapon(wep) and not wep.FireOnDeath) and "Note: This doesn't count some scripted effects.")
         },
         {'Damage to shields:', (wep.DamageToShields or wep.ShieldDamage)},
         {'Damage radius:', formatDistance(wep.NukeInnerRingRadius or wep.DamageRadius)},
@@ -341,7 +339,30 @@ local function IsContinuousBeam(weapon)
 function IsDeathWeapon(weapon)
         return (weapon.Label == 'DeathWeapon' or weapon.Label == 'DeathImpact' or weapon.WeaponCategory == 'Death')
     end
+
 -- Weapon stats ----------------------------------------------------------------
+local ProjectileMultipliers = { --Original damage given to each fragment
+    --[[UEF T1 mobile artillery]] ['/projectiles/tiffragmentationsensorshell01/tiffragmentationsensorshell01_proj.bp'] = 4,
+    --[[Unused]]                  ['/projectiles/aifquanticcluster01/aifquanticcluster01_proj.bp']                     = 24,
+    --[[Unused]]                  ['/projectiles/aifquanticcluster02/aifquanticcluster02_proj.bp']                     = 3,
+    --[[Aeon T2 Guided missile]]  ['/projectiles/aifguidedmissile01/aifguidedmissile01_proj.bp']                       = 8,
+    --[[Aeon T3 torpedo bomber]]  ['/projectiles/aantorpedocluster01/aantorpedocluster01_proj.bp']                     = 2,
+    --[[Aeon T4 rapid artillery]] ['/projectiles/aiffragmentationsensorshell01/aiffragmentationsensorshell01_proj.bp'] = 25,
+    --[[Aeon T4 rapid artillery]] ['/projectiles/aiffragmentationsensorshell02/aiffragmentationsensorshell02_proj.bp'] = 5,
+    --[[Sera T1 mobile artillery]]['/projectiles/sifthunthoartilleryshell01/sifthunthoartilleryshell01_proj.bp']       = 5,
+}
+local ProjectileSplits = { -- Damage split between each
+    --[[xsa0204]]['/projectiles/sanheavycavitationtorpedo01/sanheavycavitationtorpedo01_proj.bp'] = 3,
+    --[[xsb2205]]['/projectiles/sanheavycavitationtorpedo02/sanheavycavitationtorpedo02_proj.bp'] = 3,
+}
+local ProjectileOnDamageSplits = { -- Damage replaced with unitBP.SplitDamage.DamageAmount
+    --[[url0111]]['/projectiles/cifmissiletactical01/cifmissiletactical01_proj.bp'] = 3,
+    --[[urs0304]]['/projectiles/cifmissiletactical02/cifmissiletactical02_proj.bp'] = 3,
+    --[[urb2108]]['/projectiles/cifmissiletactical03/cifmissiletactical03_proj.bp'] = 3,
+}
+function ProjectileFragmentMultiplier(weapon)
+        return weapon.ProjectileId and ProjectileMultipliers[weapon.ProjectileId:lower()]
+    end
 local function weaponDamage(weapon)
         return (weapon.NukeInnerRingDamage or weapon.Damage)
     end
