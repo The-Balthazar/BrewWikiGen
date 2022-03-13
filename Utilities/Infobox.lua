@@ -92,6 +92,12 @@ function Infobox(spec)
                 for i, field in ipairs(self.Data) do
                     infoboxstring = infoboxstring .. InfoboxRow( table.unpack(field) )
                 end
+
+                local spacer = InfoboxRow''
+                infoboxstring = infoboxstring
+                :gsub(spacer..spacer, spacer)
+                :gsub(spacer..spacer, spacer)-- one pass would miss groups of 3+
+                :gsub(spacer..'$', '')
             end
             return infoboxstring .. InfoboxEnd(self.Style)
         end,
@@ -108,36 +114,25 @@ function DoToInfoboxDataCell(fun, infodata, key, value)
     end
 end
 
-local spacer = {''}
-
 function InfoboxFormatRawBlueprint(bp, data, k0)
     data = data or {}
     for k, v in sortedpairs(bp) do
         k = type(k)=='string'and stringHTMLWrap(k:gsub('_',' '):gsub('(%S)(%u%l+)', '%1 %2'):gsub('(%S)(%u%l+)', '%1 %2'),15) or k
         if type(v) ~= 'table' then
-            if type(v) == 'boolean' then
-                table.insert(data, {k,xml:code(tostring(v))})
-            else
-                table.insert(data, {k,v})
-            end
+            v = type(v) == 'boolean' and xml:code(tostring(v)) or v
+            table.insert(data, {k, v})
+
         elseif type(v[1])=='string' then
-            if v[1]:upper()==v[1] or getBP(v[1]) then
-                table.insert(data, {k, stringConcatLB(v, xml:code{},1)})
-            else
-                table.insert(data, {k, stringConcatLB(v, LOC,1)})
-            end
+            local concatFunction = (v[1]:upper()==v[1] or getBP(v[1])) and xml:code{} or LOC
+            table.insert(data, {k, stringConcatLB(v, concatFunction,1)})
+
         elseif next(v) then
             if type(v[1])~='table' then
                 table.insert(data, {'',xml:b((type(k)=='number'and k0..' ' or '')..k)})
             end
             InfoboxFormatRawBlueprint(v, data, k)
-            if type(v[1])~='table' and data[#data] ~= spacer then
-                table.insert(data, spacer)
-            end
+            table.insert(data, {''})
         end
-    end
-    if data[#data] == spacer then
-        table.remove(data)
     end
     return data
 end
