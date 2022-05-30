@@ -249,6 +249,10 @@ function formatNumber(n)
     return string.sub(str, -2) == '.0' and tonumber(string.sub(str, 1, -3)) or n
 end
 
+function formatKey(k)
+    return k:gsub('_',' '):gsub('(%S)(%u%l+)', '%1 %2'):gsub('(%S)(%u%l+)', '%1 %2'):gsub('(%S)(%d+)', '%1 %2') or k
+end
+
 function formatSpeed(s, naval)
     return s and s~=0 and (
         not naval and ( s > 13.7 -- Mach 0.8 or greater
