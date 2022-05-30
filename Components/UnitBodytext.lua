@@ -117,10 +117,12 @@ function UnitBodytextSectionData(bp)
 
                 if bp.Adjacency then
                     local adjline = string.format(LOC('<LOC wiki_adjacency_bonus>The adjacency bonus `%s` is given by this unit.'), bp.Adjacency)
-                    if AdjacencyBuffs[bp.Adjacency] then
+                    local AdjacencyBuffs = AdjacencyBuffs[bp.Adjacency]
+
+                    if AdjacencyBuffs then
 
                         local affects = {}
-                        for i, buffName in ipairs(AdjacencyBuffs[bp.Adjacency]) do
+                        for i, buffName in ipairs(AdjacencyBuffs) do
                             if Buffs[buffName].Affects then
                                 for effect, info in pairs(Buffs[buffName].Affects) do
                                     effect = BuffAffectsNames[effect] or effect
@@ -131,7 +133,76 @@ function UnitBodytextSectionData(bp)
                             end
                         end
                         table.sort(affects)
-                        text = text.."\n\n"..adjline..' This affects '..stringConcatOxfordComma(affects)..'.'
+
+                        local numberBuffsTotal = #AdjacencyBuffs
+                        local numberAffectsTotal = #affects
+
+                        local function GetEffectVal(info)
+                            local val = ''
+                            local add = info.Add ~= 0
+                            local mul = info.Mult ~= 1
+                            if add then
+                                val = val..(info.Add>0 and'+'or'')..info.Add
+                            end
+                            if add and mul then
+                                val = val..' and '
+                            end
+                            if mul then
+                                val = val..'×'..info.Mult
+                            end
+                            return val
+                        end
+
+                        if numberBuffsTotal == 1 and numberAffectsTotal == 1 then
+                            local buff = Buffs[AdjacencyBuffs[1]]
+                            local name, effect = next(buff.Affects)
+
+                            text = text.."\n\n"..adjline..' This gives '..GetEffectVal(effect)..' '..(BuffAffectsNames[name] or name)..' to `'..(buff.ParsedEntityCategory or buff.EntityCategory or 'error')..'` units.'
+
+                        else
+                            text = text.."\n\n"..adjline..' This affects '..stringConcatOxfordComma(affects)..'.'
+
+                            local cats = {}
+                            local catOrder = {}
+
+                            for i, buffName in ipairs(AdjacencyBuffs) do
+                                local buff = Buffs[buffName]
+                                if buff then
+                                    local entCat = (buff.ParsedEntityCategory or buff.EntityCategory)
+                                    if not cats[entCat] then
+                                        cats[entCat] = {}
+                                        table.insert(catOrder, entCat)
+                                    end
+                                    table.insert(cats[entCat], buff)
+                                end
+                            end
+
+                            for i, cat in ipairs(catOrder) do
+                                local catSet = cats[cat]
+                                local buffInfo = Infobox{
+                                    Style = 'detail-left',
+                                    Header = {cat},
+                                    Data = {},
+                                }
+                                for i, buff in ipairs(catSet) do
+                                    if buff.Affects then
+                                        for effect, info in sortedpairs(buff.Affects) do
+
+                                            local title = BuffAffectsNames[effect] or effect
+                                            title = title:sub(1,1):upper()..title:sub(2)..':'
+
+                                            local val = GetEffectVal(info)
+
+                                            table.insert(buffInfo.Data, {title, val})
+
+                                        end
+                                    end
+                                end
+
+                                text = text.."\n\n"..tostring(buffInfo)
+                            end
+                        end
+
 
                     else
                         text = text..adjline
