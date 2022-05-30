@@ -172,6 +172,38 @@ defaultOrdersTable = {
     RULEUTC_CloakToggle         = { helpText = "toggle_cloak",      bitmapId = 'intel-counter',         preferredSlot = 11.2 },
 }
 
+AdjacencyBuffs = {}
+Buffs = {}
+BuffAffectsNames = {
+    FiringRandomness   = 'weapon accuracy',
+    ShieldRegeneration = 'shield regeneration',
+    ShieldSize         = 'shield size',
+    ShieldHealth       = 'shield health',
+    Health             = 'health',
+    MaxHealth          = 'maximum health',
+    Regen              = 'health regeneration',
+    RegenPercent       = 'health regeneration (as a percentage)',
+    Damage             = 'weapon damage',
+    DamageRadius       = 'weapon damage radius',
+    MaxRadius          = 'weapon range',
+    MoveMult           = 'movement speed',
+    Stun               = 'stun',
+    WeaponsEnable      = 'weapon activation',
+    VisionRadius       = 'vision range',
+    RadarRadius        = 'radar range',
+    OmniRadius         = 'omni range',
+    BuildRate          = 'engineering speed',
+    EnergyActive       = 'energy build costs',
+    MassActive         = 'mass build costs',
+    EnergyMaintenance  = 'energy maintenance costs',
+    MassMaintenance    = 'mass maintenance costs',
+    EnergyProduction   = 'energy production',
+    MassProduction     = 'mass production',
+    EnergyWeapon       = 'weapon energy drain',
+    RateOfFire         = 'weapon rate of fire',
+    Cloak              = 'cloak',
+}
+
 Description = {}
 
 Tooltips = {

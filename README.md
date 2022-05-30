@@ -265,7 +265,6 @@ for name in folder:lines() do
       local file = io.open(folderdir..name, 'rb'):read('all')
 
       io.open(folderdir..'test\\'..newname, 'wb'):write(file):close()
-      file:close()
   end
 end
 

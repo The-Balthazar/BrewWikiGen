@@ -57,9 +57,10 @@ function GeneratorMain(Output)
     if EnvironmentData.ExtraData then safecall(dofile,           EnvironmentData.ExtraData) end
 
     -- Env data
-    if EnvironmentData.LOC       then safecall(LoadLocalization, EnvironmentData.LOC) end
-    if EnvironmentData.Lua       then safecall(LoadHelpStrings,  EnvironmentData.Lua) end
-    if EnvironmentData.location  then safecall(LoadBlueprints,   EnvironmentData) end
+    if EnvironmentData.LOC       then safecall(LoadLocalization,   EnvironmentData.LOC) end
+    if EnvironmentData.Lua       then safecall(LoadHelpStrings,    EnvironmentData.Lua)
+                                      safecall(LoadAdjacencyBuffs, EnvironmentData.Lua) end
+    if EnvironmentData.location  then safecall(LoadBlueprints,     EnvironmentData) end
 
     for i, dir in ipairs(ModDirectories) do
         __active_mods[i] = LoadModInfo(dir, i)
@@ -69,6 +70,7 @@ function GeneratorMain(Output)
     for i, mod in ipairs(__active_mods) do
         safecall(LoadModLocalization, mod.location)
         safecall(LoadModHelpStrings, mod.location)
+        safecall(LoadAdjacencyBuffs, mod.location..'hook/')
         safecall(LoadBlueprints, mod)
     end
 

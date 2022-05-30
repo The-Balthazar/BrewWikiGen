@@ -54,7 +54,7 @@ end
 
 local function fileCaseID(id) return id == id:lower() and id:upper() or id end
 
-function projShortId(id) return id:match('([^/]+)_[Pp][Rr][Oo][Jj]%.[Bb][Pp]') or id:match('([^/]+)%.[Bb][Pp]') end
+function projShortId(id) return id:match'([^/]+)_[Pp][Rr][Oo][Jj]%.[Bb][Pp]' or id:match'([^/]+)%.[Bb][Pp]' end
 
 function projSectionId(id) return projShortId(id):gsub('_',' '):gsub('(%S)(%u%l+)', '%1 %2'):gsub('(%S)(%u%l+)', '%1 %2'):gsub('(%S)(%d+)', '%1 %2') end
 

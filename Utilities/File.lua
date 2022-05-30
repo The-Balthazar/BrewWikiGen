@@ -14,6 +14,18 @@ local function SandboxedPrint(file, logtype)
     end
 end
 
+local categories = setmetatable({},{
+    __index = function(self, key)
+        self[key] = setmetatable({'`'..key..'`'}, {
+            __add = function(a, b) a[1] = '('..a[1]..' + '..b[1]..')' return a end,
+            __sub = function(a, b) a[1] = '('..a[1]..' - '..b[1]..')' return a end,
+            __mul = function(a, b) a[1] = '('..a[1]..' × '..b[1]..')' return a end,
+            __div = function(a, b) a[1] = '('..a[1]..' ÷ '..b[1]..')' return a end,
+        })
+        return self[key]
+    end
+})
+
 local Sandboxes = {
     HelpStrings = function()
         return {
@@ -75,6 +87,54 @@ local Sandboxes = {
             TrailEmitterBlueprint = export'TrailEmitter',
             UnitBlueprint         = export'Unit',
             Blueprints            = filebps,
+        }
+    end,
+    Buff = function(file)
+        local filebps = {}
+        local function export(bptype)
+            return function(t)
+                local meta; meta = {
+                    __name = bptype,
+                    __index = function(self, val)
+                        return rawget(meta, val)
+                    end
+                }
+                table.insert(filebps, setmetatable(t, meta))
+            end
+        end
+        return {
+            _VERSION = _VERSION,
+            __active_mods = __active_mods,
+
+            pairs  = sortedpairs,
+            ipairs = ipairs,
+            next   = next,
+
+            print  = SandboxedPrint(file, 'Log'),
+            LOG    = SandboxedPrint(file, 'Log'),
+            SPEW   = SandboxedPrint(file, 'Debug'),
+            _ALERT = SandboxedPrint(file, 'Log'),
+            WARN   = SandboxedPrint(file, 'Warn'),
+            import = SandboxedPrint(file, 'Warn'),
+
+            error  = error,
+            assert = assert,
+            pcall  = pcall,
+
+            table  = table,
+            string = string,
+            math   = math,
+
+            type     = type,
+            tostring = tostring,
+            tonumber = tonumber,
+
+            getmetatable = getmetatable,
+            setmetatable = setmetatable,
+
+            categories    = categories,
+            BuffBlueprint = export'Buff',
+            Buffs         = filebps,
         }
     end,
 }
@@ -161,6 +221,25 @@ function LoadHelpStrings(dir)
         log = log..' '..output..' '..(env and LogEmoji'🆗' or LogEmoji'❌')
     end
     if Logging.HelpStringsLoaded then print(log) end
+end
+
+function LoadAdjacencyBuffs(dir)
+
+    local env = GetSandboxedLuaFile(dir..'lua/sim/AdjacencyBuffs.lua', 'Buff')
+
+    if env then
+        for i, v in ipairs(env.Buffs) do
+            Buffs[v.Name] = v
+        end
+        for i, v in pairs(env) do
+            if type(v) == 'table' and type(v[1]) == 'string' then
+                AdjacencyBuffs[i] = v
+            end
+        end
+    end
+    local log = '  Preloading: Adjacency Buffs'..(env and LogEmoji'🆗' or LogEmoji'❌')
+
+    if Logging.BuffsLoaded then print(log) end
 end
 
 function LoadModHelpStrings(ModDirectory)

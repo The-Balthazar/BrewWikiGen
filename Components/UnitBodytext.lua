@@ -116,7 +116,26 @@ function UnitBodytextSectionData(bp)
                 ) or '')..LOC('<LOC wiki_adjacency_part3>. ') or '')
 
                 if bp.Adjacency then
-                    text = text..string.format(LOC('<LOC wiki_adjacency_bonus>The adjacency bonus `%s` is given by this unit.'), bp.Adjacency)
+                    local adjline = string.format(LOC('<LOC wiki_adjacency_bonus>The adjacency bonus `%s` is given by this unit.'), bp.Adjacency)
+                    if AdjacencyBuffs[bp.Adjacency] then
+
+                        local affects = {}
+                        for i, buffName in ipairs(AdjacencyBuffs[bp.Adjacency]) do
+                            if Buffs[buffName].Affects then
+                                for effect, info in pairs(Buffs[buffName].Affects) do
+                                    effect = BuffAffectsNames[effect] or effect
+                                    if not table.find(affects, effect) then
+                                        table.insert(affects, effect)
+                                    end
+                                end
+                            end
+                        end
+                        table.sort(affects)
+                        text = text.."\n\n"..adjline..' This affects '..stringConcatOxfordComma(affects)..'.'
+
+                    else
+                        text = text..adjline
+                    end
                 end
                 return text
             end

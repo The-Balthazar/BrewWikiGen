@@ -108,6 +108,7 @@ Logging = { -- Functional logs
 
     LocalisationLoaded = false,
     HelpStringsLoaded  = false,
+    BuffsLoaded        = false,
     SCMLoadIssues      = false,
     SandboxedFileLogs  = {
         Debug = false, -- SPEW
