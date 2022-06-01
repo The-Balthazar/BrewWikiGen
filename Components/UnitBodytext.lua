@@ -156,8 +156,8 @@ function UnitBodytextSectionData(bp)
                         if numberBuffsTotal == 1 and numberAffectsTotal == 1 then
                             local buff = Buffs[AdjacencyBuffs[1]]
                             local name, effect = next(buff.Affects)
-
-                            text = text.."\n\n"..adjline..' This gives '..GetEffectVal(effect)..' '..(BuffAffectsNames[name] or name)..' to `'..(buff.ParsedEntityCategory or buff.EntityCategory or 'error')..'` units.'
+                            local buffcat = buff.EntityCategory and '`'..buff.EntityCategory..'`' or buff.ParsedEntityCategory[1] or '`error`'
+                            text = text.."\n\n"..adjline..' This gives '..GetEffectVal(effect)..' '..(BuffAffectsNames[name] or name)..' to '..buffcat..' units.'
 
                         else
                             text = text.."\n\n"..adjline..' This affects '..stringConcatOxfordComma(affects)..'.'
