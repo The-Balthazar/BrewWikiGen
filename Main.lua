@@ -12,7 +12,7 @@ function printif(check, ...) if check then print(...) end end
 
 function GeneratorMain(Output)
     OutputDirectory = Output
-    WikiGeneratorDirectory = (debug.getinfo(1, 'S').short_src):match('.*/')
+    WikiGeneratorDirectory = (debug.getinfo(1, 'S').source):match('@(.*/)')
 
     local function safecall(...)
         local pass, msg = pcall(...)
