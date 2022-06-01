@@ -110,11 +110,13 @@ function UpdateGeneratedPartOfPage(page, tag, content)
 
     content = '<'..tag..">\n"..content..'</'..tag..'>'
 
-    io.open(OutputDirectory..page, "w"):write(
+    md = io.open(OutputDirectory..page, "w")
+    md:write(
         tagsFound and string.gsub( mdstring, '<'..tag..'>.*</'..tag..'>', content )
         or mdstring and mdstring.."\n"..content.."\n"
         or content
-    ):close()
+    )
+    md:close()
 end
 
 function GenerateSidebar()
@@ -247,7 +249,7 @@ function GenerateHomePage()
 
     local numMods = #UnitMods
     local rows = math.ceil(numMods/colLimit)
-    local col = numMods//rows
+    local col = math.floor(numMods/rows)
     local extra = rows - (numMods % rows)
     local cols = {}
     for i = 1, rows do

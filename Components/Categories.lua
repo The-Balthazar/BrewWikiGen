@@ -108,8 +108,8 @@ function GenerateCategoryPages()
         end
 
         md = io.open(OutputDirectory..'_categories.'..cat..'.md', "w")
-        :write(#datum..' unit'..(#datum == 1 and ' has' or 's have')..' the '..xml:code(cat).." category.\n"..xml:table(catRow(datum)).."\n")
-        :close()
+        md:write(#datum..' unit'..(#datum == 1 and ' has' or 's have')..' the '..xml:code(cat).." category.\n"..xml:table(catRow(datum)).."\n")
+        md:close()
         num = num+1
     end
 

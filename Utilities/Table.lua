@@ -138,6 +138,8 @@ function tableOverwrites(t1, t2)
     return new
 end
 
+table.copy = tableOverwrites -- for the supcom env
+
 -- shallow copies t2 into t1, returns t1 for good measure, but the original t1 reference would be the same
 function tableMergeCopy(t1, t2)
     if t1 and t2 then
@@ -184,4 +186,8 @@ function BinaryCounter(t)
         n = n + (v and 1 or 0)
     end
     return n
+end
+
+if not table.unpack then
+    table.unpack = unpack
 end

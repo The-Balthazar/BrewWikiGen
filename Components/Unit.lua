@@ -29,7 +29,8 @@ function GenerateUnitPages()
             local ModInfo = bp.ModInfo
             local BodyTextSections = UnitBodytextSectionData(bp)
 
-            local md = io.open(OutputDirectory..stringSanitiseFilename(bp.ID)..'.md', "w"):write(
+            local md = io.open(OutputDirectory..stringSanitiseFilename(bp.ID)..'.md', "w")
+            md:write(
                 UnitHeaderString(bp)..
                 tostring(UnitInfobox(bp))..
                 UnitBodytextLeadText(bp)..
@@ -37,7 +38,8 @@ function GenerateUnitPages()
                 tostring(BodyTextSections)..
                 UnitPageCategories(bp)..
                 "\n"
-            ):close()
+            )
+            md:close()
         end
     end
 end

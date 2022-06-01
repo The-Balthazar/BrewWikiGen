@@ -266,10 +266,10 @@ function OutputAsset(dir)
             printif(Logging.FileAssetCopies, 'Creating directory', mkdir)
             os.execute("mkdir "..mkdir)
         end
-        printif(Logging.FileAssetCopies, 'Copying asset to', OutputDirectory..dir); --this semicolon is actually important. Without it the next line tries to call the output of the printif.
-        (output or io.open(OutputDirectory..dir, 'wb')):write(
-            io.open(WikiGeneratorDirectory..dir, 'rb'):read('all')
-        ):close()
+        printif(Logging.FileAssetCopies, 'Copying asset to', OutputDirectory..dir)
+        local file = output or io.open(OutputDirectory..dir, 'wb')
+        file:write( io.open(WikiGeneratorDirectory..dir, 'rb'):read'all' )
+        file:close()
         OutputAssets[dir] = true
     end
     return dir

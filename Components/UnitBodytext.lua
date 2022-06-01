@@ -88,7 +88,7 @@ function UnitBodytextSectionData(bp)
                     if math.floor(bp.Physics[offsetA] or 0) ~= (bp.Physics[offsetA] or 0) - 0.5 then
                         sizevalue = sizevalue - 1
                     end
-                    return sizevalue//2*2
+                    return math.floor(sizevalue/2)*2
                 end
 
                 local EffectiveSize = math.max(2, GetEffectiveSkirtSize(bp,'X') ) + math.max(2, GetEffectiveSkirtSize(bp, 'Z'))

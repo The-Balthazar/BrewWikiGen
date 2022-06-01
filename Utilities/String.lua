@@ -223,13 +223,12 @@ print(
 
 function detailsLink(section)
     return LOCBrackets(
-        xml:a{href='#'..stringSanitiseFilename(LOC(section), true, true)}
-        (LOC'<LOC wiki_infobox_details>Details')
+        xml:a{href='#'..stringSanitiseFilename(LOC(section), true, true)}(LOC'<LOC wiki_infobox_details>Details')
     )
 end
 
 function formatTime(n)
-    local h, m, s = n//3600, n//60%60, math.floor(n%60)
+    local h, m, s = math.floor(n/3600), math.floor(n/60)%60, math.floor(n%60)
     local good, time = pcall(string.format,
         (h~=0 and '%d:' or '')..'%02d:%02d',
         h~=0 and h or m,

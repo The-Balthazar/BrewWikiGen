@@ -27,7 +27,9 @@ local function FindReplaceInFile(path, find, replace)
     bpfile:close()
     bpstring, replacements = string.gsub(bpstring, find, replace, 1)
     if replacements == 1 then
-        bpfile = io.open(path, 'w'):write(bpstring):close()
+        bpfile = io.open(path, 'w')
+        bpfile:write(bpstring)
+        bpfile:close()
         return true
     end
 end
