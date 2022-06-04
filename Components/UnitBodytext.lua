@@ -168,7 +168,7 @@ function UnitBodytextSectionData(bp)
                             for i, buffName in ipairs(AdjacencyBuffs) do
                                 local buff = Buffs[buffName]
                                 if buff then
-                                    local entCat = (buff.ParsedEntityCategory or buff.EntityCategory)
+                                    local entCat = (buff.EntityCategory or buff.ParsedEntityCategory[1] or '`error`')
                                     if not cats[entCat] then
                                         cats[entCat] = {}
                                         table.insert(catOrder, entCat)
