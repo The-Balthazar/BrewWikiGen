@@ -32,7 +32,7 @@ local function InfoboxHeader(style, data)
 <table align="right">
     <thead>
         <tr>
-            <th]]..(string.sub(data[1],1,4)=='<img'and' align="left"'or'')..[[ colspan="2">
+            <th]]..(string.sub(tostring(data[1]),1,4)=='<img'and' align="left"'or'')..[[ colspan="2">
                 %s
             </th>
         </tr>
@@ -43,7 +43,7 @@ local function InfoboxHeader(style, data)
 <table align="right">
     <thead>
         <tr>
-            <th]]..(string.sub(data[1],1,4)=='<img'and' align="left"'or'')..[[ colspan="2">
+            <th]]..(string.sub(tostring(data[1]),1,4)=='<img'and' align="left"'or'')..[[ colspan="2">
                 %s
             </th>
         </tr>
