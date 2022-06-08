@@ -15,14 +15,14 @@ local function FindSCMBoneArrayStartTagOffset(filestring)
 end
 
 local function FindSCMBoneArrayEndTagOffset(filestring, startoffset)
-    return string.find(filestring, 'SKEL\x00\x00\x80\x3f', startoffset+16) --Catches ~99%
-    or string.find(filestring, '\xc5SKEL', startoffset+15) --Catches 15/16, but only vanilla or 3dsmax exported. Blender uses the print-able character X as padding instead.
-    or string.find(filestring, '\x00SKEL', startoffset+15) + 1 --Catches the remaining 1/16, but has overlap.
+    return string.find(filestring, 'SKEL\00\00\80\63', startoffset+16) --Catches ~99%
+    or string.find(filestring, '\197SKEL', startoffset+15) --Catches 15/16, but only vanilla or 3dsmax exported. Blender uses the print-able character X as padding instead.
+    or string.find(filestring, '\00SKEL', startoffset+15) + 1 --Catches the remaining 1/16, but has overlap.
 end
 
 local function GetArrayFrom0x00DelimitedString(str)
     local things = {}
-    string.gsub(str, '([^\x00]+)\x00', function(thing)
+    string.gsub(str, '([^\00]+)\00', function(thing)
         table.insert(things, thing)
     end)
     return things
