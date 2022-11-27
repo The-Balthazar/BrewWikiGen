@@ -208,6 +208,39 @@ function BlueprintSanityChecks(bp)
         end
     end
 
+    do--if bp.Intel then
+        if bp.Intel.RadarRadius and bp.Intel.RadarRadius > 1 and not bp.CategoriesHash.OVERLAYRADAR then
+            table.insert(issues, "Has radar without overlay category.")
+        elseif (not bp.Intel.RadarRadius or bp.Intel.RadarRadius < 1) and bp.CategoriesHash.OVERLAYRADAR then
+            table.insert(issues, "Has seemingly useless category OVERLAYRADAR.")
+        end
+        if bp.Intel.SonarRadius and bp.Intel.SonarRadius > 1 and not bp.CategoriesHash.OVERLAYSONAR then
+            table.insert(issues, "Has sonar without overlay category.")
+        elseif (not bp.Intel.SonarRadius or bp.Intel.SonarRadius < 1) and bp.CategoriesHash.OVERLAYSONAR then
+            table.insert(issues, "Has seemingly useless category OVERLAYSONAR.")
+        end
+        if bp.Intel.OmniRadius and bp.Intel.OmniRadius > 1 and not bp.CategoriesHash.OVERLAYOMNI then
+            table.insert(issues, "Has omni without overlay category.")
+        elseif (not bp.Intel.OmniRadius or bp.Intel.OmniRadius < 1) and bp.CategoriesHash.OVERLAYOMNI then
+            table.insert(issues, "Has seemingly useless category OVERLAYOMNI.")
+        end
+
+        if (bp.Intel.JamRadius.Max and bp.Intel.JamRadius.Max > 1)
+        or (bp.Intel.RadarStealthFieldRadius and bp.Intel.RadarStealthFieldRadius > 1)
+        or (bp.Intel.SonarStealthFieldRadius and bp.Intel.SonarStealthFieldRadius > 1)
+        or (bp.Intel.CloakFieldRadius and bp.Intel.CloakFieldRadius > 1)
+        then
+            if not bp.CategoriesHash.OVERLAYCOUNTERINTEL then
+                table.insert(issues, "Has counterintel without overlay category.")
+            end
+        else
+            if bp.CategoriesHash.OVERLAYCOUNTERINTEL then
+                table.insert(issues, "Has potentially useless category OVERLAYCOUNTERINTEL.")
+            end
+        end
+
+    end
+
     if Sanity.BlueprintPedanticChecks then
         local pedantry = {
             { bp.Interface,                                     'Redundant bp.Interface table' },
