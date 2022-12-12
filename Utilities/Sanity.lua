@@ -99,7 +99,7 @@ function BlueprintSanityChecks(bp)
                 if Shaders[lod.ShaderName] and bp.FactionCategory ~= Shaders[lod.ShaderName] then
                     table.insert(issues, bp.FactionCategory.." LOD"..(i-1).." has non-standard faction shader "..lod.ShaderName)
                 elseif not Shaders[lod.ShaderName] and Sanity.BlueprintPedanticChecks then
-                    table.insert(issues, bp.FactionCategory.." LOD"..(i-1).." has unknown shader "..lod.ShaderName)
+                    table.insert(issues, bp.FactionCategory.." LOD"..(i-1).." has unknown shader "..(lod.ShaderName or 'nil'))
                 end
             end
         end
