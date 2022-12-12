@@ -137,18 +137,45 @@ function UnitBodytextSectionData(bp)
                         local numberBuffsTotal = #AdjacencyBuffs
                         local numberAffectsTotal = #affects
 
+                        local function ordinalSuffix(val)
+                            val = math.floor(val)%10
+                            if val == 1 then
+                                return 'st'
+                            elseif val == 2 then
+                                return 'nd'
+                            elseif val == 3 then
+                                return 'rd'
+                            end
+                            return 'th'
+                        end
+
+                        local function DisplayFraction(val)
+                            if math.abs(val) < 1 then
+                                local denominator1mod1 = (1 / math.abs(val)) % 1
+                                local numerator = 1
+                                if denominator1mod1 ~= 0 and (math.floor((((1/denominator1mod1))*100)+0.5)/100)%1 == 0 then
+                                    numerator = math.floor(1/denominator1mod1+0.5)
+                                elseif denominator1mod1 ~= 0 then
+                                    print(denominator1mod1)
+                                end
+                                local denominator = math.floor((((1 / math.abs(val))*100)*numerator)+0.5)/100
+                                return (val<0 and '-' or '')..formatNumber(numerator)..'⁄'..formatNumber(denominator)--..'<sup>'..ordinalSuffix(denominator)..(numerator == 1 and '' or 's')..'</sup>'
+                            end
+                            return val
+                        end
+
                         local function GetEffectVal(info)
                             local val = ''
                             local add = info.Add ~= 0
                             local mul = info.Mult ~= 1
                             if add then
-                                val = val..(info.Add>0 and'+'or'')..info.Add
+                                val = val..(info.Add>0 and'+'or'')..DisplayFraction(info.Add)
                             end
                             if add and mul then
                                 val = val..' and '
                             end
                             if mul then
-                                val = val..'×'..info.Mult
+                                val = val..'×'..DisplayFraction(info.Mult)
                             end
                             return val
                         end
@@ -181,7 +208,7 @@ function UnitBodytextSectionData(bp)
                                 local catSet = cats[cat]
                                 local buffInfo = Infobox{
                                     Style = 'detail-left',
-                                    Header = {cat},
+                                    Header = {'<code>'..cat..'</code>'},
                                     Data = {},
                                 }
                                 for i, buff in ipairs(catSet) do
