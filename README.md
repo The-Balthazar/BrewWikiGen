@@ -76,6 +76,10 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
     with `Videos` with an array of tables that match the format
     `{YouTube = '[Video ID]', '[Display name]'}`, where `[Video ID]` is the 11-ish
     character YouTube video ID, and `[Display name]` is the link caption to display.
+    You can also force a section to appear and/or overwrite the main contents of it
+    with a `[Section]` key, and either a `true` value to force it to appear, or
+    a string value to force it to appear and overwrite the main body of the section.
+    Prefix and suffix additions are still respected.
     Which is a very wordy way to say to look like this example:
     ```lua
     UnitData = {
@@ -89,10 +93,12 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
                 'This would appear as a bullet point in the trivia section.',
                 'As would this.',
             },
+            Balance = "This unit is mad OP because it's the only way I can get an er",
         },
     }
     ```
-    If you don't have such a document, you can remove the field or set it to `false`.
+    If you don't have such a document, you can remove the `ExtraData` field or
+    set it to `false`.
 
 * `WikiOptions` contains the following bool-ish options:
 

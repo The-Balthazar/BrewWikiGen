@@ -5,7 +5,7 @@
 local function Binary2bit(a,b) return (a and 2 or 0) + (b and 1 or 0) end
 
 local function GetSectionExtraData(id, sect)
-    return UnitData[id][sect] and "\n"..LOC(UnitData[id][sect]).."\n" or ''
+    return UnitData[id][sect] and (type(UnitData[id][sect]) == 'string' and "\n"..LOC(UnitData[id][sect]).."\n" or UnitData[id][sect])
 end
 
 function UnitHeaderString(bp)
@@ -55,7 +55,7 @@ function UnitBodytextLeadText(bp)
     }
     BuildIntroBuild = BuildIntroBuild[Binary2bit(Description[bp.id], arraySubFind(bp.Categories, 'BUILTBY'))]
 
-    return bodytext..BuildIntroTDesc..BuildIntroBuild..GetSectionExtraData(bp.ID, 'LeadSuffix')
+    return bodytext..BuildIntroTDesc..BuildIntroBuild..(GetSectionExtraData(bp.ID, 'LeadSuffix') or '')
 end
 
 function UnitBodytextSectionData(bp)
@@ -155,8 +155,6 @@ function UnitBodytextSectionData(bp)
                                 local numerator = 1
                                 if denominator1mod1 ~= 0 and (math.floor((((1/denominator1mod1))*100)+0.5)/100)%1 == 0 then
                                     numerator = math.floor(1/denominator1mod1+0.5)
-                                elseif denominator1mod1 ~= 0 then
-                                    print(denominator1mod1)
                                 end
                                 local denominator = math.floor((((1 / math.abs(val))*100)*numerator)+0.5)/100
                                 return (val<0 and '-' or '')..formatNumber(numerator)..'⁄'..formatNumber(denominator)--..'<sup>'..ordinalSuffix(denominator)..(numerator == 1 and '' or 's')..'</sup>'
@@ -834,12 +832,16 @@ function UnitBodytextSectionData(bp)
         __tostring = function(self)
             local bodytext = ''
             for i, section in ipairs(self) do
-                if section.check then
+                local prefix = GetSectionExtraData(bp.ID, noLOC(section[1])..'Prefix')
+                local suffix = GetSectionExtraData(bp.ID, noLOC(section[1])..'Suffix')
+                local flag = GetSectionExtraData(bp.ID, noLOC(section[1]))
+                local overwrite = type(flag) == 'string' and flag
+                if section.check or flag then
                     bodytext = bodytext
                     ..MDHead(section[1])
-                    ..GetSectionExtraData(bp.ID, noLOC(section[1])..'Prefix')
-                    ..section.Data(bp).."\n"
-                    ..GetSectionExtraData(bp.ID, noLOC(section[1])..'Suffix')
+                    ..(prefix or '')
+                    ..(overwrite or (section.check and section.Data(bp)) or '').."\n"
+                    ..(suffix or '')
                 end
             end
             return bodytext
