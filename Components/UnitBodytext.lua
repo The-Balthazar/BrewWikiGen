@@ -5,7 +5,10 @@
 local function Binary2bit(a,b) return (a and 2 or 0) + (b and 1 or 0) end
 
 local function GetSectionExtraData(id, sect)
-    return UnitData[id][sect] and (type(UnitData[id][sect]) == 'string' and "\n"..LOC(UnitData[id][sect]).."\n" or UnitData[id][sect])
+    local data = UnitData[id][sect]
+    if data == '' then return end
+    if type(data) == 'string' then return "\n"..LOC(UnitData[id][sect]).."\n" end
+    return data
 end
 
 function UnitHeaderString(bp)
@@ -835,7 +838,7 @@ function UnitBodytextSectionData(bp)
                 local prefix = GetSectionExtraData(bp.ID, noLOC(section[1])..'Prefix')
                 local suffix = GetSectionExtraData(bp.ID, noLOC(section[1])..'Suffix')
                 local flag = GetSectionExtraData(bp.ID, noLOC(section[1]))
-                local overwrite = type(flag) == 'string' and flag
+                local overwrite = type(flag) == 'string' and noLOC(section[1]) ~= 'Trivia' and flag
                 if section.check or flag then
                     bodytext = bodytext
                     ..MDHead(section[1])
