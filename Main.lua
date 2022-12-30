@@ -29,6 +29,8 @@ function GeneratorMain(Output)
         'Environment/Localization.lua',
         'Environment/Game.lua',
         'Utilities/Blueprints.lua',
+        'Utilities/BlueprintSerialise.lua',
+        'Utilities/BlueprintRebuild.lua',
         'Utilities/Builders.lua',
         'Utilities/Cleanup.lua',
         'Utilities/File.lua',
@@ -84,15 +86,16 @@ function GeneratorMain(Output)
     --[[ ------------------------------------------------------------------ ]]--
     --[[ Generate wiki                                                      ]]--
     --[[ ------------------------------------------------------------------ ]]--
-    if Sanity.BlueprintChecks            then safecall(CheckUnitBlueprintSanity) end
-    if Info.UnitLODCounts                then safecall(GetUnitMiscInfo) end
-    if CleanupOptions.CleanUnitBpFiles   then safecall(CleanupBlueprintsFiles) end
-    if WikiOptions.GenerateUnitPages     then safecall(GenerateUnitPages) end
-    if WikiOptions.GenerateProjectilesPage then safecall(GenerateProjectilePage) end
-    if WikiOptions.GenerateSidebar       then safecall(GenerateSidebar) end
-    if WikiOptions.GenerateModPages      then safecall(GenerateModPages) end
-    if WikiOptions.GenerateCategoryPages then safecall(GenerateCategoryPages) end
-    if WikiOptions.GenerateHomePage      then safecall(GenerateHomePage) end
+    if RebuildBlueprintOptions.RebuildBpFiles then safecall(RebuildBlueprintsFiles) end
+    if Sanity.BlueprintChecks                 then safecall(CheckUnitBlueprintSanity) end
+    if Info.UnitLODCounts                     then safecall(GetUnitMiscInfo) end
+    if CleanupOptions.CleanUnitBpFiles        then safecall(CleanupBlueprintsFiles) end
+    if WikiOptions.GenerateUnitPages          then safecall(GenerateUnitPages) end
+    if WikiOptions.GenerateProjectilesPage    then safecall(GenerateProjectilePage) end
+    if WikiOptions.GenerateSidebar            then safecall(GenerateSidebar) end
+    if WikiOptions.GenerateModPages           then safecall(GenerateModPages) end
+    if WikiOptions.GenerateCategoryPages      then safecall(GenerateCategoryPages) end
+    if WikiOptions.GenerateHomePage           then safecall(GenerateHomePage) end
 
     safecall(printTotalBlueprintValues)
 end

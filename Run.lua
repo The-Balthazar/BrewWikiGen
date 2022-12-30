@@ -41,15 +41,22 @@ WikiOptions = {
     BuildListSaysModUnits = true,
 }
 
+RebuildBlueprintOptions = {
+    RebuildBpFiles = true,
+    RemoveUnusedValues = true,
+    CleanupBuildOnLayerCaps = true,
+    CleanupWreckageLayers = true,
+    CleanupCommandCaps = true,
+    RecalculateThreat = true,
+}
+
 CleanupOptions = {
-    CleanUnitBpFiles = true,
-
-    CleanUnitBpGeneral = true,
-    CleanUnitBpDisplay = true,
-    CleanUnitBpInterface = true,
-    CleanUnitBpUseOOBTestZoom = true,
-
-    CleanUnitBpThreat = true,
+    CleanUnitBpFiles = false,
+    CleanUnitBpGeneral = false,
+    CleanUnitBpDisplay = false,
+    CleanUnitBpInterface = false,
+    CleanUnitBpUseOOBTestZoom = false,
+    CleanUnitBpThreat = false,
 }
 
 ModDirectories = { -- In order
