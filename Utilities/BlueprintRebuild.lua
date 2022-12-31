@@ -68,6 +68,19 @@ function RemoveRedundantBlueprintValues(bp)
     --if not bp.Display.MovementEffects.Land.Treads.ScrollTreads then LODs[1].Scrolling = nil end
 end
 
+local function CategoriesSortClean(cats)
+    if not cats then return end
+    local hash = {}
+    for i, cat in ipairs(cats) do
+        hash[cat] = cat
+    end
+    local clean = {}
+    for cat, cat in sortedpairs(hash) do
+        table.insert(clean, cat)
+    end
+    return clean
+end
+
 function RecalculateBlueprintThreatValues(bp)
     if not bp.Defense then return end
     local pass, threat = pcall(CalculateUnitThreatValues, bp)
@@ -87,6 +100,7 @@ function RebuildBlueprintsFiles()
             if RebuildBlueprintOptions.RecalculateThreat then
                 RecalculateBlueprintThreatValues(bp)
             end
+            bp.Categories = CategoriesSortClean(bp.Categories)
             local bpfile = io.open(bp.Source, 'w')
             bpfile:write(blueprintSerialize(bp))
             bpfile:close()

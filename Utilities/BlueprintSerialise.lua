@@ -158,8 +158,8 @@ local specificTableSerializer = {
             ..k..(' '):rep(maxKeySize-string.len(k)+1)
             ..'= Sound { Bank = \''..v.Bank..'\','..(' '):rep(maxBankSize-string.len(v.Bank)+1)
             ..'Cue = \''..v.Cue..'\','..(' '):rep(maxCueSize-string.len(v.Cue)+1)
-            ..'LodCutoff = \''..v.LodCutoff
-            ..'\' },\n'
+            ..(v.LodCutoff and 'LodCutoff = \''..v.LodCutoff..'\'' or '')
+            ..' },\n'
         end
         return str..indent(depth-1)..'}'
     end,
