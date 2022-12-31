@@ -93,6 +93,14 @@ function bpsortpairs(set, sort)
         if a == 'Description' or b == 'Description' then
             return a == 'Description'
         end
+        if type(a) == 'number' and type(b) ~= 'number' then
+            print("WARNING: Blueprint contains mixed number/string keys in a table", a, b)
+            return true
+        end
+        if type(a) ~= 'number' and type(b) == 'number' then
+            print("WARNING: Blueprint contains mixed number/string keys in a table", a, b)
+            return false
+        end
         return sortFilter(a) < sortFilter(b)
     end
 
