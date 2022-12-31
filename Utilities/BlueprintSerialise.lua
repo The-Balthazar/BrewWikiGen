@@ -86,7 +86,7 @@ function bpsortpairs(set, sort)
     end
 
     local function sortFilter(n)
-        return n:gsub('^(CollisionOffset)', 'Size%1' )
+        return type(n) == 'string' and n:gsub('^(CollisionOffset)', 'Size%1' ) or n
     end
 
     local function sortDescriptionFirst(a, b)

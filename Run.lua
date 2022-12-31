@@ -17,6 +17,7 @@ EnvironmentData = {
     location = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
 
     GenerateWikiPages = false, --Generate pages for env blueprints
+    RebuildBlueprints = false, --Rebuild env blueprints
 
     Lua = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
     LOC = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',

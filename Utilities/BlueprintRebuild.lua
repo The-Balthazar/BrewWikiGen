@@ -80,8 +80,8 @@ function RecalculateBlueprintThreatValues(bp)
 end
 
 function RebuildBlueprintsFiles()
-    for id, bp in pairs(all_units) do
-        if bp.ModInfo.GenerateWikiPages and bp.SourceFileBlueprintCount == 1 and bp.Source then
+    for id, bp in pairs(all_blueprints.Unit) do
+        if bp.ModInfo.RebuildBlueprints ~= false and bp.SourceFileBlueprintCount == 1 and bp.Source then
             print('Rebuilding '..bp.Source)
             RemoveRedundantBlueprintValues(bp)
             if RebuildBlueprintOptions.RecalculateThreat then
