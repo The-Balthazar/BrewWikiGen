@@ -155,9 +155,14 @@ local specificTableSerializer = {
         local maxKeySize, maxBankSize, maxCueSize = 0, 0, 0
 
         for k, v in pairs(sounds) do
-            maxKeySize = math.max(maxKeySize, string.len(k))
-            maxBankSize = math.max(maxBankSize, string.len(v.Bank))
-            maxCueSize = math.max(maxCueSize, string.len(v.Cue))
+            if type(v) == 'table' then
+                maxKeySize = math.max(maxKeySize, string.len(k))
+                maxBankSize = math.max(maxBankSize, string.len(v.Bank))
+                maxCueSize = math.max(maxCueSize, string.len(v.Cue))
+            else
+                print('WARNING: non-table value in audio table. Discarding ', k, v)
+                sounds[k] = nil
+            end
         end
 
         str = str .. "{\n"
