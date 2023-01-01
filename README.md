@@ -37,8 +37,14 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
   * `location` optionally is a path for it to search for environmental blueprints.
     If it finds none it will use a shell link in there instead. Note this isn't recursive.
 
-  * `GenerateWikiPages`, if true, has the generator treat the environment as 'mod 0'.
+  * `GenerateWikiPages`, if `true`, has the generator treat the environment as 'mod 0'.
     Otherwise it will just be used for added context for mod pages.
+
+  * `RebuildBlueprints`, if not `false`, and blueprint rebuild is enabled, it will
+    rebuild environment blueprints.
+
+  * `RunSanityChecks`, if `true`, and blueprint sanity checks are enabled, it will
+    give logs about potential errors in environment blueprints.
 
   * `Factions`, optionally, is a an array of custom factions formatted as sub-arrays
     containing the faction category then the faction name. For example:
@@ -136,7 +142,9 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
   * `BuildListSaysModUnits` if true the build list refers to what can be built as
     "mod unit(s)" instead of "unit(s)".
 
-* `CleanupOptions` contains the following bool options:
+* `CleanupOptions` (Depreciated) handles options for 'cleanup', which uses regex
+  expressions to remove specific values from blueprint values. Contains the
+  following bool options:
 
   * `CleanUnitBpFiles`; `true` or `false`: Enables or disables all `.bp` file
     modifying scripts. Note it only applies to loaded `.bp` files that would be
@@ -152,6 +160,46 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
 
   * `CleanUnitBpThreat`; `true` or `false`: Updates the threat values based on
     an extensive formula.
+
+* `RebuildBlueprintOptions` handles options for 'rebuild', which rebuilds blueprints
+  by re-serializing loaded unit blueprints files. Beautifying them you might say. It
+  contains the following bool options:
+
+  * `RebuildBpFiles`; if `true`, enables rebuild.
+  * `RemoveUnusedValues`, if `true`, removes the unit blueprint values:
+    * `bp.General.Category`
+    * `bp.General.Classification`
+    * `bp.General.TechLevel`
+    * `bp.General.UnitWeight`
+    * `bp.Display.PlaceholderMeshName`
+    * `bp.Display.SpawnRandomRotation`
+    * `bp.UseOOBTestZoom`
+    * `bp.Interface`
+
+  * `CleanupBuildOnLayerCaps` if `true` does the following to `bp.Physics.BuildOnLayerCaps`:
+    * If the unit has a motion type that isn't `RULEUMT_None`, it removes the table;
+      they don't use it, and you shouldn't trust anything it says.
+    * If the unit has a motion type of `RULEUMT_None` and has `LAYER_Land` as the
+      only true value it removes the table; that's the default.
+    * Otherwise it removes any false values. This will leave an empty table if there
+      are no true values. This is functionally different from having no table.
+
+  * `CleanupWreckageLayers` if `true`, it will remove false values from wreckage layers.
+  * `CleanupCommandCaps` if `true`, it will remove false values from command caps,
+    if there were no true values, it removes the table.
+  * `RemoveMilitaryOverlayCategories` if `true`, it will remove the `OVERLAY` categories
+    for `AIR`, `NAVY`, `DEFENSE`, `DIRECTFIRE`, and `INDIRECTFIRE`. They are not
+    referenced in `rangeoverlayparams.lua`.
+  * `RemoveProductCategories` if `true`, removes categories starting with `PRODUCT`;
+    in the core game they are only useful for *easily* restricting units added by
+    patches and FA, which is a questionable use at best (and still attainable
+    without the categories by checking `bp.Source` and the first letter of the ID),
+    and in mods *generally* only indicates where the unit bp was originally copied
+    from, or if updated to actually indicate the mod just occupies memory.
+
+    *Steps down off soap box*
+  * `RecalculateThreat` if `true`, recalculates the units threat, based on
+    `Utilities/Threat.lua`.
 
 * `ModDirectories` should point to your local copies of the mod(s) you wish to
 load in the order you wish them to appear. It assumes, but doesn't require, multiple
