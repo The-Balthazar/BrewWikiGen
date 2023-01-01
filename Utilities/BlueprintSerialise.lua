@@ -86,7 +86,21 @@ function bpsortpairs(set, sort)
     end
 
     local function sortFilter(n)
-        return type(n) == 'string' and n:gsub('^(CollisionOffset)', 'Size%1' ) or n
+        local namefilters = {
+            {'^(CollisionOffset)', 'Size%1'},
+            {'^(Mesh)(Name)$', 'Z0%2%1'},
+            {'^(Albedo)(Name)$', 'Z1%2%1'},
+            {'^(Normals)(Name)$', 'Z2%2%1'},
+            {'^(Specular)(Name)$', 'Z3%2%1'},
+        }
+        if type(n) == 'string' then
+            for i, subs in ipairs(namefilters) do
+                n = n:gsub(subs[1], subs[2])
+            end
+            return n
+        else
+            return n
+        end
     end
 
     local function sortDescriptionFirst(a, b)
