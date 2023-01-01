@@ -207,6 +207,8 @@ function LoadModInfo(dir, i)
     if ModInfo.GenerateWikiPages == nil then
         ModInfo.GenerateWikiPages = true
     end
+    ModInfo.RunSanityChecks = Sanity.BlueprintChecks
+
     return ModInfo
 end
 
