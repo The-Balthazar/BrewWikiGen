@@ -51,7 +51,7 @@ function BlueprintSanityChecks(bp)
                 end
             end
 
-            local builtby = arraySubFind(bp.Categories, 'BUILTBY')
+            local builtby = arraySubFind(bp.Categories, 'BUILT[B]?[Y]?[T]?[I]?[E]?[R]?%d')
             if builtby and t then
 
                 local function UpgradesFrom(to, from)
