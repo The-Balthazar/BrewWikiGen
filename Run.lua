@@ -49,6 +49,8 @@ RebuildBlueprintOptions = {
     CleanupBuildOnLayerCaps = true,
     CleanupWreckageLayers = true,
     CleanupCommandCaps = true,
+    RemoveMilitaryOverlayCategories = true,
+    RemoveProductCategories = true,
     RecalculateThreat = true,
 }
 

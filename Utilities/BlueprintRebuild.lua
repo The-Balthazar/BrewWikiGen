@@ -65,6 +65,18 @@ function RemoveRedundantBlueprintValues(bp)
         end
     end
 
+    if RebuildBlueprintOptions.RemoveMilitaryOverlayCategories and bp.Categories then
+        table.removeByValue(bp.Categories, 'OVERLAYANTIAIR')
+        table.removeByValue(bp.Categories, 'OVERLAYANTINAVY')
+        table.removeByValue(bp.Categories, 'OVERLAYDEFENSE')
+        table.removeByValue(bp.Categories, 'OVERLAYDIRECTFIRE')
+        table.removeByValue(bp.Categories, 'OVERLAYINDIRECTFIRE')
+    end
+
+    if RebuildBlueprintOptions.RemoveProductCategories and bp.Categories then
+        table.removeByValue(bp.Categories, arrayFindSub(bp.Categories, 1, 7, 'PRODUCT') )
+    end
+
     --if not bp.Display.MovementEffects.Land.Treads.ScrollTreads then LODs[1].Scrolling = nil end
 end
 
@@ -96,11 +108,11 @@ function RebuildBlueprintsFiles()
     for id, bp in pairs(all_blueprints.Unit) do
         if bp.ModInfo.RebuildBlueprints ~= false and bp.SourceFileBlueprintCount == 1 and bp.Source then
             print('Rebuilding '..bp.Source)
+            bp.Categories = CategoriesSortClean(bp.Categories)
             RemoveRedundantBlueprintValues(bp)
             if RebuildBlueprintOptions.RecalculateThreat then
                 RecalculateBlueprintThreatValues(bp)
             end
-            bp.Categories = CategoriesSortClean(bp.Categories)
             local bpfile = io.open(bp.Source, 'w')
             bpfile:write(blueprintSerialize(bp))
             bpfile:close()
