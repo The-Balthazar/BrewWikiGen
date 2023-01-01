@@ -16,7 +16,7 @@ local IconMotionTypes = {
 }
 
 function BlueprintSanityChecks(bp)
-    if not Sanity.BlueprintChecks or not bp.ModInfo.GenerateWikiPages then
+    if not Sanity.BlueprintChecks or not bp.ModInfo.RunSanityChecks then
         return
     end
     HashUnitCategories(bp) -- Sanity happens before this happens for reals, so do it again. It'll get overwritten later, but that's fine.
