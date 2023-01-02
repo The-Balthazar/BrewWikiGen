@@ -41,6 +41,9 @@ WikiOptions = {
     BalanceNote = '<LOC wiki_balance_stats_steam>Displayed stats are from when launched on the steam/retail version of the game.',
     ConstructionNote = '<LOC wiki_builders_note_steam>Build times from the Steam/retail version of the game:',
     BuildListSaysModUnits = true,
+
+    OnlineRepoUnitPageBlueprintLink = 'https://github.com/The-Balthazar/BrewLAN/tree/master/',
+    LocalRepuUnitPageBlueprintLink = 'C:/BrewLAN/',
 }
 
 RebuildBlueprintOptions = {
