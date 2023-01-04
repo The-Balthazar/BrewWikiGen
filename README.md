@@ -142,6 +142,11 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
   * `BuildListSaysModUnits` if true the build list refers to what can be built as
     "mod unit(s)" instead of "unit(s)".
 
+  * `LocalRepuUnitPageBlueprintLink` and `OnlineRepoUnitPageBlueprintLink`, if they
+    exist, it create unit page links to the original `.bp` files on the repo, using
+    the the pair as a regex search and replace on the source location it found the
+    reference `.bp` files at.
+
 * `CleanupOptions` (Depreciated) handles options for 'cleanup', which uses regex
   expressions to remove specific values from blueprint values. Contains the
   following bool options:
