@@ -10,7 +10,7 @@ function UnitInfobox(bp)
             UnitIcon(bp.ID, {align='left', title=(bp.General.UnitName or 'The')..' unit icon'})..
             StrategicIcon(bp.StrategicIconName, {align='right'})..
             (bp.General.UnitName or xml:i'Unnamed')..xml:br()..(bp.TechDescription or xml:i'No description'),
-            FileExists(OutputDirectory..BPimg) and xml:a{href=BPimg}(xml:img{width='256px', src=BPimg}) or nil
+            FileExists(OutputDirectory..BPimg) and xml:a{href=BPimg}(xml:img{width='256px', src=BPimg}) or Logging.MissingUnitImage and print(bp.id, "has no infobox image ("..BPimg..")") or nil
         },
         Data = {
             {bp.WikiInfoboxNote and '', bp.WikiInfoboxNote and LOC(bp.WikiInfoboxNote)..(bp.WikiBalance and detailsLink('<LOC wiki_sect_balance>Balance') or '')},

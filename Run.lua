@@ -132,6 +132,7 @@ Logging = { -- Functional logs
 
     ExcludedBlueprints = false,
     BlueprintTotals    = true,
+    MissingUnitImage   = true,
 
     ChangeDiscarded    = true,
     NewFileWrites      = true,
