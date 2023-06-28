@@ -129,6 +129,16 @@ function LoadBlueprints(modinfo)
         RegisterBlueprintsFromFile(dirData[1], dirData[2], modinfo)
     end
 
+    -- If they aren't getting included, apply merges.
+    -- We don't want to if they are, since the bp merges will be detailed separately on the pages.
+    for id, group in pairs(merge_blueprints) do
+        if all_units[id] and not all_units[id].ModInfo.GenerateWikiPages then
+            for i, mergebp in ipairs(group) do
+                tableDeepMerge(all_units[id], mergebp)
+            end
+        end
+    end
+
     --[[ Logging ]]--
     print('    Loaded '..(modinfo.Units or 0)..' units, '..(modinfo.UnitMerges or 0)..' unit merges, and '..(modinfo.Projectiles or 0)..' projectiles from '..#BlueprintPathsArray..' .bp file'..pluralS(#BlueprintPathsArray)..'. ' )
     TotalBlueprintFiles = TotalBlueprintFiles + #BlueprintPathsArray

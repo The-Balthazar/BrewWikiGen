@@ -150,6 +150,23 @@ function tableMergeCopy(t1, t2)
     return t1
 end
 
+-- deep copies values from t2 into t1
+function tableDeepMerge(t1, t2)
+    if t1 and t2 then
+        for k, v in pairs(t2) do
+            if type(t2[k]) == 'table' then
+                if not (type(t1[k]) == 'table') then
+                    t1[k] = {}
+                end
+                tableDeepMerge(t1[k], t2[k])
+            else
+                t1[k] = v
+            end
+        end
+    end
+    return t1
+end
+
 function table.getn(t) return #t end
 
 -- #t for keyed tables
