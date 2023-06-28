@@ -29,8 +29,8 @@ function BlueprintSanityChecks(bp)
             table.insert(issues, 'Multiple tech level categories')
         elseif t4 then -- Experimental things
 
-            if Sanity.BlueprintStrategicIconChecks and bp.StrategicIconName ~= 'icon_experimental_generic' then
-                table.insert(issues, 'Experimental without \'icon_experimental_generic\'')
+            if Sanity.BlueprintStrategicIconChecks and (bp.StrategicIconName and not bp.StrategicIconName:find'experimental' or not bp.StrategicIconName) then
+                table.insert(issues, 'Experimental without experimental icon')
             end
 
         else -- Tech 1-3
