@@ -266,7 +266,7 @@ function OutputAsset(dir)
         if not output then
             local mkdir = string.gsub(OutputDirectory..string.match(dir, '(.*)/'), '/', '\\')
             printif(Logging.FileAssetCopies, 'Creating directory', mkdir)
-            os.execute("mkdir "..mkdir)
+            os.execute('mkdir "'..mkdir..'"')
         end
         printif(Logging.FileAssetCopies, 'Copying asset to', OutputDirectory..dir)
         local file = output or io.open(OutputDirectory..dir, 'wb')
