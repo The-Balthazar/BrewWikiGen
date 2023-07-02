@@ -77,10 +77,22 @@ function GeneratorMain(Output)
     end
 
     --[[ ------------------------------------------------------------------ ]]--
-    --[[ Pre-compute data                                                   ]]--
+    --[[ Pre-compute data (Blueprints.lua)                                  ]]--
     --[[ ------------------------------------------------------------------ ]]--
+    if EnvironmentData.PreModBlueprints[1] then
+        for i, func in ipairs(EnvironmentData.PreModBlueprints) do
+            safecall(LoadSystemBlueprintsFile, EnvironmentData.Lua, func)
+        end
+    else
+        safecall(LoadSystemBlueprintsFile, EnvironmentData.Lua, 'WikiBlueprints')
+    end
     for i, mod in ipairs(__active_mods) do
-        safecall(LoadModSystemBlueprintsFile, mod.location)
+        safecall(LoadSystemBlueprintsFile, mod.location..'hook/', 'WikiBlueprints')
+    end
+    if EnvironmentData.PostModBlueprints[1] then
+        for i, func in ipairs(EnvironmentData.PostModBlueprints) do
+            safecall(LoadSystemBlueprintsFile, EnvironmentData.Lua, func)
+        end
     end
 
     --[[ ------------------------------------------------------------------ ]]--

@@ -154,10 +154,13 @@ end
 --[[ ---------------------------------------------------------------------- ]]--
 --[[ Blueprint loading                                                      ]]--
 --[[ ---------------------------------------------------------------------- ]]--
-function LoadModSystemBlueprintsFile(modDir)
-    local SystemBlueprints = GetSandboxedLuaFile(modDir..'hook/lua/system/Blueprints.lua', "MohoLua")
 
-    if SystemBlueprints.WikiBlueprints then
-        SystemBlueprints.WikiBlueprints(all_blueprints)
+local systemBlueprints = {}
+
+function LoadSystemBlueprintsFile(modDir, func)
+    systemBlueprints[modDir] = systemBlueprints[modDir] or GetSandboxedLuaFile(modDir..'lua/system/Blueprints.lua', "MohoLua")
+
+    if systemBlueprints[modDir][func] then
+        systemBlueprints[modDir][func](all_blueprints)
     end
 end

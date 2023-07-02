@@ -64,6 +64,12 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
     They are expected to be valid Lua, and are sandboxed with no access to functions.
     If undefined, the generator comes with a default set of order tooltips.
 
+  * `PreModBlueprints`, and `PostModBlueprints`, optional arrays of functions to
+    have run from the environments' `lua/system/Blueprints.lua` file before and
+    after mod hook `lua/system/Blueprints.lua` `WikiBlueprints` functions. If
+    `PreModBlueprints` isn't populated it will try to run a `WikiBlueprints`
+    function from that file at that time instead.
+
   * `LOC`, optional, defines the location that *contains* the loc folder to try
     to load `loc/`Language`/strings_db.lua` from. It is expected to be valid Lua
     and is sandboxed with no access to functions.
