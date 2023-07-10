@@ -195,6 +195,10 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
     * Otherwise it removes any false values. This will leave an empty table if there
       are no true values. This is functionally different from having no table.
 
+  * `CleanupGeneralBackgroundIcon` if `true` and the unit has a `bp.General` table,
+    changes the `bp.General.Icon` value to correctly match what layers the unit can
+    exist on, or to indicate what it can build if it's a factory structure.
+
   * `CleanupWreckageLayers` if `true`, it will remove false values from wreckage layers.
   * `CleanupCommandCaps` if `true`, it will remove false values from command caps,
     if there were no true values, it removes the table.

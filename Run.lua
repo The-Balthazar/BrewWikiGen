@@ -53,6 +53,7 @@ RebuildBlueprintOptions = {
     RebuildBpFiles = true,
     RemoveUnusedValues = true,
     CleanupBuildOnLayerCaps = true,
+    CleanupGeneralBackgroundIcon = true,
     CleanupWreckageLayers = true,
     CleanupCommandCaps = true,
     CleanupIntelOverlayCategories = true,

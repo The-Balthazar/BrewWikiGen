@@ -31,6 +31,18 @@ local function BuildOnLayerBitwiseValue(buildCaps)
     (buildCaps.LAYER_Air and 16 or 0)
 end
 
+local IconMotionTypes = {
+    RULEUMT_Air                = { Icon = 'air', },
+    RULEUMT_Amphibious         = { Icon = 'amph', },
+    RULEUMT_AmphibiousFloating = { Icon = 'amph', },
+    RULEUMT_Biped              = { Icon = 'land', },
+    RULEUMT_Land               = { Icon = 'land', },
+    RULEUMT_Hover              = { Icon = 'amph', },
+    RULEUMT_Water              = { Icon = 'sea', },
+    RULEUMT_SurfacingSub       = { Icon = 'sea', },
+    RULEUMT_None               = { Icon = 'land', },
+}
+
 function RemoveRedundantBlueprintValues(bp)
     -- Just straight up kill these, always. They do nothing
     if RebuildBlueprintOptions.RemoveUnusedValues then
@@ -100,6 +112,38 @@ function RemoveRedundantBlueprintValues(bp)
             end
         else
             table.removeByValue(bp.Categories, 'OVERLAYCOUNTERINTEL')
+        end
+    end
+
+    if RebuildBlueprintOptions.CleanupGeneralBackgroundIcon and bp.General then
+        local currenticon = (bp.General.Icon or 'land')
+        local factoryicon
+        local physicaicon
+
+        if bp.Physics.MotionType ~= 'RULEUMT_None' then
+            physicaicon = IconMotionTypes[bp.Physics.MotionType].Icon
+        else
+            local blc = bp.Physics.BuildOnLayerCaps
+            local BLwater = blc and (blc.LAYER_Water or blc.LAYER_Sub or blc.LAYER_Seabed) and 'sea'
+            local BLland = (blc and blc.LAYER_Land or not blc) and 'land'
+
+            local BLbin = BinaryCounter{BLland, BLwater}
+
+            physicaicon = (BLbin == 1) and (BLland or BLwater) or 'amph'
+
+            if table.find(bp.Categories, 'FACTORY') then
+                local Cair = table.find(bp.Categories, 'AIR') and 'air'
+                local Cland = table.find(bp.Categories, 'LAND') and 'land'
+                local Cnaval = table.find(bp.Categories, 'NAVAL') and 'sea'
+
+                local Cbin = BinaryCounter{Cair, Cland, Cnaval}
+
+                factoryicon = (Cbin == 1) and (Cair or Cnaval or (Cland and physicaicon) ) or (Cbin ~= 0) and 'amph'
+            end
+        end
+
+        if currenticon ~= (factoryicon or physicaicon) then
+            bp.General.Icon = (factoryicon or physicaicon)
         end
     end
 
