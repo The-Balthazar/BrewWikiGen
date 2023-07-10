@@ -198,6 +198,11 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
   * `CleanupWreckageLayers` if `true`, it will remove false values from wreckage layers.
   * `CleanupCommandCaps` if `true`, it will remove false values from command caps,
     if there were no true values, it removes the table.
+  * `CleanupIntelOverlayCategories` if `true`, it will give the `OVERLAYRADAR`, `-SONAR`
+    and `-OMNI` categories to anything with ranges in those things greater than 0,
+    and take it from anything else. It will do the same for the `OVERLAYCOUNTERINTEL`
+    category to anything that doesn't have a non-0 field radius for radar stealth,
+    sonar stealth, or cloak, or a non-0 max jammer radius and more than 0 jammer blips.
   * `RemoveMilitaryOverlayCategories` if `true`, it will remove the `OVERLAY` categories
     for `AIR`, `NAVY`, `DEFENSE`, `DIRECTFIRE`, and `INDIRECTFIRE`. They are not
     referenced in `rangeoverlayparams.lua`.

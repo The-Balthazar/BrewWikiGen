@@ -77,6 +77,32 @@ function RemoveRedundantBlueprintValues(bp)
         table.removeByValue(bp.Categories, arrayFindSub(bp.Categories, 1, 7, 'PRODUCT') )
     end
 
+    if RebuildBlueprintOptions.CleanupIntelOverlayCategories and bp.Categories then
+        for i, set in ipairs{
+            {'RadarRadius', 'OVERLAYRADAR'},
+            {'SonarRadius', 'OVERLAYSONAR'},
+            {'OmniRadius', 'OVERLAYOMNI'},
+        } do
+            if (bp.Intel[ set[1] ] or 0)>0 then
+                if not table.find(bp.Categories, set[2]) then
+                    table.insert(bp.Categories, set[2])
+                end
+            else
+                table.removeByValue(bp.Categories, set[2])
+            end
+        end
+        if (bp.Intel.RadarStealthFieldRadius or 0)>0
+        or (bp.Intel.SonarStealthFieldRadius or 0)>0
+        or (bp.Intel.CloakFieldRadius or 0)>0
+        or (bp.Intel.JamRadius.Max or 0)>0 and (bp.Intel.JammerBlips or 0)>0 then
+            if not table.find(bp.Categories, 'OVERLAYCOUNTERINTEL') then
+                table.insert(bp.Categories, 'OVERLAYCOUNTERINTEL')
+            end
+        else
+            table.removeByValue(bp.Categories, 'OVERLAYCOUNTERINTEL')
+        end
+    end
+
     --if not bp.Display.MovementEffects.Land.Treads.ScrollTreads then LODs[1].Scrolling = nil end
 end
 
