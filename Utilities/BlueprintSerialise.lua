@@ -25,9 +25,17 @@ end
 
 local inlineTableSerializer, serialiseValue
 
-function serialiseValue(value)
+local specificValueSerializer = {
+    RateOfFire = function(value, key)
+        return ('10/%d'):format(math.floor(10/value+0.5))
+    end,
+}
+
+function serialiseValue(value, key)
     local valtype = type(value)
-    if valtype == 'table' then
+    if specificValueSerializer[key] then
+        return specificValueSerializer[key](value, key)
+    elseif valtype == 'table' then
         print('This bp has an unexpected table and may look ugly')
         return inlineTableSerializer('', value)
     elseif (valtype == 'number' or valtype == 'boolean') then
@@ -286,7 +294,7 @@ function blueprintSerialize(val, key, depth)
         str = tableSerialize(str, val, key, depth)
 
     else
-        str = str .. serialiseValue(val)
+        str = str .. serialiseValue(val, key)
     end
 
     return str
