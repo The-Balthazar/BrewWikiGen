@@ -31,6 +31,19 @@ local specificValueSerializer = {
     end,
 }
 
+local specificValueComments = {
+    RateOfFire = function(value, key)
+        return '10/integer interval in ticks'
+    end,
+}
+
+local function getValueComment(value, key)
+    if specificValueComments[key] then
+        return ' --'..specificValueComments[key](value, key)
+    end
+    return ''
+end
+
 function serialiseValue(value, key)
     local valtype = type(value)
     if specificValueSerializer[key] then
@@ -257,7 +270,7 @@ local function tableSerialize(str, val, key, depth)
                     elseif k:find'^%A' or k:find'[^%w_]' or reserved[k] then
                         k = string.format("[%q]", tostring(k) )
                     end
-                    str = str .. blueprintSerialize(v, k, depth + 1) .. ",\n"
+                    str = str .. blueprintSerialize(v, k, depth + 1) .. "," .. getValueComment(v, k) .. "\n"
                 end
                 str = str .. indent(depth) .. '}'
             end
