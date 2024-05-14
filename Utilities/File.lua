@@ -66,6 +66,8 @@ local Sandboxes = {
 
             getmetatable = getmetatable,
             setmetatable = setmetatable,
+
+            DiskFindFiles = function()error("Unsupported DiskFindFiles called by "..file) end,
         }
         env._G = env
         env.doscript = function(path)
