@@ -168,7 +168,12 @@ end
 function FindBlueprints(dir, shell)
     local paths = {}
 
-    local dirs = io.popen('dir "'..dir..'" /b /s /a-s-h-d | findstr /e .bp')
+    local dirs
+    if package.config:sub(1,1) == '\\' then
+        dirs = io.popen('dir "'..dir..'" /b /s /a-s-h-d | findstr /e \\.bp')
+    else
+        dirs = io.popen("find '"..dir.."' -type f -name '*.bp'")
+    end
     for bppath in dirs:lines() do
         bppath = bppath:gsub('\\', '/')
         if not MatchesExclusion(bppath, BlueprintExclusions) then
@@ -178,7 +183,12 @@ function FindBlueprints(dir, shell)
     dirs:close()
 
     if not shell and not paths[1] then -- Follow links only if we found nothing, and only follow one, once.
-        dirs = io.popen('dir "'..dir..'" /b /s /a-s-h-d | findstr /e .lnk')
+        local dirs
+        if package.config:sub(1,1) == '\\' then
+            dirs = io.popen('dir "'..dir..'" /b /s /a-s-h-d | findstr /e \\.lnk')
+        else
+            dirs = io.popen("find '"..dir.."' -type f -name '*.lnk'")
+        end
         for lnk in dirs:lines() do
             paths = FindBlueprints(GetDirFromShellLnk(lnk), true)
             break
