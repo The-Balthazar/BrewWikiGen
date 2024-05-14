@@ -34,8 +34,7 @@ local Sandboxes = {
         }
     end,
     MohoLua = function(file)
-        local env; env = {
-            _G = env,
+        local env = {
             _VERSION = _VERSION,
             __active_mods = __active_mods,
 
@@ -64,6 +63,7 @@ local Sandboxes = {
             getmetatable = getmetatable,
             setmetatable = setmetatable,
         }
+        env._G = env
         return env
     end,
     Blueprint = function()
@@ -104,8 +104,7 @@ local Sandboxes = {
                 table.insert(filebps, setmetatable(t, meta))
             end
         end
-        local env; env= {
-            _G = env,
+        local env = {
             _VERSION = _VERSION,
             __active_mods = __active_mods,
 
@@ -139,6 +138,7 @@ local Sandboxes = {
             BuffBlueprint = export'Buff',
             Buffs         = filebps,
         }
+        env._G = env
         return env
     end,
 }
