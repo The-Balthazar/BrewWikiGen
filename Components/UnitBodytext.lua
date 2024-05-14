@@ -336,7 +336,7 @@ function UnitBodytextSectionData(bp)
                                     pageLink(
                                         builderbp.ID,
                                         -- For more context, it will include the name if it exists when no page will be linked to.
-                                        (builderbp.General.UnitName and not builderbp.ModInfo.GenerateWikiPages and ('"'..builderbp.General.UnitName..'": ') or '')..builderbp.TechDescription
+                                        (builderbp.General.UnitName and not builderbp.ModInfo.GenerateWikiPages and ('"'..builderbp.General.UnitName..'": ') or '').. (builderbp.TechDescription or '')
                                     ),
                                     builderbp.Economy.BuildRate,
                                     UpgradesFrom(bp, builderbp)

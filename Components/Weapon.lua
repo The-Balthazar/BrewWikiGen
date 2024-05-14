@@ -318,7 +318,7 @@ local function TotalMuzzleFiringTime(weapon)
         return (NumMuzzles(weapon) - 1) * weapon.MuzzleSalvoDelay
     end
 local function TotalFiringTimePossible(weapon)
-        return not (TotalMuzzleFiringTime(weapon) > (1 / weapon.RateOfFire))
+        return not (TotalMuzzleFiringTime(weapon) > (1 / (weapon.RateOfFire or 1)))
     end
 local function weaponHasBasicValues(weapon)
         return weapon.RackBones and weapon.MuzzleSalvoSize and weapon.MuzzleSalvoDelay
