@@ -167,8 +167,8 @@ function UnitBodytextSectionData(bp)
 
                         local function GetEffectVal(info)
                             local val = ''
-                            local add = info.Add ~= 0
-                            local mul = info.Mult ~= 1
+                            local add = (info.Add or 0) ~= 0
+                            local mul = (info.Mult or 1) ~= 1
                             if add then
                                 val = val..(info.Add>0 and'+'or'')..DisplayFraction(info.Add)
                             end
