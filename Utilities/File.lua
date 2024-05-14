@@ -68,6 +68,15 @@ local Sandboxes = {
             setmetatable = setmetatable,
         }
         env._G = env
+        env.doscript = function(path)
+            --NOTE: this just assumes it's only being ran from a file in env.
+            --It'd need to translate the relative mounted path of the executed file else.
+            local chunk, msg = loadfile(EnvironmentData.Lua..path, 'bt', env)
+            if chunk then
+                chunk()
+                return env
+            end
+        end
         return env
     end,
     Blueprint = function()
