@@ -55,6 +55,10 @@ local Sandboxes = {
             table  = table,
             string = string,
             math   = math,
+            debug  = {
+                getinfo=debug.getinfo,
+                traceback=debug.traceback,
+            },
 
             type     = type,
             tostring = tostring,
