@@ -112,6 +112,12 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
     If you don't have such a document, you can remove the `ExtraData` field or
     set it to `false`.
 
+  * `base64`, optional, a table of flags for encoding image data as base 64. The
+    only accepted flag is currently `UnitIcons`, because after testing, GitHub
+    wiki markdown strips base64 `src` fields of images, so it's not actually useful
+    for its intended purpose of limiting how quickly unauthenticated users hit the
+    rate and rest limits for GitHub API calls, so was never developed further.
+
 * `WikiOptions` contains the following bool-ish options:
 
   * `Language` should be the two letter language code for which LOC files should

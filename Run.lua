@@ -20,6 +20,10 @@ EnvironmentData = {
     RebuildBlueprints = false, --Rebuild env blueprints
     RunSanityChecks = false,   --Sanity check env bps
 
+    base64 = {
+        UnitIcons = false,
+    },
+
     Lua = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
     LOC = 'C:/Program Files (x86)/Steam/steamapps/common/supreme commander forged alliance/gamedata/',
     ExtraData = 'C:/BrewLAN/mods/BrewLAN/documentation/Wiki Data.lua',
