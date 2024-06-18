@@ -186,7 +186,21 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
   by re-serializing loaded unit blueprints files. Beautifying them you might say. It
   contains the following bool options:
 
-  * `RebuildBpFiles`; if `true`, enables rebuild.
+  * `RebuildBpFiles`; either `nil`/`false` or a hash of blueprint types to rebuild,
+    for example:
+    ```lua
+    {
+        Unit = true,
+        Beam = false,
+        Mesh = false,
+        Prop = false,
+        Emitter = false,
+        Projectile = false,
+        TrailEmitter = false,
+    }
+    ```
+    would have it rebuild just unit blueprints. `false` values can be removed/excluded.
+    Said blueprint types need to be actually loaded. See `LoadExtraBlueprints`.
   * `RemoveUnusedValues`, if `true`, removes the unit blueprint values:
     * `bp.General.Category`
     * `bp.General.Classification`

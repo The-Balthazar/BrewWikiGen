@@ -44,6 +44,7 @@ local IconMotionTypes = {
 }
 
 function RemoveRedundantBlueprintValues(bp)
+    if bp.__name~='Unit' then return end
     -- Just straight up kill these, always. They do nothing
     if RebuildBlueprintOptions.RemoveUnusedValues then
         bp.General.Category = nil
@@ -164,6 +165,7 @@ local function CategoriesSortClean(cats)
 end
 
 function RecalculateBlueprintThreatValues(bp)
+    if bp.__name~='Unit' then return end
     if not bp.Defense then return end
     local pass, threat = pcall(CalculateUnitThreatValues, bp)
     if pass and threat then
@@ -175,17 +177,30 @@ function RecalculateBlueprintThreatValues(bp)
 end
 
 function RebuildBlueprintsFiles()
-    for id, bp in pairs(all_blueprints.Unit) do
-        if bp.ModInfo.RebuildBlueprints ~= false and bp.SourceFileBlueprintCount == 1 and bp.Source then
-            print('Rebuilding '..bp.Source)
-            bp.Categories = CategoriesSortClean(bp.Categories)
-            RemoveRedundantBlueprintValues(bp)
-            if RebuildBlueprintOptions.RecalculateThreat then
-                RecalculateBlueprintThreatValues(bp)
+    local toRebuild = RebuildBlueprintOptions.RebuildBpFiles
+    if type(toRebuild)~='table' then
+        print(LogEmoji'⚠️'..' RebuildBlueprintOptions.RebuildBpFiles is using old format bool rather than hash of types')
+    else
+        for bpType, bool in pairs(RebuildBlueprintOptions.RebuildBpFiles) do
+            if bool and all_blueprints[bpType] then
+                for id, bp in pairs(all_blueprints[bpType]) do
+                    if bp.ModInfo.RebuildBlueprints ~= false and bp.SourceFileBlueprintCount == 1 and bp.Source then
+                        print('Rebuilding '..bp.Source)
+                        bp.Categories = CategoriesSortClean(bp.Categories)
+                        if bpType=='Unit' then
+                            RemoveRedundantBlueprintValues(bp)
+                            if RebuildBlueprintOptions.RecalculateThreat then
+                                RecalculateBlueprintThreatValues(bp)
+                            end
+                        end
+                        local bpfile = io.open(bp.Source, 'w')
+                        bpfile:write(blueprintSerialize(bp))
+                        bpfile:close()
+                    end
+                end
+            elseif bool and not all_blueprints[bpType] then
+                print(LogEmoji'⚠️'..' RebuildBpFiles blueprint type '..bpType..' isn\'t set to be loaded in EnvironmentData.LoadExtraBlueprints')
             end
-            local bpfile = io.open(bp.Source, 'w')
-            bpfile:write(blueprintSerialize(bp))
-            bpfile:close()
         end
     end
 end

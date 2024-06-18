@@ -32,11 +32,11 @@ EnvironmentData = {
     PostModBlueprints = {},
 
     LoadExtraBlueprints = {
-        Beam = true,
-        Mesh = true,
-        Prop = true,
-        Emitter = true,
-        TrailEmitter = true,
+        Beam = false,
+        Mesh = false,
+        Prop = false,
+        Emitter = false,
+        TrailEmitter = false,
     },
 }
 
@@ -62,7 +62,15 @@ WikiOptions = {
 }
 
 RebuildBlueprintOptions = {
-    RebuildBpFiles = true,
+    RebuildBpFiles = {
+        Unit = true,
+        Beam = false,
+        Mesh = false,
+        Prop = false,
+        Emitter = false,
+        Projectile = false,
+        TrailEmitter = false,
+    },
     RemoveUnusedValues = true,
     CleanupBuildOnLayerCaps = true,
     CleanupGeneralBackgroundIcon = true,
