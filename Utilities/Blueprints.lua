@@ -62,7 +62,7 @@ function projSectionId(id) return formatKey(projShortId(id)) end
 --[[ Blueprint loading                                                      ]]--
 --[[ ---------------------------------------------------------------------- ]]--
 local function LogExcludedBlueprint(id, bp)
-    if getmetatable(bp).__name == 'Unit' or getmetatable(bp).__name == 'Projectile' then
+    if bp.__name == 'Unit' or bp.__name == 'Projectile' or EnvironmentData.LoadExtraBlueprints[bp.__name] then
         TotalIgnoredBlueprints = TotalIgnoredBlueprints + 1
         if Logging.ExcludedBlueprints then
             print(LogEmoji'⚠️'..' Excluding '..id,
@@ -114,6 +114,12 @@ local function RegisterBlueprintsFromFile(dir, file, modinfo)
             meta.ID = projSectionId(file)
             all_projectiles[bp.id] = bp
             modinfo.Projectiles = (modinfo.Projectiles or 0)+1
+
+        elseif EnvironmentData.LoadExtraBlueprints[bp.__name] then
+            meta.id = longID(filedir, modinfo)
+            meta.ID = projSectionId(file)
+            all_blueprints[bp.__name] = all_blueprints[bp.__name] or {}
+            all_blueprints[bp.__name][bp.id] = bp
 
         else
             LogExcludedBlueprint(id, bp)

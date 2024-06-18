@@ -112,6 +112,10 @@ don't have one, it at very least needs to be a valid folder. Use forward slashes
     If you don't have such a document, you can remove the `ExtraData` field or
     set it to `false`.
 
+  * `LoadExtraBlueprints`, optional, hash of extra blueprint types to actually load.
+    `Unit` and `Projectile` are loaded by default, this allows loading of `Beam`,
+    `Mesh`, `Prop`, `Emitter`, and `TrailEmitter` blueprints.
+
   * `base64`, optional, a table of flags for encoding image data as base 64. The
     only accepted flag is currently `UnitIcons`, because after testing, GitHub
     wiki markdown strips base64 `src` fields of images, so it's not actually useful

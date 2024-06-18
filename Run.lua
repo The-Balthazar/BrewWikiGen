@@ -30,6 +30,14 @@ EnvironmentData = {
 
     PreModBlueprints = {},
     PostModBlueprints = {},
+
+    LoadExtraBlueprints = {
+        Beam = true,
+        Mesh = true,
+        Prop = true,
+        Emitter = true,
+        TrailEmitter = true,
+    },
 }
 
 WikiOptions = {
