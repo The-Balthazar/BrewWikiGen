@@ -79,6 +79,10 @@ local Sandboxes = {
                 return env
             end
         end
+        env.table.empty = function(t)
+            if type(t) ~= 'table' then return true end
+            return next(t) == nil
+        end
         return env
     end,
     Blueprint = function()
