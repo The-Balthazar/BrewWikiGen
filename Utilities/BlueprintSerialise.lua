@@ -288,7 +288,7 @@ local tableNameMap = {
     Prop       = 'PropBlueprint',
     Emitter    = 'EmitterBlueprint',
     Projectile = 'ProjectileBlueprint',
-    Trail      = 'TrailEmitterBlueprint',
+    TrailEmitter = 'TrailEmitterBlueprint',
     Unit       = 'UnitBlueprint',
     Sound      = 'Sound',
 }
