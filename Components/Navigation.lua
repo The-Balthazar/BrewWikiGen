@@ -248,6 +248,7 @@ function GenerateHomePage()
     local colLimit = 6
 
     local numMods = #UnitMods
+    assert(numMods>0,"Homepage tried to generate with 0 entries.")
     local rows = math.ceil(numMods/colLimit)
     local col = math.floor(numMods/rows)
     local extra = rows - (numMods % rows)
