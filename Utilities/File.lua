@@ -302,7 +302,7 @@ function OutputAsset(dir, base64)
                 mkdir = string.gsub(mkdir, '/', '\\')
             end
             printif(Logging.FileAssetCopies, 'Creating directory', mkdir)
-            os.execute('mkdir "'..mkdir..'"')
+            os.execute('mkdir -p "'..mkdir..'"')
         end
         printif(Logging.FileAssetCopies, 'Copying asset to', OutputDirectory..dir)
         local file = output or io.open(OutputDirectory..dir, 'wb')
