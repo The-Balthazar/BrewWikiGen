@@ -297,7 +297,10 @@ function OutputAsset(dir, base64)
     if dir and not OutputAssets[dir] and not FileExists(OutputDirectory..dir) and FileExists(WikiGeneratorDirectory..dir) then
         local output = io.open(OutputDirectory..dir, 'wb')
         if not output then
-            local mkdir = string.gsub(OutputDirectory..string.match(dir, '(.*)/'), '/', '\\')
+            local mkdir = OutputDirectory..string.match(dir, '(.*)/')
+            if package.config:sub(1,1) == '\\' then
+                mkdir = string.gsub(mkdir, '/', '\\')
+            end
             printif(Logging.FileAssetCopies, 'Creating directory', mkdir)
             os.execute('mkdir "'..mkdir..'"')
         end
