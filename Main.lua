@@ -61,7 +61,8 @@ function GeneratorMain(Output)
     -- Env data
     if EnvironmentData.LOC       then safecall(LoadLocalization,   EnvironmentData.LOC) end
     if EnvironmentData.Lua       then safecall(LoadHelpStrings,    EnvironmentData.Lua)
-                                      safecall(LoadAdjacencyBuffs, EnvironmentData.Lua) end
+                                      safecall(LoadBuffs,          EnvironmentData.Lua, 'lua/sim/AdjacencyBuffs.lua')
+                                      safecall(LoadBuffs,          EnvironmentData.Lua, 'lua/sim/BuffDefinitions.lua') end
     if EnvironmentData.location  then safecall(LoadBlueprints,     EnvironmentData) end
 
     for i, dir in ipairs(ModDirectories) do
@@ -72,7 +73,8 @@ function GeneratorMain(Output)
     for i, mod in ipairs(__active_mods) do
         safecall(LoadModLocalization, mod.location)
         safecall(LoadModHelpStrings, mod.location)
-        safecall(LoadAdjacencyBuffs, mod.location..'hook/')
+        safecall(LoadBuffs, mod.location..'hook/', 'lua/sim/AdjacencyBuffs.lua')
+        safecall(LoadBuffs, mod.location..'hook/', 'lua/sim/BuffDefinitions.lua')
         safecall(LoadBlueprints, mod)
     end
 

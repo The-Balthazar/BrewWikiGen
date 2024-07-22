@@ -769,7 +769,8 @@ function UnitBodytextSectionData(bp)
 
                             local spacer = #sortedBuffs>1 and '\n    * ' or ''
                             --table.insert(text, spacer)
-                            table.insert(text, bp.Defense.MaxHealth and iconText('Health', '+'..formatNumber(bp.Defense.MaxHealth / 10 * i) ) or 'error:vet defined and no defense defined')
+                            local VetHealth = (Buffs[('VeterancyHealth%d'):format(i)].Affects.MaxHealth.Mult or (1+0.1*i))-1
+                            table.insert(text, bp.Defense.MaxHealth and iconText('Health', '+'..formatNumber(bp.Defense.MaxHealth * VetHealth) ) or 'error:vet defined and no defense defined')
 
                             for i, sortedbuff in ipairs(sortedBuffs) do
                                 local buffname = sortedbuff[1]

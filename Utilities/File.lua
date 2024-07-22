@@ -258,9 +258,9 @@ function LoadHelpStrings(dir)
     if Logging.HelpStringsLoaded then print(log) end
 end
 
-function LoadAdjacencyBuffs(dir)
+function LoadBuffs(dir, file)
 
-    local env = GetSandboxedLuaFile(dir..'lua/sim/AdjacencyBuffs.lua', 'Buff')
+    local env = GetSandboxedLuaFile(dir..file, 'Buff')
 
     if env then
         for i, v in ipairs(env.Buffs) do
@@ -272,7 +272,7 @@ function LoadAdjacencyBuffs(dir)
             end
         end
     end
-    local log = '  Preloading: Adjacency Buffs'..(env and LogEmoji'🆗' or LogEmoji'❌')
+    local log = '  Preloading: '..file..(env and LogEmoji'🆗' or LogEmoji'❌')
 
     if Logging.BuffsLoaded then print(log) end
 end
