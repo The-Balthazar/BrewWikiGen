@@ -760,7 +760,7 @@ function UnitBodytextSectionData(bp)
                                     table.insert(sortedBuffs, {buffname, buffD})
                                 end
                             end
-                            table.sort(sortedBuffs)
+                            table.sort(sortedBuffs, function(a,b) return a[1]<b[1] end)
                             if bp.Buffs.Regen then
                                 table.insert(sortedBuffs, 1, {'Regen', bp.Buffs.Regen})
                             end
