@@ -184,7 +184,7 @@ function UnitBodytextSectionData(bp)
                         if numberBuffsTotal == 1 and numberAffectsTotal == 1 then
                             local buff = Buffs[AdjacencyBuffs[1]]
                             local name, effect = next(buff.Affects)
-                            local buffcat = buff.EntityCategory and '`'..buff.EntityCategory..'`' or buff.ParsedEntityCategory[1] or '`error`'
+                            local buffcat = buff.EntityCategory and '`'..buff.EntityCategory..'`' or buff.ParsedEntityCategory or '`error`'
                             text = text.."\n\n"..adjline..' This gives '..GetEffectVal(effect)..' '..(BuffAffectsNames[name] or name)..' to '..buffcat..' units.'
 
                         else
@@ -196,7 +196,7 @@ function UnitBodytextSectionData(bp)
                             for i, buffName in ipairs(AdjacencyBuffs) do
                                 local buff = Buffs[buffName]
                                 if buff then
-                                    local entCat = (buff.EntityCategory or buff.ParsedEntityCategory[1] or '`error`')
+                                    local entCat = (buff.EntityCategory and '`'..buff.EntityCategory..'`' or buff.ParsedEntityCategory or '`error`')
                                     if not cats[entCat] then
                                         cats[entCat] = {}
                                         table.insert(catOrder, entCat)
@@ -209,7 +209,7 @@ function UnitBodytextSectionData(bp)
                                 local catSet = cats[cat]
                                 local buffInfo = Infobox{
                                     Style = 'detail-left',
-                                    Header = {'<code>'..cat..'</code>'},
+                                    Header = {(cat:gsub('%b``', function(a) return '<code>'..a:sub(2,-2)..'</code>' end))},
                                     Data = {},
                                 }
                                 for i, buff in ipairs(catSet) do

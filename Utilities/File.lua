@@ -16,11 +16,12 @@ end
 
 local categories = setmetatable({},{
     __index = function(self, key)
+        local function S(a) return type(a)=='table' and a[1] or a end
         self[key] = setmetatable({'`'..key..'`'}, {
-            __add = function(a, b) a[1] = '('..a[1]..' + '..b[1]..')' return a end,
-            __sub = function(a, b) a[1] = '('..a[1]..' - '..b[1]..')' return a end,
-            __mul = function(a, b) a[1] = '('..a[1]..' × '..b[1]..')' return a end,
-            __div = function(a, b) a[1] = '('..a[1]..' ÷ '..b[1]..')' return a end,
+            __add = function(a, b) return '('..S(a)..' + '..S(b)..')' end,
+            __sub = function(a, b) return '('..S(a)..' - '..S(b)..')' end,
+            __mul = function(a, b) return '('..S(a)..' × '..S(b)..')' end,
+            __div = function(a, b) return '('..S(a)..' ÷ '..S(b)..')' end,
         })
         return self[key]
     end
