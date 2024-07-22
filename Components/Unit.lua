@@ -31,13 +31,15 @@ function GenerateUnitPages()
 
             local md = io.open(OutputDirectory..stringSanitiseFilename(bp.ID)..'.md', "w")
             md:write(
-                UnitHeaderString(bp)..
-                tostring(UnitInfobox(bp))..
-                UnitBodytextLeadText(bp)..
-                TableOfContents(BodyTextSections)..
-                tostring(BodyTextSections)..
-                UnitPageCategories(bp)..
-                "\n"
+                table.concat({
+                    UnitHeaderString(bp),
+                    tostring(UnitInfobox(bp)),
+                    UnitBodytextLeadText(bp),
+                    TableOfContents(BodyTextSections),
+                    tostring(BodyTextSections),
+                    UnitPageCategories(bp),
+                    "\n"
+                })
             )
             md:close()
         end
