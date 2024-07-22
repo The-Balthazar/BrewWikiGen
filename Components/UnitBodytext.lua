@@ -743,20 +743,22 @@ function UnitBodytextSectionData(bp)
             Data = function(bp)
                 local text
                 if not bp.Weapon or (bp.Weapon and #bp.Weapon == 1 and IsDeathWeapon(bp.Weapon[1])) then
-                    text = "This unit has defined veteran levels, despite not having any weapons. Other effects can still give experience towards those levels though, which are as follows; note they replace each other by default:\n"
+                    text = {"This unit has defined veteran levels, despite not having any weapons. Other effects can still give experience towards those levels though, which are as follows; note they replace each other by default:\n"}
                 else
-                    text = "Note: Each veteran level buff replaces the previous by default; values are shown here as written.\n"
+                    text = {"Note: Each veteran level buff replaces the previous by default; values are shown here as written.\n"}
                 end
 
                 for i = 1, 5 do
                     local lev = 'Level'..i
                     if bp.Veteran[lev] then
-                        text = text .. "\n"..i..'. '..bp.Veteran[lev]..' kills gives: '..(bp.Defense and bp.Defense.MaxHealth and iconText('Health', '+'..formatNumber(bp.Defense.MaxHealth / 10 * i) ) or 'error:vet defined and no defense defined' )
+                        table.insert(text,
+                            table.concat{"\n", i, '. ', bp.Veteran[lev],' kills gives: '}
+                        )
                         if bp.Buffs then
 
                             local sortedBuffs = {}
                             for buffname, buffD in pairs(bp.Buffs) do
-                                if buffname ~= 'Regen' then
+                                if buffname ~= 'Regen' and buffname ~= 'MaxHealth' then
                                     table.insert(sortedBuffs, {buffname, buffD})
                                 end
                             end
@@ -765,21 +767,27 @@ function UnitBodytextSectionData(bp)
                                 table.insert(sortedBuffs, 1, {'Regen', bp.Buffs.Regen})
                             end
 
+                            local spacer = #sortedBuffs>1 and '\n    * ' or ''
+                            --table.insert(text, spacer)
+                            table.insert(text, bp.Defense.MaxHealth and iconText('Health', '+'..formatNumber(bp.Defense.MaxHealth / 10 * i) ) or 'error:vet defined and no defense defined')
+
                             for i, sortedbuff in ipairs(sortedBuffs) do
                                 local buffname = sortedbuff[1]
                                 local buffD = sortedbuff[2]
                                 if buffD[lev] then
                                     if buffname == 'Regen' then
-                                        text = text..' (+'..buffD[lev]..'/s)'
+                                        table.insert(text, ' (+'..buffD[lev]..'/s)')
                                     else
-                                        text = text..' '..buffname..': '..buffD[lev]
+                                        buffname = formatKey(buffname)
+                                        table.insert(text, spacer)
+                                        table.insert(text, table.concat{' ', buffname:sub(1,1), buffname:sub(2):lower(), ': ', buffD[lev]})
                                     end
                                 end
                             end
                         end
                     end
                 end
-                return text
+                return table.concat(text)
             end
         },
         {
