@@ -271,7 +271,7 @@ function UnitBodytextSectionData(bp)
                 end
                 if merge_blueprints[bp.id] then
                     if #merge_blueprints[bp.id] == 1 then
-                        text = text.."This unit has the folloing blueprint merge affecting it:\n"
+                        text = text.."This unit has the following blueprint merge affecting it:\n"
                     else
                         text = text.."This unit is affected by the following blueprint merges:\n"
                     end
