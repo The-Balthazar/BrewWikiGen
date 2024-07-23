@@ -243,48 +243,53 @@ function UnitBodytextSectionData(bp)
             '<LOC wiki_sect_balance>Balance',
             check = bp.WikiBalance or merge_blueprints[bp.id],
             Data = function(bp)
-                local text = ''
+                local text = {}
                 if bp.WikiBalance then
-                    text = WikiOptions.BalanceNote and LOC'<LOC wiki_balance_dynamic_script>A dynamic balance script changes the stats of this unit on game launch based on the stats of other units.' or ''
+                    if WikiOptions.BalanceNote then
+                        table.insert(text, LOC'<LOC wiki_balance_dynamic_script>A dynamic balance script changes the stats of this unit on game launch based on the stats of other units.')
+                    end
 
                     if bp.WikiBalance.Affects then
-                        text = (text ~= '' and text..' ' or '')..string.format(LOC((#bp.WikiBalance.Affects == 1) and
+                        if text[1] then table.insert(text, ' ') end
+                        table.insert(text, string.format(LOC((#bp.WikiBalance.Affects == 1) and
                             '<LOC wiki_balance_stats_affected_singular>Stats effected are from the %s blueprint section' or
                             '<LOC wiki_balance_stats_affected>Stats effected are from the %s blueprint sections'
-                        ), stringConcatOxfordComma(bp.WikiBalance.Affects, xml:code{}))
+                        ), stringConcatOxfordComma(bp.WikiBalance.Affects, xml:code{})))
 
                         if bp.WikiBalance.ReferenceIDs then
                             local refNum = #bp.WikiBalance.ReferenceIDs
 
-                            text = text..string.format(LOC(refNum == 1 and '<LOC wiki_balance_based> and are based on %s' or
+                            table.insert(text, string.format(LOC(refNum == 1 and '<LOC wiki_balance_based> and are based on %s' or
                             refNum == 2 and '<LOC wiki_balance_based_average> and are based on an average of %s and %s'),
                             unitDescLink(bp.WikiBalance.ReferenceIDs[1]),
-                            unitDescLink(bp.WikiBalance.ReferenceIDs[2]))
+                            unitDescLink(bp.WikiBalance.ReferenceIDs[2])))
                         end
 
-                        text = text..".\n\n"
+                        table.insert(text, ".\n\n")
                     end
-                    text = text..(WikiOptions.BalanceNote and LOC(WikiOptions.BalanceNote) or '')
+                    if WikiOptions.BalanceNote then
+                        table.insert(text, LOC(WikiOptions.BalanceNote))
+                    end
                 end
                 if bp.WikiBalance and merge_blueprints[bp.id] then
-                    text = text.."\n\n"
+                    table.insert(text, "\n\n")
                 end
                 if merge_blueprints[bp.id] then
                     if #merge_blueprints[bp.id] == 1 then
-                        text = text.."This unit has the following blueprint merge affecting it:\n"
+                        table.insert(text, "This unit has the following blueprint merge affecting it:\n")
                     else
-                        text = text.."This unit is affected by the following blueprint merges:\n"
+                        table.insert(text, "This unit is affected by the following blueprint merges:\n")
                     end
                     -- This should have been recursive.
                     for i, mergebp in ipairs(merge_blueprints[bp.id]) do
-                        text = text..tostring(Infobox{
+                        table.insert(text, tostring(Infobox{
                             Style = 'detail-left',
                             Header = { 'From '..xml:i(mergebp.ModInfo.name) },
                             Data = InfoboxFormatRawBlueprint(mergebp),
-                        })
+                        }))
                     end
                 end
-                return text
+                return table.concat(text)
             end
         },
         {
