@@ -59,11 +59,14 @@ function RemoveRedundantBlueprintValues(bp)
 
     -- Build on layer caps
     if RebuildBlueprintOptions.CleanupBuildOnLayerCaps then
-        if bp.Physics.MotionType ~= 'RULEUMT_None' -- Only structures use BuildOnLayerCaps
-        or BuildOnLayerBitwiseValue(bp.Physics.BuildOnLayerCaps) == 1 then -- This is the undefined default
+        if bp.Physics.MotionType ~= 'RULEUMT_None' then -- Only structures use BuildOnLayerCaps
             bp.Physics.BuildOnLayerCaps = nil
         else
-            NilFalseValuesInFlagList(bp.Physics.BuildOnLayerCaps)
+            if not bp.Physics.BuildOnLayerCaps then -- Set the undefined default so mods can merge into it
+                bp.Physics.BuildOnLayerCaps = { LAYER_Land = true }
+            else
+                NilFalseValuesInFlagList(bp.Physics.BuildOnLayerCaps)
+            end
         end
     end
 
